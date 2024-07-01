@@ -1,0 +1,25 @@
+diff --git a/makefile b/makefile
+index 145a32f3b..c05fa4b91 100644
+--- a/makefile
++++ b/makefile
+@@ -12,7 +12,7 @@ PFLOTRANCHEM_LIB="${PFLOTRAN_DIR_LOC}/src/pflotran/libpflotranchem.a"
+ # build pflotran and libpflotran.a
+ all:
+ 	@(cd ${PFLOTRAN_DIR_LOC}/src/pflotran && \
+-           ${MAKE} pflotran libpflotran.a libpflotranchem.a PETSC_DIR=${PETSC_DIR_LOC} PETSC_ARCH=${PETSC_ARCH_LOC}) 2>&1 | tee make.log
++           ${MAKE} -j pflotran libpflotran.a libpflotranchem.a PETSC_DIR=${PETSC_DIR_LOC} PETSC_ARCH=${PETSC_ARCH_LOC}) 2>&1 | tee make.log
+ 	@if [ -e "${PFLOTRAN_EXE}" -a -e "${PFLOTRAN_LIB}" -a -e "${PFLOTRANCHEM_LIB}" ] ; then \
+           echo "pflotran, libpflotran.a, and libpflotranchem.a successfully built." ;\
+         else \
+diff --git a/src/pflotran/makefile b/src/pflotran/makefile
+index 0dfcf41a4..0e7b52e12 100644
+--- a/src/pflotran/makefile
++++ b/src/pflotran/makefile
+@@ -185,6 +185,7 @@ endif
+ ifdef have_hdf5
+ LIBS +=  -L${HDF5_LIB} -lhdf5_fortran -lhdf5 -lz 
+ endif
++LIBS +=  -L${HDF5_LIB} -lhdf5_fortran -lhdf5_hl_fortran -lhdf5 -lz
+ 
+ # Set this accordingly on your platform
+ # SCORPIO_DIR=${HOME}/soft/scorpio
