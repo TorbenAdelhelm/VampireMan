@@ -5,6 +5,8 @@ import argparse
 import logging
 import pathlib
 
+import vary_my_params.prepare_simulation.pflotran.pflotran_in_renderer as pflotran
+
 
 def main():
     logging.info("staring up")
@@ -16,3 +18,5 @@ def main():
 
     args = parser.parse_args()
     print(args)
+
+    pflotran.render()
