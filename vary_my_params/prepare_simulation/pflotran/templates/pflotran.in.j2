@@ -14,8 +14,8 @@ SUBSURFACE
 #=========================== times ============================================
 
   TIME
-    FINAL_TIME {{ time.final_time }} y
-    MAXIMUM_TIMESTEP_SIZE 1.0 y
+    FINAL_TIME {{ time.final_time }} year
+    MAXIMUM_TIMESTEP_SIZE 1.0 year
   END
 
   REFERENCE_PRESSURE 101325. #[Pa]
@@ -222,7 +222,7 @@ SUBSURFACE
 
   OUTPUT
     SNAPSHOT_FILE
-      #PERIODIC TIME 0.00001 y BETWEEN 0. y AND 0.00010 y
+      #PERIODIC TIME 0.00001 y BETWEEN 0. y AND 0.00010 year
       TIMES y 0.1 1. 5.
       FORMAT HDF5 #VTK
       PRINT_COLUMN_IDS
