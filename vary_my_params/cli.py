@@ -15,8 +15,15 @@ def main():
     parser.add_argument("--config", type=pathlib.Path, default="./config.yaml", help="number of datapoints to generate")
     parser.add_argument("--datapoints", type=int, default=1, help="number of datapoints to generate")
     parser.add_argument("--name", type=str, default="default", help="name of the simulation")
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="enable debug logging",
+    )
 
     args = parser.parse_args()
-    print(args)
+
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
 
     pflotran.render()
