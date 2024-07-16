@@ -5,16 +5,18 @@ import argparse
 import logging
 import pathlib
 
-import vary_my_params.prepare_simulation.pflotran.pflotran_in_renderer as pflotran
+from vary_my_params.pipeline import run
 
 
 def main():
     logging.info("staring up")
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--config", type=pathlib.Path, default="./config.yaml", help="number of datapoints to generate")
+    parser.add_argument("--config-file", type=pathlib.Path, help="number of datapoints to generate")
     parser.add_argument("--datapoints", type=int, default=1, help="number of datapoints to generate")
     parser.add_argument("--name", type=str, default="default", help="name of the simulation")
+    parser.add_argument("--workflow", type=str, default="pflotran", help="name of the simulation workflow")
+    parser.add_argument("--stages", type=str, default="all", help="name of the pipeline stages to run")
     parser.add_argument(
         "--verbose",
         action="store_true",
@@ -26,4 +28,4 @@ def main():
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    pflotran.render()
+    run(args)

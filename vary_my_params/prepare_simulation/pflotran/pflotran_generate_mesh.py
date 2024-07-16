@@ -31,7 +31,8 @@ def write_mesh_file(settings: dict[str, dict[str, list[int]]], path_to_output: s
         faceArea = cellXWidth**2
     else:
         logging.error(
-            "The grid is not cubic - look at create_grid_unstructured.py OR 2D case and settings.yaml depth for z is not adapted"
+            "The grid is not cubic - look at create_grid_unstructured.py OR "
+            + "2D case and settings.yaml depth for z is not adapted"
         )
         raise ValueError("Grid is not cubic")
 
