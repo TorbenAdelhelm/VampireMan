@@ -67,8 +67,32 @@
             self.packages.x86_64-linux.default
             pkgs.mpi
             pkgs.poetry
+            pkgs.nixfmt-rfc-style
+            pkgs.treefmt
             python3_env
           ];
+        };
+      };
+
+      checks.x86_64-linux = {
+        treefmt = pkgs.stdenv.mkDerivation {
+          name = "treefmtTest";
+          src = ./.;
+
+          doCheck = true;
+
+          nativeBuildInputs = [
+            pkgs.treefmt
+            pkgs.nixfmt-rfc-style
+            pkgs.ruff
+          ];
+
+          checkPhase = ''
+            treefmt --version
+            treefmt --verbose --on-unmatched=debug --no-cache --fail-on-change
+          '';
+
+          installPhase = "mkdir -p $out";
         };
       };
     };
