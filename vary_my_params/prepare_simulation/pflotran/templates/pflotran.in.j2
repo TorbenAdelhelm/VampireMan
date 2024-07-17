@@ -56,7 +56,7 @@ SUBSURFACE
     LONGITUDINAL_DISPERSIVITY 1.0       #[m]
     TRANSVERSE_DISPERSIVITY_H 0.1       #[m]
     PERMEABILITY                        #[m^2] #TESTCASE
-      EXTERNAL_FILE interim_iso_permeability.txt
+      PERM_ISO 1.3576885245230967e-09
     /
     CHARACTERISTIC_CURVES cc1
   END
@@ -71,7 +71,7 @@ SUBSURFACE
     LONGITUDINAL_DISPERSIVITY 1.0       #[m]
     TRANSVERSE_DISPERSIVITY_H 0.1       #[m]
     PERMEABILITY                        #[m^2] #TESTCASE
-      EXTERNAL_FILE interim_iso_permeability.txt
+      PERM_ISO 1.3576885245230967e-09
     /
     CHARACTERISTIC_CURVES cc1
   END
@@ -122,7 +122,11 @@ SUBSURFACE
   FILE east.ex
   END
 
-  EXTERNAL_FILE regions_hps.txt
+  REGION heatpump_inject0
+    LIST
+      1482
+    /
+  END
 
 #=========================== flow conditions ==================================
 
@@ -133,7 +137,7 @@ SUBSURFACE
     /
     DATUM 200.d0 0.d0 85.d0
     GRADIENT
-      EXTERNAL_FILE interim_pressure_gradient.txt
+      LIQUID_PRESSURE 0 -0.0024757478454929577 0
     /
     LIQUID_PRESSURE 101325.d0
     TEMPERATURE 10.6d0 C
@@ -144,19 +148,27 @@ SUBSURFACE
       TEMPERATURE DIRICHLET
     /
     RATE LIST
-      TIME_UNITS day
+      TIME_UNITS d
       DATA_UNITS m^3/s
       0.    0.
-      1.    0.00024
+      38.   0.
+      72.   0.00024
     /
+#   RATE LIST
+#     TIME_UNITS day
+#     DATA_UNITS m^3/s
+#     0.    0.
+#     1.    0.00024
+#   /
+    TEMPERATURE 15.6d0 C
 # this varies the temp over a year
-    TEMPERATURE LIST
-      TIME_UNITS year
-      DATA_UNITS C
-      0.    15.6d0 !???
-      0.5   18.0d0
-      1     15.6d0
-    /
+#   TEMPERATURE LIST
+#     TIME_UNITS year
+#     DATA_UNITS C
+#     0.    15.6d0 !???
+#     0.5   18.0d0
+#     1     15.6d0
+#   /
   /
 
 #=========================== condition couplers ===============================
@@ -178,7 +190,10 @@ SUBSURFACE
     REGION south
   /
 
-  EXTERNAL_FILE conditions_hps.txt
+  SOURCE_SINK heatpump_inject0
+    FLOW_CONDITION injection
+    REGION heatpump_inject0
+  END
 
 #=========================== stratigraphy couplers ============================
 
@@ -188,7 +203,10 @@ SUBSURFACE
   END
 
 # same but different material for hps to get a map with the hp locations alias Material_ID
-  EXTERNAL_FILE strata_hps.txt
+  STRATA
+    REGION heatpump_inject0
+    MATERIAL gravel_inj
+  END
 
 #=========================== output options ===================================
 
