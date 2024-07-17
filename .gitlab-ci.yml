@@ -1,0 +1,21 @@
+stages:
+  - lint
+  - build
+  - test
+
+# image: nixos/nix:2.18.0
+
+linting:
+  stage: lint
+  script:
+    - nix flake check
+
+build-pflotran:
+  stage: build
+  script:
+    - nix build .#pflotran
+
+flake-checks:
+  stage: test
+  script:
+    - nix flake check
