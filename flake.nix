@@ -94,6 +94,21 @@
 
           installPhase = "mkdir -p $out";
         };
+
+        ruff = pkgs.stdenv.mkDerivation {
+          name = "ruff";
+          src = ./.;
+
+          doCheck = true;
+
+          nativeBuildInputs = [ pkgs.ruff ];
+
+          checkPhase = ''
+            ruff check .
+          '';
+
+          installPhase = "mkdir -p $out";
+        };
       };
     };
 }
