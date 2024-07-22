@@ -5,10 +5,15 @@ stages:
 
 # image: nixos/nix:2.18.0
 
-linting:
+ruff:
   stage: lint
   script:
-    - nix flake check
+    - nix build .#checks.x86_64-linux.ruff
+
+treefmt:
+  stage: lint
+  script:
+    - nix build .#checks.x86_64-linux.treefmt
 
 build-pflotran:
   stage: build
