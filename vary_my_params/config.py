@@ -19,6 +19,7 @@ class Config:
     )
     steps: list[str] = field(default_factory=lambda: ["global"])
     parameters: list[dict[str, Any]] = field(default_factory=lambda: [])
+    data: list[dict[str, Any]] = field(default_factory=lambda: [])
 
     def override_with(self, other_config: "Config"):
         self.general |= other_config.general
@@ -66,7 +67,7 @@ def load_config(arguments: argparse.Namespace) -> Config:
             from .default_config import pflotran as config_module
         case _:
             logging.error("%s workflow is not yet implemented", arguments.workflow)
-            raise ValueError("Workflow not implemented")
+            raise NotImplementedError("Workflow not implemented")
 
     default_config = config_module.get_defaults()
 

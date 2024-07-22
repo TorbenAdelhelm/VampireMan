@@ -126,7 +126,7 @@
 
           checkPhase = ''
             mkdir -p temp
-            python vary_my_params/prepare_simulation/pflotran/pflotran_in_renderer.py > temp/pflotran.in
+            python -m vary_my_params > temp/pflotran.in
 
             python vary_my_params/prepare_simulation/pflotran/pflotran_generate_mesh.py
             mv mesh.uge temp

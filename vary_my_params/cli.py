@@ -5,7 +5,7 @@ import argparse
 import logging
 import pathlib
 
-from vary_my_params.pipeline import run
+from .pipeline import run
 
 
 def main():
