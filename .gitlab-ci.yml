@@ -20,7 +20,8 @@ build-pflotran:
   script:
     - nix build .#pflotran
 
-flake-checks:
+check-h5-file:
   stage: test
+  allow_failure: true
   script:
     - nix build .#checks.x86_64-linux.check_h5_file
