@@ -109,6 +109,39 @@
 
           installPhase = "mkdir -p $out";
         };
+
+        check_h5_file = pkgs.stdenv.mkDerivation {
+          name = "checkH5File";
+          src = ./.;
+
+          doCheck = true;
+
+          nativeBuildInputs = [
+            self.packages.x86_64-linux.default
+            pkgs.mpi
+            pkgs.hdf5
+            pkgs.openssh
+            python3_env
+          ];
+
+          checkPhase = ''
+            mkdir -p temp
+            python vary_my_params/prepare_simulation/pflotran/pflotran_in_renderer.py > temp/pflotran.in
+
+            python vary_my_params/prepare_simulation/pflotran/pflotran_generate_mesh.py
+            mv mesh.uge temp
+
+            cp tests/reference_files/*.ex temp
+
+            pushd temp
+            mpirun -n 1 pflotran
+            popd
+
+            h5diff -v1 temp/pflotran.h5 tests/reference_files/pflotran.h5
+          '';
+
+          installPhase = "mkdir -p $out";
+        };
       };
     };
 }
