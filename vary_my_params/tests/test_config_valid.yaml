@@ -1,0 +1,19 @@
+general:
+  interactive: false
+parameters:
+  grid:
+    data_type: array
+    input_source: manual
+    value: [64, 256, 1]
+  permeability:
+    data_type: array
+    vary: null
+    value: [1, 1, 1]
+  pressure:
+    data_type: array
+    vary: null
+    input_source: manual
+    value: [1, 1, 1]
+  none:
+    data_type: scalar
+    value: null
