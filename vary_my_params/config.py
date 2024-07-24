@@ -77,6 +77,15 @@ class Parameter:
 
         return result
 
+    def __str__(self) -> str:
+        return (
+            f"====== Parameter {self.name}\n"
+            f"       DataType: {self.data_type}\n"
+            f"       Value: {self.value}\n"
+            f"       Vary: {self.vary}\n"
+            f"       Input source: {self.input_source}\n"
+        )
+
 
 @dataclass
 class GeneralConfig:
@@ -131,6 +140,15 @@ class GeneralConfig:
             raise ValueError(f"There was additional data in config dict: {conf}")
 
         return result
+
+    def __str__(self) -> str:
+        return (
+            f"=== GeneralConfig\n"
+            f"    Interactive: {self.interactive}\n"
+            f"    Output directory: {self.output_directory}\n"
+            f"    Random seed: {self.random_seed}\n"
+            f"    Using workflow: {self.workflow}\n"
+        )
 
 
 @dataclass
@@ -203,6 +221,23 @@ class Config:
         logging.debug("Yaml: %s", yaml_values)
 
         return Config.from_dict(yaml_values)
+
+    def __str__(self) -> str:
+        parameter_strings = []
+        for name, param in self.parameters.items():
+            parameter_strings.append(str(param))
+
+        return (
+            f"=== This config will be used ===\n"
+            f"\n"
+            f"{self.general}\n"
+            f"=== Steps (in this order)\n"
+            f"    {"\n".join(self.steps)}\n"
+            f"\n"
+            f"=== Parameters\n\n"
+            f"{"\n".join(parameter_strings)}"
+            f"\n"
+        )
 
 
 def load_config(arguments: argparse.Namespace) -> Config:

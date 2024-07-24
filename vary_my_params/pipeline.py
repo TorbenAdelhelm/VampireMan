@@ -21,7 +21,6 @@ def wait_for_confirmation(config: Config, next_stage: str = ""):
 
 def run_vary_params(config: Config) -> Config:
     wait_for_confirmation(config, "Parameter variation")
-    logging.debug(config.general)
 
     match config.general.workflow:
         case Workflow.PFLOTRAN:
@@ -44,6 +43,7 @@ def run_all(config: Config):
 
 def run(args: Namespace):
     config = load_config(args)
+    print(config)
 
     match args.stages.split(","):
         case ["all"]:
