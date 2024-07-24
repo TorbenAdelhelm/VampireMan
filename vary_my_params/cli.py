@@ -18,6 +18,11 @@ def main():
     parser.add_argument("--workflow", type=str, default="pflotran", help="name of the simulation workflow")
     parser.add_argument("--stages", type=str, default="all", help="name of the pipeline stages to run")
     parser.add_argument(
+        "--non-interactive",
+        action="store_true",
+        help="don't ask for user confirmation to move to next stage",
+    )
+    parser.add_argument(
         "--verbose",
         action="store_true",
         help="enable debug logging",

@@ -11,6 +11,7 @@ class Config:
     # Need to use field here, as otherwise it would be the same dict across several objects
     general: dict[str, Any] = field(
         default_factory=lambda: {
+            "interactive": True,
             "output_directory": "./out_dir",
             # This forces every run to be reproducible by default!
             "random_seed": 0,
@@ -81,6 +82,10 @@ def load_config(arguments: argparse.Namespace) -> Config:
         user_config = Config.from_yaml(config_file)
         run_config.override_with(user_config)
 
+    # Also consider arguments from command line
+    run_config.general["interactive"] = not arguments.non_interactive
+    if arguments.non_interactive:
+        logging.debug("Running non-interactively")
 
     logging.debug("Config: %s", run_config)
 
