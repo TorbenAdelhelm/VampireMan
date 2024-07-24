@@ -21,3 +21,18 @@ def get_defaults() -> Config:
     )
 
     return config
+
+
+def ensure_value(config, name):
+    value = config.parameters.get(name)
+    if value is None:
+        raise ValueError(f"`{name}` must not be None")
+
+
+def ensure_config_is_valid(config: Config):
+    for item in [
+        "permeability",
+        "cell_resolution",
+        "number_cells",
+    ]:
+        ensure_value(config, item)

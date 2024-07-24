@@ -2,6 +2,7 @@ import logging
 from argparse import Namespace
 
 from .config import Config, Workflow, load_config
+from .load_config.pflotran import ensure_config_is_valid
 from .prepare_simulation.pflotran.pflotran_in_renderer import render
 from .vary_params import pflotran
 
@@ -37,6 +38,7 @@ def run_render(config: Config):
 
 def run(args: Namespace):
     config = load_config(args)
+    ensure_config_is_valid(config)
     print(config)
     logging.debug("Will run all stages")
     config = run_vary_params(config)
