@@ -3,9 +3,6 @@ from ..config import Config
 
 def get_defaults():
     return Config(
-        general={
-            "workflow": "pflotran",
-        },
         parameters={
             "number_cells": {
                 "data_type": "array",

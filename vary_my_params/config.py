@@ -15,19 +15,17 @@ class Config:
             "output_directory": "./out_dir",
             # This forces every run to be reproducible by default!
             "random_seed": 0,
-            "workflow": "dummy",
+            "workflow": "pflotran",
         }
     )
     steps: list[str] = field(default_factory=lambda: ["global"])
-    parameters: list[dict[str, Any]] = field(default_factory=lambda: [])
-    data: list[dict[str, Any]] = field(default_factory=lambda: [])
+    parameters: dict[str, Any] = field(default_factory=lambda: {})
+    data: dict[str, Any] = field(default_factory=lambda: {})
 
     def override_with(self, other_config: "Config"):
         self.general |= other_config.general
-        # XXX: If the following lines are commented in, we dont
-        # override the params and steps if other_config has empty values
-        self.parameters = other_config.parameters  # or self.parameters
-        self.steps = other_config.steps  # or self.steps
+        self.parameters |= other_config.parameters
+        self.steps = other_config.steps or self.steps
 
     @staticmethod
     def from_yaml(config_file_path: str) -> "Config":
@@ -44,7 +42,7 @@ class Config:
         user_config = Config()
 
         user_config.general = yaml_values.get("general", {})
-        user_config.parameters = yaml_values.get("parameters", [])
+        user_config.parameters = yaml_values.get("parameters", {})
         user_config.steps = yaml_values.get("steps", [])
 
         return user_config
