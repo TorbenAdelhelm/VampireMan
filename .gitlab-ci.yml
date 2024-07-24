@@ -1,7 +1,8 @@
 stages:
   - lint
   - build
-  - test
+  - unit-test
+  - integration-test
 
 # image: nixos/nix:2.18.0
 
@@ -20,8 +21,13 @@ build-pflotran:
   script:
     - nix build .#pflotran
 
+pytest:
+  stage: unit-test
+  script:
+    - nix build .#checks.x86_64-linux.pytest
+
 check-h5-file:
-  stage: test
+  stage: integration-test
   allow_failure: true
   script:
     - nix build .#checks.x86_64-linux.check_h5_file

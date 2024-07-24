@@ -75,7 +75,7 @@
       };
 
       checks.x86_64-linux = {
-        treefmt = pkgs.stdenv.mkDerivation {
+        treefmt = pkgs.stdenvNoCC.mkDerivation {
           name = "treefmtTest";
           src = ./.;
 
@@ -95,7 +95,7 @@
           installPhase = "mkdir -p $out";
         };
 
-        ruff = pkgs.stdenv.mkDerivation {
+        ruff = pkgs.stdenvNoCC.mkDerivation {
           name = "ruff";
           src = ./.;
 
@@ -110,7 +110,7 @@
           installPhase = "mkdir -p $out";
         };
 
-        check_h5_file = pkgs.stdenv.mkDerivation {
+        check_h5_file = pkgs.stdenvNoCC.mkDerivation {
           name = "checkH5File";
           src = ./.;
 
@@ -132,6 +132,21 @@
             popd
 
             h5diff -v1 out_dir/pflotran.h5 tests/reference_files/pflotran.h5
+          '';
+
+          installPhase = "mkdir -p $out";
+        };
+
+        pytest = pkgs.stdenvNoCC.mkDerivation {
+          name = "pytest";
+          src = ./.;
+
+          doCheck = true;
+
+          nativeBuildInputs = [ python3_env ];
+
+          checkPhase = ''
+            pytest
           '';
 
           installPhase = "mkdir -p $out";
