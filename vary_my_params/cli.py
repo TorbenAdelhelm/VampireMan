@@ -16,7 +16,6 @@ def main():
     parser.add_argument("--datapoints", type=int, default=1, help="number of datapoints to generate")
     parser.add_argument("--name", type=str, default="default", help="name of the simulation")
     parser.add_argument("--workflow", type=str, default="pflotran", help="name of the simulation workflow")
-    parser.add_argument("--stages", type=str, default="all", help="name of the pipeline stages to run")
     parser.add_argument(
         "--non-interactive",
         action="store_true",
