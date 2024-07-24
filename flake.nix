@@ -125,19 +125,13 @@
           ];
 
           checkPhase = ''
-            mkdir -p temp
-            python -m vary_my_params --non-interactive > temp/pflotran.in
+            python -m vary_my_params --non-interactive
 
-            python vary_my_params/prepare_simulation/pflotran/pflotran_generate_mesh.py
-            mv mesh.uge temp
-
-            cp tests/reference_files/*.ex temp
-
-            pushd temp
+            pushd out_dir
             mpirun -n 1 pflotran
             popd
 
-            h5diff -v1 temp/pflotran.h5 tests/reference_files/pflotran.h5
+            h5diff -v1 out_dir/pflotran.h5 tests/reference_files/pflotran.h5
           '';
 
           installPhase = "mkdir -p $out";

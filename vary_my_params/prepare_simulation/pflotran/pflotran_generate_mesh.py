@@ -2,29 +2,14 @@ import logging
 import os
 
 
-def generate_meshes():
-    settings = {
-        # Number of cells in the grid
-        "number_cells": [
-            64,
-            256,
-            1,
-        ],
-        # Size of one cell in the grid, given in meters
-        "cell_resolution": [
-            5,
-            5,
-            5,
-        ],
-    }
+def write_mesh_and_border_files(config: dict[str, dict[str, list[int]]], output_dir: str) -> None:
+    write_lines_to_file("mesh.uge", render_mesh(config), output_dir)
 
-    write_lines_to_file("mesh.uge", render_mesh(settings))
-
-    north, east, south, west = render_borders(settings)
-    write_lines_to_file("north.ex", north)
-    write_lines_to_file("east.ex", east)
-    write_lines_to_file("south.ex", south)
-    write_lines_to_file("west.ex", west)
+    north, east, south, west = render_borders(config)
+    write_lines_to_file("north.ex", north, output_dir)
+    write_lines_to_file("east.ex", east, output_dir)
+    write_lines_to_file("south.ex", south, output_dir)
+    write_lines_to_file("west.ex", west, output_dir)
 
 
 def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: str = "."):
@@ -139,7 +124,3 @@ def render_borders(settings: dict[str, dict[str, list[int]]]):
             output_string_west.append(f"\n{cellID_west} {xloc_west} {yloc} {zloc} {faceArea}")
 
     return (output_string_north, output_string_east, output_string_south, output_string_west)
-
-
-if __name__ == "__main__":
-    generate_meshes()
