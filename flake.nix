@@ -1,26 +1,23 @@
 {
   description = "Pflotran flake";
+
   inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+  inputs.poetry2nix.url = "github:nix-community/poetry2nix";
+
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      poetry2nix,
+    }:
     let
       pkgs = import nixpkgs {
         system = "x86_64-linux";
         config.allowUnfree = true;
       };
-      python3_env = pkgs.python3.withPackages (
-        ps: with ps; [
-          h5py
-          jinja2
-          matplotlib
-          noise
-          numpy
-          pytest
-          pyyaml
-          scipy
-          tqdm
-        ]
-      );
+
+      inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryEnv;
+      python3_env = mkPoetryEnv { projectDir = ./.; };
     in
     {
       packages.x86_64-linux = rec {
@@ -62,6 +59,7 @@
 
         inherit python3_env;
       };
+
       devShells.x86_64-linux = {
         default = pkgs.mkShell {
           PFLOTRAN_DIR = self.packages.x86_64-linux.default;
