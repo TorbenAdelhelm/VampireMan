@@ -62,6 +62,7 @@ def load_config(arguments: argparse.Namespace) -> Config:
     # except Exception as err:
     #     logging.error(err)
 
+    # Get workflow specific defaults
     match arguments.workflow:
         case "pflotran":
             from .default_config import pflotran as config_module
@@ -69,19 +70,18 @@ def load_config(arguments: argparse.Namespace) -> Config:
             logging.error("%s workflow is not yet implemented", arguments.workflow)
             raise NotImplementedError("Workflow not implemented")
 
-    default_config = config_module.get_defaults()
+    workflow_specific_default_config = config_module.get_defaults()
 
     run_config = Config()
-    run_config.override_with(default_config)
+    run_config.override_with(workflow_specific_default_config)
 
+    # Load config from file if provided
     config_file = arguments.config_file
-    if config_file is None:
-        logging.debug("No config file given, using default config")
-        logging.debug("Config: %s", run_config)
-        return run_config
+    if config_file is not None:
+        user_config = Config.from_yaml(config_file)
+        run_config.override_with(user_config)
 
-    user_config = Config.from_yaml(config_file)
-    run_config.override_with(user_config)
+
     logging.debug("Config: %s", run_config)
 
     return run_config
