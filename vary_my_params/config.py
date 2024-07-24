@@ -256,7 +256,7 @@ def load_config(arguments: argparse.Namespace) -> Config:
     # Get workflow specific defaults
     match arguments.workflow:
         case "pflotran":
-            from .default_config import pflotran as config_module
+            from .load_config import pflotran as config_module
         case _:
             logging.error("%s workflow is not yet implemented", arguments.workflow)
             raise NotImplementedError("Workflow not implemented")
