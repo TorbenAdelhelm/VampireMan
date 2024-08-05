@@ -127,11 +127,11 @@
           checkPhase = ''
             python -m vary_my_params --non-interactive
 
-            pushd out_dir
+            pushd out_dir/datapoint-0
             mpirun -n 1 pflotran
             popd
 
-            h5diff -v1 out_dir/pflotran.h5 tests/reference_files/pflotran.h5
+            h5diff -v1 out_dir/datapoint-0/pflotran.h5 tests/reference_files/pflotran.h5
           '';
 
           installPhase = "mkdir -p $out";

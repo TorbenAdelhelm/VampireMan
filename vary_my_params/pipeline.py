@@ -4,6 +4,7 @@ from argparse import Namespace
 from .config import Config, Workflow, load_config
 from .load_config.pflotran import ensure_config_is_valid
 from .prepare_simulation.pflotran.pflotran_in_renderer import render
+from .run_simulation.pflotran import run_simulation as run_pflotran
 from .vary_params import pflotran
 
 

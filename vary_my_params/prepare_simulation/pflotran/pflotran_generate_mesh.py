@@ -1,18 +1,21 @@
 import logging
 import os
+from pathlib import Path
+
+from ...config import Parameter
 
 
-def write_mesh_and_border_files(config: dict[str, dict[str, list[int]]], output_dir: str) -> None:
-    write_lines_to_file("mesh.uge", render_mesh(config), output_dir)
+def write_mesh_and_border_files(parameters: dict[str, Parameter], output_dir: Path) -> None:
+    write_lines_to_file("mesh.uge", render_mesh(parameters), output_dir)
 
-    north, east, south, west = render_borders(config)
+    north, east, south, west = render_borders(parameters)
     write_lines_to_file("north.ex", north, output_dir)
     write_lines_to_file("east.ex", east, output_dir)
     write_lines_to_file("south.ex", south, output_dir)
     write_lines_to_file("west.ex", west, output_dir)
 
 
-def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: str = "."):
+def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: Path):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -20,9 +23,9 @@ def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: s
         file.writelines(output_strings)
 
 
-def render_mesh(settings: dict[str, dict[str, list[int]]]) -> list[str]:
-    xGrid, yGrid, zGrid = settings["number_cells"]
-    cellXWidth, cellYWidth, cellZWidth = settings["cell_resolution"]
+def render_mesh(parameters: dict[str, Parameter]) -> list[str]:
+    xGrid, yGrid, zGrid = parameters.get("number_cells").value
+    cellXWidth, cellYWidth, cellZWidth = parameters.get("cell_resolution").value
 
     volume = cellXWidth * cellYWidth * cellZWidth
     if cellXWidth == cellYWidth == cellZWidth:
@@ -82,9 +85,9 @@ def render_mesh(settings: dict[str, dict[str, list[int]]]) -> list[str]:
     return output_string_cells + ["\n"] + output_string_connections
 
 
-def render_borders(settings: dict[str, dict[str, list[int]]]):
-    xGrid, yGrid, zGrid = settings["number_cells"]
-    cellXWidth, cellYWidth, cellZWidth = settings["cell_resolution"]
+def render_borders(parameters: dict[str, Parameter]):
+    xGrid, yGrid, zGrid = parameters.get("number_cells").value
+    cellXWidth, cellYWidth, cellZWidth = parameters.get("cell_resolution").value
 
     if cellXWidth == cellYWidth == cellZWidth:
         faceArea = cellXWidth**2

@@ -93,12 +93,14 @@ class GeneralConfig:
     output_directory: Path = Path("./out_dir")
     # This forces every run to be reproducible by default
     random_seed: int = 0
+    number_datapoints: int = 1
     workflow: Workflow = Workflow.PFLOTRAN
 
     def override_with(self, other: "GeneralConfig"):
         self.interactive = other.interactive
         self.output_directory = other.output_directory
         self.random_seed = other.random_seed
+        self.number_datapoints = other.number_datapoints
         self.workflow = other.workflow
 
     @staticmethod
@@ -128,6 +130,12 @@ class GeneralConfig:
                 raise ValueError("`random_seed` is not of type int")
             result.random_seed = random_seed
 
+        number_datapoints = conf.pop("number_datapoints", None)
+        if number_datapoints is not None:
+            if not isinstance(number_datapoints, int):
+                raise ValueError("`number_datapoints` is not of type int")
+            result.number_datapoints = number_datapoints
+
         workflow = conf.pop("workflow", None)
         if workflow is not None:
             if isinstance(workflow, str):
@@ -147,6 +155,7 @@ class GeneralConfig:
             f"    Interactive: {self.interactive}\n"
             f"    Output directory: {self.output_directory}\n"
             f"    Random seed: {self.random_seed}\n"
+            f"    Number of datapoints: {self.number_datapoints}\n"
             f"    Using workflow: {self.workflow}\n"
         )
 
@@ -157,13 +166,13 @@ class Config:
     general: GeneralConfig = field(default_factory=lambda: GeneralConfig())
     steps: list[str] = field(default_factory=lambda: ["global"])
     parameters: dict[str, Parameter] = field(default_factory=lambda: {})
-    data: dict[str, Any] = field(default_factory=lambda: {})
+    datapoints: list[dict[str, Any]] = field(default_factory=lambda: [])
 
     def override_with(self, other_config: "Config"):
         self.general = other_config.general
         self.steps = other_config.steps or self.steps
         self.parameters |= other_config.parameters
-        self.data |= other_config.data
+        self.datapoints = other_config.datapoints
 
     @staticmethod
     def from_dict(conf: dict[str, Any]) -> "Config":
@@ -276,6 +285,9 @@ def load_config(arguments: argparse.Namespace) -> Config:
     run_config.general.interactive = not arguments.non_interactive
     if arguments.non_interactive:
         logging.debug("Running non-interactively")
+
+    if arguments.datapoints is not None:
+        run_config.general.number_datapoints = arguments.datapoints
 
     logging.debug("Config: %s", run_config)
 

@@ -13,7 +13,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--config-file", type=pathlib.Path, help="number of datapoints to generate")
-    parser.add_argument("--datapoints", type=int, default=1, help="number of datapoints to generate")
+    parser.add_argument("--datapoints", type=int, help="number of datapoints to generate")
     parser.add_argument("--name", type=str, default="default", help="name of the simulation")
     parser.add_argument("--workflow", type=str, default="pflotran", help="name of the simulation workflow")
     parser.add_argument(
