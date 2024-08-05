@@ -37,6 +37,11 @@ def run_render(config: Config):
     render(config)
 
 
+def run_simulation(config: Config):
+    wait_for_confirmation(config, "Running stage run_simulation")
+    run_pflotran(config)
+
+
 def run(args: Namespace):
     config = load_config(args)
     ensure_config_is_valid(config)
@@ -44,3 +49,4 @@ def run(args: Namespace):
     logging.debug("Will run all stages")
     config = run_vary_params(config)
     run_render(config)
+    run_simulation(config)
