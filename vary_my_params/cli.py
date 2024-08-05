@@ -5,7 +5,7 @@ import argparse
 import logging
 import pathlib
 
-from .pipeline import run
+from . import pipeline
 
 
 def main():
@@ -32,4 +32,4 @@ def main():
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    run(args)
+    pipeline.run(args)
