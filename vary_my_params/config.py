@@ -233,7 +233,7 @@ class Config:
 
     def __str__(self) -> str:
         parameter_strings = []
-        for name, param in self.parameters.items():
+        for _, param in self.parameters.items():
             parameter_strings.append(str(param))
 
         return (
