@@ -11,4 +11,4 @@ def run_simulation(config: Config):
         # always go back to the original_dir as we use relative paths
         os.chdir(original_dir)
         os.chdir(config.general.output_directory / f"datapoint-{index}")
-        subprocess.run(["pflotran"])
+        subprocess.run(["mpirun", "-n", "1", "pflotran"])
