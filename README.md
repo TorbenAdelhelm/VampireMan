@@ -10,7 +10,7 @@ The minimum required python version is 3.10.
 ## Quickstart
 
 After installing the dependencies, you can run the most basic default case by executing `python -m vary_my_params`.
-This command will interactively guide you through the stages of the pipeline and render all files needed to execute a pflotran simulation to the directory specified by `output_directory` in the configs `general` section (which is by default `./out_dir`.
+This command will interactively guide you through the stages of the pipeline and render all files needed to execute a pflotran simulation to the directory specified by `output_directory` in the configs `general` section (which is by default `./out_dir`).
 
 When the program has exited successfully, `cd out_dir` into the directory and run pflotran (since this is the default case) by either executing `pflotran` or `mpirun -n <processor_cores> pflotran`.
 
@@ -21,6 +21,7 @@ When the program has exited successfully, `cd out_dir` into the directory and ru
 1. Install at least python 3.10 (e.g., `apt install python3`)
 1. Install poetry (e.g., `pip install poetry`)
 1. Enter a poetry shell (e.g., `poetry shell`)
+1. Install pflotan 5.0.0
 
 ### Nix
 
@@ -32,7 +33,9 @@ The program runs several stages, one after another, passing the outputs of the p
 
 Namely, the stages are (in this order):
 - load_config
+    load the user provided values and parameters etc
 - vary_parameters
+    varies the values loaded from the config step
 - prepare_simulation
 - run_simulation
 - collect_results
