@@ -19,6 +19,11 @@ def get_defaults() -> Config:
         data_type=DataType.SCALAR,
         value=1.3576885245230967e-09,
     )
+    config.parameters["temperature"] = Parameter(
+        name="temperature",
+        data_type=DataType.SCALAR,
+        value=10.6,
+    )
 
     return config
 
