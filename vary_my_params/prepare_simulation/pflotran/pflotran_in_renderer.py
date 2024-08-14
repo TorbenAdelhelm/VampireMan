@@ -22,5 +22,5 @@ def render(config: Config):
         except FileExistsError:
             logging.warning("The directory %s already exists, will override the contents", datapoint_dir)
         with open(f"{datapoint_dir}/pflotran.in", "w") as file:
-            file.write(template.render(datapoint))
+            file.write(template.render(datapoint.to_values()))
             logging.debug("Rendered pflotran-%s.in", index)

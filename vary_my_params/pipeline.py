@@ -26,7 +26,11 @@ def run_vary_params(config: Config) -> Config:
 
     match config.general.workflow:
         case Workflow.PFLOTRAN:
-            return pflotran.vary_params(config)
+            data = pflotran.vary_params(config)
+            print("Following datapoints will be used")
+            for datapoint in data.datapoints:
+                print(datapoint)
+            return data
         case _:
             logging.error("%s varying is not yet implemented", config.general.workflow)
             raise NotImplementedError()

@@ -88,6 +88,41 @@ class Parameter:
 
 
 @dataclass
+class Data:
+    name: str
+    data_type: DataType
+    value: Any
+
+    def to_value(self) -> Any:
+        """Reduce data item to its value"""
+        return self.value
+
+    def __str__(self) -> str:
+        return f"====== {self.name} [{self.data_type}]: {self.value}"
+
+
+@dataclass
+class Datapoint:
+    index: int
+    data: dict[str, Data]
+
+    def to_values(self) -> dict[str, Any]:
+        """Reduce all data items to only their values.
+        This is useful for rendering values in a .j2 file, as it expects a dict"""
+        values: dict[str, Any] = {}
+        for name, item in self.data.items():
+            values[name] = item.value
+        return values
+
+    def __str__(self) -> str:
+        data_strings = []
+        for _, item in self.data.items():
+            data_strings.append(str(item))
+
+        return f"=== Datapoint #{self.index}:\n" f"{"\n".join(data_strings)}"
+
+
+@dataclass
 class GeneralConfig:
     interactive: bool = True
     output_directory: Path = Path("./out_dir")
@@ -166,7 +201,8 @@ class Config:
     general: GeneralConfig = field(default_factory=lambda: GeneralConfig())
     steps: list[str] = field(default_factory=lambda: ["global"])
     parameters: dict[str, Parameter] = field(default_factory=lambda: {})
-    datapoints: list[dict[str, Any]] = field(default_factory=lambda: [])
+    # TODO split this in datapoints_fixed, datapoint_const_within_datapoint, ...
+    datapoints: list[Datapoint] = field(default_factory=lambda: [])
 
     def override_with(self, other_config: "Config"):
         self.general = other_config.general
