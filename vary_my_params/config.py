@@ -16,8 +16,10 @@ class DataType(enum.StrEnum):
 
 
 class Vary(enum.StrEnum):
-    # XXX: Is this fixed, vary_within_datapoint etc?
     NONE = "none"
+    CONST = "const_within_datapoint"
+    TIME = "timely_vary_within_datapoint"
+    SPACE = "spatially_vary_within_datapoint"
 
 
 class InputSource(enum.StrEnum):
