@@ -1,4 +1,5 @@
 from ..config import Config, Data, Datapoint, DataType, Parameter, Vary
+from .vary_perlin import create_vary_fields
 
 
 def copy_parameter(parameter: Parameter) -> Data:
@@ -18,11 +19,11 @@ def vary_params(config: Config) -> Config:
                 case Vary.NONE:
                     data[parameter.name] = copy_parameter(parameter)
                 case Vary.SPACE:
-                    # data[parameter.name] = copy_parameter(parameter)
-                    pass
+                    data[parameter.name] = Data(
+                        parameter.name, parameter.vary, create_vary_fields(index, config, parameter)
+                    )
                 case _:
                     raise ValueError()
-
 
         config.datapoints.append(Datapoint(index, data))
 

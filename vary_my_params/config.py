@@ -11,8 +11,12 @@ yaml = YAML(typ="safe")
 
 
 class DataType(enum.StrEnum):
+    # XXX is this even needed?
     SCALAR = "scalar"
     ARRAY = "array"
+    STRUCT = "structure"
+    # This needs to be a dict with the keys `factor`, `frequency`, `max` and `min`
+    PERLIN = "perlin"
 
 
 class Vary(enum.StrEnum):
@@ -35,8 +39,9 @@ class Parameter:
     name: str
     data_type: DataType
     value: Any
+    # steps: list[str]
     vary: Vary = Vary.NONE
-    input_source: InputSource = InputSource.MANUAL
+    input_source: InputSource = InputSource.MANUAL  # TODO is this really needed?
 
     @staticmethod
     def from_dict(name: str, conf: dict[str, Any]) -> "Parameter":
@@ -58,6 +63,12 @@ class Parameter:
         if "value" not in conf:
             raise ValueError("`value` missing from parameter")
         value = conf.pop("value")
+
+        # If the parameter should be varied as perlin, the keys must be in place
+        if data_type is DataType.PERLIN and (
+            not value or not ("factor" in value and "frequency" in value and "min" in value and "max" in value)
+        ):
+            raise ValueError("`PERLIN` type must contain factor, frequency, min and max")
 
         result = Parameter(name, data_type, value)
 

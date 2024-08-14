@@ -13,7 +13,7 @@ def wait_for_confirmation(config: Config, next_stage: str = ""):
         return
     try:
         match input(f"Do you want to continue? {f"Next stage: {next_stage} " if next_stage else ""}Y/n "):
-            case "n" | "N" | "no":
+            case "n" | "N" | "no" | "q":
                 logging.info("Exiting as instructed")
                 exit(0)
     except KeyboardInterrupt:

@@ -1,4 +1,4 @@
-from ..config import Config, DataType, Parameter
+from ..config import Config, DataType, Parameter, Vary
 
 
 def get_defaults() -> Config:
@@ -16,8 +16,14 @@ def get_defaults() -> Config:
     )
     config.parameters["permeability"] = Parameter(
         name="permeability",
-        data_type=DataType.SCALAR,
-        value=1.3576885245230967e-09,
+        data_type=DataType.PERLIN,
+        value={
+            "factor": 40,
+            "frequency": [1.8, 1.8, 1.8],
+            "max": 1.2882090745857623e-1,
+            "min": 1.2882090745857623e-10,
+        },
+        vary=Vary.SPACE,
     )
     config.parameters["temperature"] = Parameter(
         name="temperature",

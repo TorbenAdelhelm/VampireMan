@@ -43,6 +43,11 @@ SUBSURFACE
     DIFFUSION_COEFFICIENT 1.d-9 #[m^2/s] #checked
   END
 
+  DATASET perm
+    HDF5_DATASET_NAME Permeability
+    FILENAME permeability_field.h5
+  END
+
 #=========================== material properties ==============================
 
   MATERIAL_PROPERTY gravel
@@ -55,7 +60,7 @@ SUBSURFACE
     LONGITUDINAL_DISPERSIVITY 1.0       #[m]
     TRANSVERSE_DISPERSIVITY_H 0.1       #[m]
     PERMEABILITY                        #[m^2] #TESTCASE
-      PERM_ISO {{ permeability }}
+      DATASET perm
     /
     CHARACTERISTIC_CURVES cc1
   END
@@ -70,7 +75,7 @@ SUBSURFACE
     LONGITUDINAL_DISPERSIVITY 1.0       #[m]
     TRANSVERSE_DISPERSIVITY_H 0.1       #[m]
     PERMEABILITY                        #[m^2] #TESTCASE
-      PERM_ISO {{ permeability }}
+      DATASET perm
     /
     CHARACTERISTIC_CURVES cc1
   END

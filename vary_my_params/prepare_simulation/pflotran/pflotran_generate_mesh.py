@@ -14,6 +14,8 @@ def write_mesh_and_border_files(parameters: dict[str, Parameter], output_dir: Pa
     write_lines_to_file("south.ex", south, output_dir)
     write_lines_to_file("west.ex", west, output_dir)
 
+    logging.debug("Rendered {north,east,south,west}.ex")
+
 
 def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: Path):
     if not os.path.exists(output_dir):
