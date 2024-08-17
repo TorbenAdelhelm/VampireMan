@@ -10,7 +10,7 @@ from .pflotran_write_permeability import plot_vary_field, save_vary_field
 
 
 def render(config: Config):
-    write_mesh_and_border_files(config.parameters, config.general.output_directory)
+    write_mesh_and_border_files(config, config.general.output_directory)
 
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(pathlib.Path(__file__).parent / "templates"))
     template = env.get_template("pflotran.in.j2")
@@ -28,11 +28,12 @@ def render(config: Config):
             file.write(template.render(datapoint.to_values()))
             logging.debug("Rendered pflotran-%s.in", index)
 
-        permeability = datapoint.data.get("permeability")
+        # Raise if permeability is not in data
+        permeability = datapoint.data["permeability"]
 
         save_vary_field(
             datapoint_dir / "permeability_field.h5",
-            config.parameters.get("number_cells").value,
+            config.general.number_cells.value,
             permeability.value,
             "permeability",
         )

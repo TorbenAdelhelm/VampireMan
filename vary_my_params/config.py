@@ -4,7 +4,7 @@ import enum
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
 from ruamel.yaml import YAML
 
@@ -41,7 +41,7 @@ class Workflow(enum.StrEnum):
 
 
 @dataclass
-class Parameter:
+class BaseParameter:
     name: str
     data_type: DataType
     value: Any
@@ -50,8 +50,10 @@ class Parameter:
     vary: Vary = Vary.NONE
     input_source: InputSource = InputSource.MANUAL  # TODO is this really needed?
 
+    T = TypeVar("T", bound="BaseParameter")
+
     @staticmethod
-    def from_dict(name: str, conf: dict[str, Any]) -> "Parameter":
+    def from_dict(name: str, conf: dict[str, Any], cls: type[T]) -> T:
         if conf == {}:
             raise ValueError("Parameter config is empty")
 
@@ -77,7 +79,7 @@ class Parameter:
         ):
             raise ValueError("`PERLIN` type must contain frequency, min and max")
 
-        result = Parameter(name, data_type, value)
+        result = cls(name, data_type, value=value)
 
         distribution = conf.pop("distribution", None)
         if distribution is not None:
@@ -117,6 +119,21 @@ class Parameter:
 
 
 @dataclass
+class Parameter(BaseParameter):
+    value: float | list[int] | dict[str, float | list[float]]
+
+
+@dataclass
+class ParameterListInt(BaseParameter):
+    value: list[int]
+
+
+@dataclass
+class ParameterListFloat(BaseParameter):
+    value: list[float]
+
+
+@dataclass
 class Data:
     name: str
     data_type: DataType
@@ -153,11 +170,25 @@ class Datapoint:
 
 @dataclass
 class GeneralConfig:
+    number_cells: ParameterListInt = field(
+        default_factory=lambda: ParameterListInt(
+            name="number_cells",
+            data_type=DataType.ARRAY,
+            value=[32, 128, 1],
+        )
+    )
+    cell_resolution: ParameterListFloat = field(
+        default_factory=lambda: ParameterListFloat(
+            name="cell_resolution",
+            data_type=DataType.ARRAY,
+            value=[5, 5, 5],
+        )
+    )
     interactive: bool = True
     # XXX: Hopefully the format `2024-08-17T10:06:15+00:00` is supported by the common file systems
     output_directory: Path = Path(f"./datasets_out/{datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")}")
     # This forces every run to be reproducible by default
-    random_seed: int = 0
+    random_seed: None | int = 0
     number_datapoints: int = 1
     workflow: Workflow = Workflow.PFLOTRAN
 
@@ -271,7 +302,7 @@ class Config:
                 raise ValueError("`parameters` is not of type dict")
             typed_parameters = {}
             for param_name, param_meta in parameters.items():
-                typed_parameters[param_name] = Parameter.from_dict(param_name, param_meta)
+                typed_parameters[param_name] = Parameter.from_dict(param_name, param_meta, Parameter)
 
             result.parameters = typed_parameters
 

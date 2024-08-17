@@ -11,10 +11,10 @@ def make_grid(
     aimed_min: float,
     aimed_max: float,
     config: Config,
-    offset: float = None,
-    freq: list[float] = None,
+    offset: NDArray[Any],
+    freq: list[float],
 ) -> NDArray[np.floating[Any]]:
-    grid_dimensions: list[int] = config.parameters.get("number_cells").value
+    grid_dimensions: list[int] = config.general.number_cells.value
 
     # adapted by Manuel Hirche
 
@@ -55,9 +55,18 @@ def make_grid(
     return values
 
 
-def create_vary_fields(index: int, config: Config, parameter: Parameter):
+def create_vary_fields(config: Config, parameter: Parameter):
     base_offset = np.random.rand(3) * 4242
     base_offset = [0, 0, 0]
+
+    if not isinstance(parameter.value, dict):
+        raise ValueError()
+    if not isinstance(parameter.value["frequency"], list):
+        raise ValueError()
+    if not isinstance(parameter.value["min"], float):
+        raise ValueError()
+    if not isinstance(parameter.value["max"], float):
+        raise ValueError()
 
     freq_factor = parameter.value["frequency"]
 
@@ -85,7 +94,7 @@ def create_vary_fields(index: int, config: Config, parameter: Parameter):
     return cells
 
 
-def calc_pressure_from_gradient_field(gradient_field: np.array, config: Config, settings: dict = None):
+def calc_pressure_from_gradient_field(gradient_field: NDArray[Any], config: Config, settings: dict | None = None):
     raise NotImplementedError("calc_pressure_from_gradient_field not implemented correctly")
     #
     # pressure = config.parameters.get("pressure").value

@@ -20,7 +20,7 @@ def vary_params(config: Config) -> Config:
                     data[parameter.name] = copy_parameter(parameter)
                 case Vary.SPACE:
                     data[parameter.name] = Data(
-                        parameter.name, parameter.vary, create_vary_fields(index, config, parameter)
+                        parameter.name, parameter.data_type, create_vary_fields(config, parameter)
                     )
                 case _:
                     raise ValueError()

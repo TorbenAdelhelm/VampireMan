@@ -16,6 +16,8 @@ def wait_for_confirmation(config: Config, next_stage: str = ""):
             case "n" | "N" | "no" | "q":
                 logging.info("Exiting as instructed")
                 exit(0)
+            case _:
+                pass
     except KeyboardInterrupt:
         logging.info("Exiting as instructed")
         exit(0)

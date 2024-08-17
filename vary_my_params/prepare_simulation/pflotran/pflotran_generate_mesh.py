@@ -2,13 +2,13 @@ import logging
 import os
 from pathlib import Path
 
-from ...config import Parameter
+from ...config import Config
 
 
-def write_mesh_and_border_files(parameters: dict[str, Parameter], output_dir: Path) -> None:
-    write_lines_to_file("mesh.uge", render_mesh(parameters), output_dir)
+def write_mesh_and_border_files(config: Config, output_dir: Path) -> None:
+    write_lines_to_file("mesh.uge", render_mesh(config), output_dir)
 
-    north, east, south, west = render_borders(parameters)
+    north, east, south, west = render_borders(config)
     write_lines_to_file("north.ex", north, output_dir)
     write_lines_to_file("east.ex", east, output_dir)
     write_lines_to_file("south.ex", south, output_dir)
@@ -25,9 +25,9 @@ def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: P
         file.writelines(output_strings)
 
 
-def render_mesh(parameters: dict[str, Parameter]) -> list[str]:
-    xGrid, yGrid, zGrid = parameters.get("number_cells").value
-    cellXWidth, cellYWidth, cellZWidth = parameters.get("cell_resolution").value
+def render_mesh(config: Config) -> list[str]:
+    xGrid, yGrid, zGrid = config.general.number_cells.value
+    cellXWidth, cellYWidth, cellZWidth = config.general.cell_resolution.value
 
     volume = cellXWidth * cellYWidth * cellZWidth
     if cellXWidth == cellYWidth == cellZWidth:
@@ -87,9 +87,9 @@ def render_mesh(parameters: dict[str, Parameter]) -> list[str]:
     return output_string_cells + ["\n"] + output_string_connections
 
 
-def render_borders(parameters: dict[str, Parameter]):
-    xGrid, yGrid, zGrid = parameters.get("number_cells").value
-    cellXWidth, cellYWidth, cellZWidth = parameters.get("cell_resolution").value
+def render_borders(config: Config):
+    xGrid, yGrid, zGrid = config.general.number_cells.value
+    cellXWidth, cellYWidth, cellZWidth = config.general.cell_resolution.value
 
     if cellXWidth == cellYWidth == cellZWidth:
         faceArea = cellXWidth**2
