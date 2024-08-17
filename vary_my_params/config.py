@@ -230,11 +230,14 @@ class GeneralConfig:
                 raise ValueError("`output_directory` is not anything path-like")
             result.output_directory = output_directory
 
-        random_seed = conf.pop("random_seed", None)
-        if random_seed is not None:
-            if not isinstance(random_seed, int):
-                raise ValueError("`random_seed` is not of type int")
+        try:
+            random_seed = conf["random_seed"]
+            random_seed = conf.pop("random_seed")
+            if random_seed is not None and not isinstance(random_seed, int):
+                raise ValueError("`random_seed` is not of type int or None")
             result.random_seed = random_seed
+        except KeyError:
+            pass
 
         number_datapoints = conf.pop("number_datapoints", None)
         if number_datapoints is not None:
