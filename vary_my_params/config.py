@@ -16,7 +16,7 @@ class DataType(enum.StrEnum):
     SCALAR = "scalar"
     ARRAY = "array"
     STRUCT = "structure"
-    # This needs to be a dict with the keys `factor`, `frequency`, `max` and `min`
+    # This needs to be a dict with the keys `frequency`, `max` and `min`
     PERLIN = "perlin"
 
 
@@ -73,9 +73,9 @@ class Parameter:
 
         # If the parameter should be varied as perlin, the keys must be in place
         if data_type is DataType.PERLIN and (
-            not value or not ("factor" in value and "frequency" in value and "min" in value and "max" in value)
+            not value or not ("frequency" in value and "min" in value and "max" in value)
         ):
-            raise ValueError("`PERLIN` type must contain factor, frequency, min and max")
+            raise ValueError("`PERLIN` type must contain frequency, min and max")
 
         result = Parameter(name, data_type, value)
 

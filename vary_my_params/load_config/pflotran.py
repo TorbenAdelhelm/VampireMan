@@ -18,7 +18,6 @@ def get_defaults() -> Config:
         name="permeability",
         data_type=DataType.PERLIN,
         value={
-            "factor": 40,
             "frequency": [1.8, 1.8, 1.8],
             "max": 1.2882090745857623e-1,
             "min": 1.2882090745857623e-10,
