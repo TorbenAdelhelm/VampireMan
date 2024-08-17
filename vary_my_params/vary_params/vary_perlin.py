@@ -56,8 +56,7 @@ def make_grid(
 
 
 def create_vary_fields(config: Config, parameter: Parameter):
-    base_offset = np.random.rand(3) * 4242
-    base_offset = [0, 0, 0]
+    base_offset = np.random.default_rng(seed=config.general.random_seed).random(3) * 4242
 
     if not isinstance(parameter.value, dict):
         raise ValueError()
