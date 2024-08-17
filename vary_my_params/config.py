@@ -206,6 +206,16 @@ class GeneralConfig:
         if conf == {}:
             return result
 
+        number_cells = conf.pop("number_cells", None)
+        if number_cells is not None:
+            result.number_cells = ParameterListInt.from_dict("number_cells", number_cells, ParameterListInt)
+
+        cell_resolution = conf.pop("cell_resolution", None)
+        if cell_resolution is not None:
+            result.cell_resolution = ParameterListFloat.from_dict(
+                "cell_resolution", cell_resolution, ParameterListFloat
+            )
+
         interactive = conf.pop("interactive", None)
         if interactive is not None:
             if not isinstance(interactive, bool):
