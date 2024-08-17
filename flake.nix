@@ -110,6 +110,24 @@
           installPhase = "mkdir -p $out";
         };
 
+        pyright = pkgs.stdenvNoCC.mkDerivation {
+          name = "pyright";
+          src = ./.;
+
+          doCheck = true;
+
+          nativeBuildInputs = [
+            pkgs.pyright
+            python3_env
+          ];
+
+          checkPhase = ''
+            pyright .
+          '';
+
+          installPhase = "mkdir -p $out";
+        };
+
         check_h5_file = pkgs.stdenvNoCC.mkDerivation {
           name = "checkH5File";
           src = ./.;

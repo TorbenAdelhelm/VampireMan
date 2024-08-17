@@ -11,6 +11,11 @@ ruff:
   script:
     - nix build .#checks.x86_64-linux.ruff
 
+pyright:
+  stage: lint
+  script:
+    - nix build .#checks.x86_64-linux.pyright
+
 treefmt:
   stage: lint
   script:
