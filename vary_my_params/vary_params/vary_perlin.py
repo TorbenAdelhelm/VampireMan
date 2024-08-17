@@ -4,7 +4,7 @@ import noise
 import numpy as np
 from numpy.typing import NDArray
 
-from ..config import Config, Parameter
+from ..config import Config, Distribution, Parameter
 
 
 def make_grid(
@@ -64,7 +64,7 @@ def create_vary_fields(index: int, config: Config, parameter: Parameter):
     vary_min = parameter.value["min"]
     vary_max = parameter.value["max"]
 
-    if parameter.name == "permeability":
+    if parameter.distribution == Distribution.LOG:
         vary_min = np.log10(vary_min)
         vary_max = np.log10(vary_max)
 
@@ -72,11 +72,11 @@ def create_vary_fields(index: int, config: Config, parameter: Parameter):
         vary_min,
         vary_max,
         config,
-        offset=base_offset + [0, 0, 0],
-        freq=freq_factor,
+        base_offset,
+        freq_factor,
     )
 
-    if parameter.name == "permeability":
+    if parameter.distribution == Distribution.LOG:
         cells = 10**cells
 
     if parameter.name == "pressure":

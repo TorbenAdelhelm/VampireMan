@@ -20,6 +20,11 @@ class DataType(enum.StrEnum):
     PERLIN = "perlin"
 
 
+class Distribution(enum.StrEnum):
+    UNIFORM = "uniform"
+    LOG = "logarithmic"
+
+
 class Vary(enum.StrEnum):
     NONE = "none"
     CONST = "const_within_datapoint"
@@ -41,6 +46,7 @@ class Parameter:
     data_type: DataType
     value: Any
     # steps: list[str]
+    distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.NONE
     input_source: InputSource = InputSource.MANUAL  # TODO is this really needed?
 
@@ -73,6 +79,14 @@ class Parameter:
 
         result = Parameter(name, data_type, value)
 
+        distribution = conf.pop("distribution", None)
+        if distribution is not None:
+            if isinstance(distribution, str):
+                distribution = Distribution(distribution)
+            if not isinstance(distribution, Distribution):
+                raise ValueError("`distribution` is not of type Distribution")
+            result.distribution = distribution
+
         vary = conf.pop("vary", None)
         if vary is not None:
             if isinstance(vary, str):
@@ -96,6 +110,7 @@ class Parameter:
             f"====== Parameter {self.name}\n"
             f"       DataType: {self.data_type}\n"
             f"       Value: {self.value}\n"
+            f"       Distribution: {self.distribution}\n"
             f"       Vary: {self.vary}\n"
             f"       Input source: {self.input_source}\n"
         )
