@@ -126,7 +126,7 @@
 
           checkPhase = ''
             python -m vary_my_params --non-interactive
-            h5diff -v1 out_dir/datapoint-0/pflotran.h5 tests/reference_files/pflotran.h5
+            h5diff -v1 datasets_out/*/datapoint-0/pflotran.h5 tests/reference_files/pflotran.h5
           '';
 
           installPhase = "mkdir -p $out";

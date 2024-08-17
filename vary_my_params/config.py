@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import enum
 import logging
 from dataclasses import dataclass, field
@@ -138,7 +139,8 @@ class Datapoint:
 @dataclass
 class GeneralConfig:
     interactive: bool = True
-    output_directory: Path = Path("./out_dir")
+    # XXX: Hopefully the format `2024-08-17T10:06:15+00:00` is supported by the common file systems
+    output_directory: Path = Path(f"./datasets_out/{datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")}")
     # This forces every run to be reproducible by default
     random_seed: int = 0
     number_datapoints: int = 1
