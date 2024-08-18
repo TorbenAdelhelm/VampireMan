@@ -6,6 +6,7 @@ from .load_config.pflotran import ensure_config_is_valid
 from .prepare_simulation.pflotran.pflotran_in_renderer import render
 from .run_simulation.pflotran import run_simulation as run_pflotran
 from .vary_params import pflotran
+from .visualize.pflotran import plot_sim
 
 
 def wait_for_confirmation(config: Config, next_stage: str = ""):
@@ -48,6 +49,11 @@ def run_simulation(config: Config):
     run_pflotran(config)
 
 
+def run_visualization(config: Config):
+    wait_for_confirmation(config, "Running stage run_visualization")
+    plot_sim(config)
+
+
 def run(args: Namespace):
     config = load_config(args)
     ensure_config_is_valid(config)
@@ -56,3 +62,4 @@ def run(args: Namespace):
     config = run_vary_params(config)
     run_render(config)
     run_simulation(config)
+    run_visualization(config)
