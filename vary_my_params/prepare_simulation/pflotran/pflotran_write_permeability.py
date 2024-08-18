@@ -12,12 +12,10 @@ def save_vary_field(filename, number_cells, cells, parameter_name: str = "permea
     iarray[:] += 1  # convert to 1-based
     cells_array_flatten = cells.reshape(n, order="F")
 
-    h5file = File(filename, mode="w")
+    with File(filename, mode="w") as h5file:
+        h5file.create_dataset("Cell Ids", data=iarray)
+        h5file.create_dataset(parameter_name.title(), data=cells_array_flatten)
 
-    h5file.create_dataset("Cell Ids", data=iarray)
-    h5file.create_dataset(parameter_name.title(), data=cells_array_flatten)
-
-    h5file.close()
     logging.info(f"Created a {parameter_name}-field")
 
 
