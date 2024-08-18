@@ -19,6 +19,7 @@ scipy = "^1.14.0"
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.26.0"
 pytest = "^8.3.1"
+pudb = "^2024.1.2"
 
 [build-system]
 requires = ["poetry-core"]
