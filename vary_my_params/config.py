@@ -209,12 +209,20 @@ class GeneralConfig:
         number_cells = conf.pop("number_cells", None)
         if number_cells is not None:
             result.number_cells = ParameterListInt.from_dict("number_cells", number_cells, ParameterListInt)
+            value = result.number_cells.value
+            if len(value) != 3:
+                logging.warning("`number_cells` only works with three dimensions. Assuming three dimensions.")
+                result.number_cells.value = [value[0], value[1], 1]
 
         cell_resolution = conf.pop("cell_resolution", None)
         if cell_resolution is not None:
             result.cell_resolution = ParameterListFloat.from_dict(
                 "cell_resolution", cell_resolution, ParameterListFloat
             )
+            value = result.cell_resolution.value
+            if len(value) != 3:
+                logging.warning("`cell_resolution` only works with three dimensions. Assuming three dimensions.")
+                result.cell_resolution.value = [value[0], value[1], 1]
 
         interactive = conf.pop("interactive", None)
         if interactive is not None:
