@@ -1,3 +1,4 @@
+import logging
 from ..config import Config, DataType, Parameter, Vary
 
 
@@ -27,7 +28,14 @@ def ensure_parameter_isset(config: Config, name: str):
 
 def ensure_config_is_valid(config: Config):
     # TODO make this more extensive
+
+    # These parameters are mandatory
     for item in [
         "permeability",
     ]:
         ensure_parameter_isset(config, item)
+
+    # Simulation without heatpumps doesn't make much sense
+    heatpumps = [{name: d.name} for name, d in config.parameters.items() if d.data_type == DataType.HEATPUMP]
+    if len(heatpumps) < 1:
+        logging.warn("There are no heatpumps in this simulation. This usually doesn't make much sense.")
