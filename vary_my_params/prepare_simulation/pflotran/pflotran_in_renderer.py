@@ -4,7 +4,7 @@ import pathlib
 
 import jinja2
 
-from ...config import Config
+from ...config import Config, DataType
 from .pflotran_generate_mesh import write_mesh_and_border_files
 from .pflotran_write_permeability import plot_vary_field, save_vary_field
 
@@ -24,10 +24,16 @@ def render(config: Config):
         except OSError as error:
             logging.critical("Directory at %s could not be created, cannot proceed", datapoint_dir)
             raise error
+
+        values = datapoint.to_values()
+        heatpumps = [{name: d.to_value()} for name, d in datapoint.data.items() if d.data_type == DataType.HEATPUMP]
+        values["heatpumps"] = heatpumps
+
         with open(f"{datapoint_dir}/pflotran.in", "w") as file:
-            file.write(template.render(datapoint.to_values()))
+            file.write(template.render(values))
             logging.debug("Rendered pflotran-%s.in", index)
 
+        # TODO move this to ensure config
         # Raise if permeability is not in data
         permeability = datapoint.data["permeability"]
 

@@ -18,6 +18,8 @@ class DataType(enum.StrEnum):
     STRUCT = "structure"
     # This needs to be a dict with the keys `frequency`, `max` and `min`
     PERLIN = "perlin"
+    # This needs `location`, `injection_temp` and `injection_rate`
+    HEATPUMP = "heatpump"
 
 
 class Distribution(enum.StrEnum):
@@ -51,6 +53,21 @@ class BaseParameter:
     input_source: InputSource = InputSource.MANUAL  # TODO is this really needed?
 
     T = TypeVar("T", bound="BaseParameter")
+
+    @staticmethod
+    def parameter_type_from_dict(conf: dict[str, Any]) -> type:
+        if conf == {}:
+            raise ValueError("Parameter config is empty")
+
+        data_type = conf.get("data_type")
+        if data_type is None:
+            raise ValueError("`data_type` missing from parameter")
+
+        match DataType(data_type):
+            case DataType.HEATPUMP:
+                return ParameterHeatPump
+            case _:
+                return Parameter
 
     @staticmethod
     def from_dict(name: str, conf: dict[str, Any], cls: type[T]) -> T:
@@ -119,6 +136,58 @@ class ParameterListFloat(BaseParameter):
 
 
 @dataclass
+class HeatPump:
+    location: list[float]
+    # TODO make this list[float]
+    injection_temp: float
+    # TODO make this list[float]
+    injection_rate: float
+
+    @staticmethod
+    def from_dict(conf: dict[str, dict[str, float | list[float]]]) -> "HeatPump":
+        try:
+            value = conf["value"]
+            if not isinstance(value, dict):
+                raise ValueError()
+
+            location = value["location"]
+            if not isinstance(value["location"], list):
+                raise ValueError("`location` value of HeatPump must be list[float]")
+            assert isinstance(location, list)  # Hack for pyright
+            if not all(isinstance(float(item), float) for item in location):
+                raise ValueError("`location` value of HeatPump must be list[float]")
+
+            injection_temp = value["injection_temp"]
+            if not isinstance(injection_temp, float):
+                raise ValueError("`injection_temp` value of HeatPump must be float")
+
+            injection_rate = value["injection_rate"]
+            if not isinstance(injection_rate, float):
+                raise ValueError("`injection_rate` value of HeatPump must be float")
+        except KeyError as err:
+            logging.critical("Could not parse HeatPump config")
+            raise err
+        return HeatPump(location, injection_temp, injection_rate)
+
+    def to_value(self) -> dict[str, Any]:
+        return {
+            "location": self.location,
+            "injection_temp": self.injection_temp,
+            "injection_rate": self.injection_rate,
+        }
+
+
+@dataclass
+class ParameterHeatPump(BaseParameter):
+    value: HeatPump
+
+    @staticmethod
+    def from_dict(name: str, conf: dict[str, Any]) -> "ParameterHeatPump":  # type: ignore
+        conf["value"] = HeatPump.from_dict(conf)
+        return BaseParameter.from_dict(name, conf, ParameterHeatPump)
+
+
+@dataclass
 class Data:
     name: str
     data_type: DataType
@@ -126,7 +195,11 @@ class Data:
 
     def to_value(self) -> Any:
         """Reduce data item to its value"""
-        return self.value
+        try:
+            return self.value.to_value()
+        except AttributeError:
+            # self.value is probably a dict or a trivial datatype
+            return self.value
 
     def __str__(self) -> str:
         return f"====== {self.name} [{self.data_type}]: {self.value}"
@@ -142,7 +215,7 @@ class Datapoint:
         This is useful for rendering values in a .j2 file, as it expects a dict"""
         values: dict[str, Any] = {}
         for name, item in self.data.items():
-            values[name] = item.value
+            values[name] = item.to_value()
         return values
 
     def __str__(self) -> str:
@@ -300,7 +373,10 @@ class Config:
                 raise ValueError("`parameters` is not of type dict")
             typed_parameters = {}
             for param_name, param_meta in parameters.items():
-                typed_parameters[param_name] = Parameter.from_dict(param_name, param_meta, Parameter)
+                if BaseParameter.parameter_type_from_dict(param_meta) is ParameterHeatPump:
+                    typed_parameters[param_name] = ParameterHeatPump.from_dict(param_name, param_meta)
+                else:
+                    typed_parameters[param_name] = Parameter.from_dict(param_name, param_meta, Parameter)
 
             result.parameters = typed_parameters
 

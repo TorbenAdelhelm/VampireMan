@@ -26,6 +26,7 @@ def ensure_parameter_isset(config: Config, name: str):
 
 
 def ensure_config_is_valid(config: Config):
+    # TODO make this more extensive
     for item in [
         "permeability",
     ]:
