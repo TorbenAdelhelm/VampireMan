@@ -63,10 +63,7 @@ class BaseParameter:
         data_type = conf.pop("data_type", None)
         if data_type is None:
             raise ValueError("`data_type` missing from parameter")
-        if isinstance(data_type, str):
-            data_type = DataType(data_type)
-        if not isinstance(data_type, DataType):
-            raise ValueError("`data_type` is not of type DataType")
+        data_type = DataType(data_type)
 
         # Value could probably be None, so we can't use the same logic here
         if "value" not in conf:
@@ -83,27 +80,15 @@ class BaseParameter:
 
         distribution = conf.pop("distribution", None)
         if distribution is not None:
-            if isinstance(distribution, str):
-                distribution = Distribution(distribution)
-            if not isinstance(distribution, Distribution):
-                raise ValueError("`distribution` is not of type Distribution")
-            result.distribution = distribution
+            result.distribution = Distribution(distribution)
 
         vary = conf.pop("vary", None)
         if vary is not None:
-            if isinstance(vary, str):
-                vary = Vary(vary)
-            if not isinstance(vary, Vary):
-                raise ValueError("`vary` is not of type Vary")
-            result.vary = vary
+            result.vary = Vary(vary)
 
         input_source = conf.pop("input_source", None)
         if input_source is not None:
-            if isinstance(input_source, str):
-                input_source = InputSource(input_source)
-            if not isinstance(input_source, InputSource):
-                raise ValueError("`input_source` is not of type InputSource")
-            result.input_source = input_source
+            result.input_source = InputSource(input_source)
 
         return result
 
@@ -232,11 +217,7 @@ class GeneralConfig:
 
         output_directory = conf.pop("output_directory", None)
         if output_directory is not None:
-            if isinstance(output_directory, str):
-                output_directory = Path(output_directory)
-            if not isinstance(output_directory, Path):
-                raise ValueError("`output_directory` is not anything path-like")
-            result.output_directory = output_directory
+            result.output_directory = Path(output_directory)
 
         try:
             random_seed = conf["random_seed"]
@@ -255,11 +236,7 @@ class GeneralConfig:
 
         workflow = conf.pop("workflow", None)
         if workflow is not None:
-            if isinstance(workflow, str):
-                workflow = Workflow(workflow)
-            if not isinstance(workflow, Workflow):
-                raise ValueError("`workflow` is not of type Workflow")
-            result.workflow = workflow
+            result.workflow = Workflow(workflow)
 
         if conf:
             raise ValueError(f"There was additional data in config dict: {conf}")
