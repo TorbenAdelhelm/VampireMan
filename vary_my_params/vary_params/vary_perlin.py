@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 from ..config import Config, Distribution, Parameter
 
 
-def make_grid(
+def make_perlin_grid(
     aimed_min: float,
     aimed_max: float,
     config: Config,
@@ -55,7 +55,7 @@ def make_grid(
     return values
 
 
-def create_vary_fields(config: Config, parameter: Parameter):
+def create_vary_field(config: Config, parameter: Parameter):
     base_offset = np.random.default_rng(seed=config.general.random_seed).random(3) * 4242
 
     if not isinstance(parameter.value, dict):
@@ -76,7 +76,7 @@ def create_vary_fields(config: Config, parameter: Parameter):
         vary_min = np.log10(vary_min)
         vary_max = np.log10(vary_max)
 
-    cells = make_grid(
+    cells = make_perlin_grid(
         vary_min,
         vary_max,
         config,
