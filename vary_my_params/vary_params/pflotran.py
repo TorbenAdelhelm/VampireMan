@@ -1,5 +1,5 @@
 from ..config import Config, Data, Datapoint, DataType, Parameter, Vary
-from .vary_perlin import create_vary_field
+from .vary_perlin import create_const_field, create_vary_field
 
 
 def copy_parameter(parameter: Parameter) -> Data:
@@ -19,9 +19,14 @@ def vary_params(config: Config) -> Config:
                 case Vary.NONE:
                     data[parameter.name] = copy_parameter(parameter)
                 case Vary.SPACE:
-                    data[parameter.name] = Data(
-                        parameter.name, parameter.data_type, create_vary_field(config, parameter)
-                    )
+                    match parameter.data_type:
+                        case DataType.SCALAR:
+                            field = create_const_field(config, parameter)
+                        case DataType.PERLIN:
+                            field = create_vary_field(config, parameter)
+                        case _:
+                            raise NotImplementedError()
+                    data[parameter.name] = Data(parameter.name, parameter.data_type, field)
                 case _:
                     raise ValueError()
 

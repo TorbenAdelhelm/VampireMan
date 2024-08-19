@@ -93,6 +93,13 @@ def create_vary_field(config: Config, parameter: Parameter):
     return cells
 
 
+def create_const_field(config: Config, parameter: Parameter):
+    if parameter.name == "pressure":
+        cells = calc_pressure_from_gradient_field(cells, config)
+
+    return np.full(config.general.number_cells.value, parameter.value)
+
+
 def calc_pressure_from_gradient_field(gradient_field: NDArray[Any], config: Config, settings: dict | None = None):
     raise NotImplementedError("calc_pressure_from_gradient_field not implemented correctly")
     #
