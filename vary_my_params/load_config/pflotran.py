@@ -6,12 +6,8 @@ def get_defaults() -> Config:
 
     config.parameters["permeability"] = Parameter(
         name="permeability",
-        data_type=DataType.PERLIN,
-        value={
-            "frequency": [1.8, 1.8, 1.8],
-            "max": 1.2882090745857623e-1,
-            "min": 1.2882090745857623e-10,
-        },
+        data_type=DataType.SCALAR,
+        value=1.2882090745857623e-10,
         vary=Vary.SPACE,
     )
     config.parameters["temperature"] = Parameter(
