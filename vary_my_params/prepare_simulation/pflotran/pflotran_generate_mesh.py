@@ -52,13 +52,13 @@ def render_mesh(config: Config) -> list[str]:
 
     cellID_1 = 1
 
-    for k in range(0, zGrid):
+    for k in range(zGrid):
         zloc = (k + 0.5) * cellZWidth
 
-        for j in range(0, yGrid):
+        for j in range(yGrid):
             yloc = (j + 0.5) * cellYWidth
 
-            for i in range(0, xGrid):
+            for i in range(xGrid):
                 xloc = (i + 0.5) * cellXWidth
 
                 output_string_cells.append(f"\n{cellID_1} {xloc} {yloc} {zloc} {volume}")
@@ -111,17 +111,17 @@ def render_borders(config: Config):
     yloc_north = yGrid * cellYWidth
     xloc_east = xGrid * cellXWidth
 
-    for k in range(0, zGrid):
+    for k in range(zGrid):
         zloc = (k + 0.5) * cellZWidth
 
-        for i in range(0, xGrid):
+        for i in range(xGrid):
             xloc = (i + 0.5) * cellXWidth
             cellID_north = (xGrid * (yGrid - 1)) + i + 1 + k * xGrid * yGrid
             cellID_south = i + 1 + k * xGrid * yGrid
             output_string_north.append(f"\n{cellID_north} {xloc} {yloc_north} {zloc} {faceArea}")
             output_string_south.append(f"\n{cellID_south} {xloc} {yloc_south} {zloc} {faceArea}")
 
-        for j in range(0, yGrid):
+        for j in range(yGrid):
             yloc = (j + 0.5) * cellYWidth
             cellID_east = (j + 1) * xGrid + k * xGrid * yGrid
             cellID_west = j * xGrid + 1 + k * xGrid * yGrid
