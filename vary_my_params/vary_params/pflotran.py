@@ -1,7 +1,7 @@
 import numpy as np
 
 from ..config import Config, Data, Datapoint, DataType, HeatPump, Parameter, ParameterHeatPump, Vary
-from ..utils import random_float
+from ..utils import random_nd_array
 from .vary_perlin import create_const_field, create_vary_field
 
 
@@ -11,24 +11,24 @@ def copy_parameter(parameter: Parameter) -> Data:
 
 
 def vary_heatpump(config: Config, parameter: ParameterHeatPump) -> Data:
-    resolution = config.general.cell_resolution.value
-    number_cells = config.general.number_cells.value
+    resolution = np.array(config.general.cell_resolution.value)
+    number_cells = np.array(config.general.number_cells.value)
 
     hp = parameter.value
-    result_location = [0.0, 0.0, 0.0]
+    result_location = np.zeros(3)
 
     # XXX is this needed?
     match parameter.vary:
         case Vary.CONST:
-            for i in range(3):
-                result_location[i] = random_float(config) * resolution[i] * (number_cells[i] - 1 + 0.5)
+            result_location = (number_cells - 1) * random_nd_array(config, 3) * resolution + (resolution * 0.5)
         case Vary.NONE:
-            for i in range(3):
-                result_location[i] = (hp.location[i] - 1 + 0.5) * resolution[i]
+            result_location = (np.array(hp.location) - 1) * resolution + (resolution * 0.5)
         case _:
             raise NotImplementedError()
 
-    return Data(parameter.name, parameter.data_type, HeatPump(result_location, hp.injection_temp, hp.injection_rate))
+    return Data(
+        parameter.name, parameter.data_type, HeatPump(result_location.tolist(), hp.injection_temp, hp.injection_rate)
+    )
 
 
 def vary_params(config: Config) -> Config:
