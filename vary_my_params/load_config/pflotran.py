@@ -1,5 +1,6 @@
 import logging
-from ..config import Config, DataType, Parameter, Vary
+
+from ..config import Config, DataType, HeatPump, Parameter, ParameterHeatPump, Vary
 
 
 def get_defaults() -> Config:
@@ -15,6 +16,11 @@ def get_defaults() -> Config:
         name="temperature",
         data_type=DataType.SCALAR,
         value=10.6,
+    )
+    config.parameters["hp1"] = ParameterHeatPump(
+        name="hp1",
+        data_type=DataType.HEATPUMP,
+        value=HeatPump([16, 32, 1], 13.6, 0.00024),
     )
 
     return config
