@@ -89,7 +89,7 @@ def create_vary_field(config: Config, parameter: Parameter):
         cells = 10**cells
 
     if parameter.name == "pressure":
-        cells = calc_pressure_from_gradient_field(cells, config)
+        cells = calc_pressure_from_gradient_field(cells, config, parameter)
 
     return cells
 
@@ -99,30 +99,30 @@ def create_const_field(config: Config, parameter: Parameter):
     return np.full(config.general.number_cells.value, parameter.value)
 
 
-def calc_pressure_from_gradient_field(gradient_field: NDArray[Any], config: Config, settings: dict | None = None):
-    raise NotImplementedError("calc_pressure_from_gradient_field not implemented correctly")
-    #
-    # pressure = config.parameters.get("pressure").value
-    #
-    # # scale pressure field to -0.0035 and -0.0015
-    # current_min = np.min(gradient_field)
-    # current_max = np.max(gradient_field)
-    # new_min = pressure["min"]
-    # new_max = pressure["max"]
-    # gradient_field = (gradient_field - current_min) / (current_max - current_min) * (new_max - new_min) + new_min
-    #
-    # reference = 101325  # pressure
-    # len_cells = np.array(settings["grid"]["size"]) / np.array(settings["grid"]["ncells"])
-    # pressure_field = np.zeros_like(gradient_field)
-    # pressure_field[:, 0] = reference
-    # for i in range(1, pressure_field.shape[1]):
-    #     pressure_field[:, i] = pressure_field[:, i - 1] + gradient_field[:, i] * len_cells[1] * 1000
-    # pressure_field = pressure_field[::-1]
-    # # for i in range(1, pressure_field.shape[0]):
-    # #     pressure_field[i,:] = (pressure_field[i-1,:] + gradient_field[i,:] * len_cells[0] + pressure_field[i,:])/2
-    # # pressure_field = gradient_field * len_cells[1] + reference
-    #
-    # plt.imshow(pressure_field)
-    # plt.colorbar()
-    # plt.show()
-    # return pressure_field
+def calc_pressure_from_gradient_field(gradient_field: NDArray[Any], config: Config, parameter: Parameter):
+    # XXX: is this function correctly implemented?
+
+    pressure = config.parameters.get("pressure").value
+
+    # scale pressure field to min and max values from config
+    current_min = np.min(gradient_field)
+    current_max = np.max(gradient_field)
+
+    new_min = pressure["min"]
+    new_max = pressure["max"]
+    gradient_field = (gradient_field - current_min) / (current_max - current_min) * (new_max - new_min) + new_min
+
+    reference = 101325  # Standard atmosphere pressure in Pa
+    resolution = config.general.cell_resolution.value
+
+    pressure_field = np.zeros_like(gradient_field)
+    pressure_field[:, 0] = reference
+    for i in range(1, pressure_field.shape[1]):
+        pressure_field[:, i] = pressure_field[:, i - 1] + gradient_field[:, i] * resolution[1] * 1000
+    pressure_field = pressure_field[::-1]
+
+    # for i in range(1, pressure_field.shape[0]):
+    #     pressure_field[i,:] = (pressure_field[i-1,:] + gradient_field[i,:] * resolution[0] + pressure_field[i,:])/2
+    # pressure_field = gradient_field * resolution[1] + reference
+
+    return pressure_field
