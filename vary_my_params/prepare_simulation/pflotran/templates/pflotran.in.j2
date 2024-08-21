@@ -161,24 +161,20 @@ SUBSURFACE
     TYPE
       RATE SCALED_VOLUMETRIC_RATE VOLUME
       TEMPERATURE DIRICHLET
-    /
+    END
+
     RATE LIST
       TIME_UNITS d
       DATA_UNITS m^3/s
-      0.    0.
-      38.   0.
-      72.   0.00024
-    /
-    TEMPERATURE {{ value.injection_temp }} C
-# this varies the temp over a year
-#   TEMPERATURE LIST
-#     TIME_UNITS year
-#     DATA_UNITS C
-#     0.    15.6d0 !???
-#     0.5   18.0d0
-#     1     15.6d0
-#   /
-  /
+      0.    0.00024
+    END
+
+    TEMPERATURE LIST
+      TIME_UNITS year
+      DATA_UNITS C
+      0.    {{ value.injection_temp }}
+    END
+  END
   {% endfor %}
   {%- endfor %}
 
