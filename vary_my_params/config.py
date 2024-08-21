@@ -388,7 +388,7 @@ class Config:
 
             result.parameters = typed_parameters
 
-        if conf.pop("general", None) is not None:
+        if conf.pop("data", None) is not None:
             raise ValueError("`data` must not be given via a config file")
 
         if conf:
