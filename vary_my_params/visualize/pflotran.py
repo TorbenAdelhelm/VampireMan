@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from ..config import Config
+from ..config import Config, DataType
 
 TimeData = OrderedDict[str, dict[str, Any]]
 
@@ -28,16 +28,26 @@ def plot_sim(config: Config):
         plot_y(list_to_plot, datapoint_path)
         plot_isolines(config, list_to_plot, datapoint_path)
 
-        print_heatpump_temp(list_to_plot, datapoint.index)
+        # print_heatpump_temp(config, list_to_plot)
 
 
-def print_heatpump_temp(data: TimeData, index: int):
+def print_heatpump_temp(config: Config, data: TimeData):
+    # XXX is this needed?
     key, value = data.popitem()
     data[key] = value
     temp_data = value["Temperature [C]"]
-    temp = np.round(temp_data[9, 23], 4)
-    # XXX Use correct heatpump location, but how if there are multiple?
-    logging.info(f"datapoint {index}: Temperature at HP at '{key}' ({pflotran_time_to_year(key)} years): {temp} C")
+    years = pflotran_time_to_year(key)
+
+    for index, datapoint in enumerate(config.datapoints):
+        heatpumps = [{name: d.to_value()} for name, d in datapoint.data.items() if d.data_type == DataType.HEATPUMP]
+        for heatpump in heatpumps:
+            for hp_name, hp_val in heatpump.items():
+                location = hp_val["location"]
+                try:
+                    temp = np.round(temp_data[location[0], location[1]], 4)
+                except Exception as err:
+                    logging.error("Could not get HP temp: %s", err)
+                logging.info(f"datapoint %s: Temperature at HP at '%s' (%s years): %s C", index, hp_name, years, temp)
 
 
 def make_plottable_and_2D(config: Config, hdf5_file: h5py.File) -> TimeData:
