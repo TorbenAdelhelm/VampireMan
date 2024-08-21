@@ -1,5 +1,10 @@
+import cProfile
+import io
 import logging
+import pstats
 from argparse import Namespace
+from collections.abc import Callable
+from pstats import SortKey
 
 from .config import Config, Workflow, load_config
 from .load_config.pflotran import ensure_config_is_valid
@@ -54,12 +59,38 @@ def run_visualization(config: Config):
     plot_sim(config)
 
 
+def profile_stage(config: Config, stage: Callable[[Config], None | Config]):
+    result = None
+
+    if config.general.profiling:
+        profile = cProfile.Profile()
+        profile.enable()
+
+        result = stage(config)
+
+        profile.disable()
+        s = io.StringIO()
+        ps = pstats.Stats(profile, stream=s).sort_stats(SortKey.CUMULATIVE)
+        ps.print_stats()
+
+        with open(f"profiling_{stage.__name__}.txt", "w") as file:
+            file.write(s.getvalue())
+    else:
+        result = stage(config)
+
+    return result
+
+
 def run(args: Namespace):
     config = load_config(args)
-    ensure_config_is_valid(config)
+    profile_stage(config, ensure_config_is_valid)
+
     print(config)
     logging.debug("Will run all stages")
-    config = run_vary_params(config)
-    run_render(config)
-    run_simulation(config)
-    run_visualization(config)
+
+    config = profile_stage(config, run_vary_params)
+    assert config is not None
+
+    profile_stage(config, run_render)
+    profile_stage(config, run_simulation)
+    profile_stage(config, run_visualization)

@@ -171,3 +171,6 @@ pflotran.h5
 
 # Direnv gc roots and environments
 /.direnv
+
+# Profiling files
+/profiling_*

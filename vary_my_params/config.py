@@ -249,6 +249,7 @@ class GeneralConfig:
     random_seed: None | int = 0
     number_datapoints: int = 1
     workflow: Workflow = Workflow.PFLOTRAN
+    profiling: bool = False
 
     def override_with(self, other: "GeneralConfig"):
         self.interactive = other.interactive
@@ -256,6 +257,7 @@ class GeneralConfig:
         self.random_seed = other.random_seed
         self.number_datapoints = other.number_datapoints
         self.workflow = other.workflow
+        self.profiling = other.profiling
 
     @staticmethod
     def from_dict(conf: dict[str, Any]) -> "GeneralConfig":
@@ -310,6 +312,12 @@ class GeneralConfig:
         workflow = conf.pop("workflow", None)
         if workflow is not None:
             result.workflow = Workflow(workflow)
+
+        profiling = conf.pop("profiling", None)
+        if profiling is not None:
+            if not isinstance(profiling, bool):
+                raise ValueError("`profiling` is not of type bool")
+            result.profiling = profiling
 
         if conf:
             raise ValueError(f"There was additional data in config dict: {conf}")
