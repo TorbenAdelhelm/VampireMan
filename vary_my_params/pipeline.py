@@ -92,5 +92,6 @@ def run(args: Namespace):
     assert config is not None
 
     profile_stage(config, run_render)
+    # XXX: visualize in between the steps
     profile_stage(config, run_simulation)
     profile_stage(config, run_visualization)

@@ -32,6 +32,8 @@ def vary_heatpump(config: Config, parameter: ParameterHeatPump) -> Data:
 
 
 def vary_params(config: Config) -> Config:
+    # for step in config.steps:
+    #     filter over params where step == param.step
     for index in range(config.general.number_datapoints):
         # TODO split into data_fixed etc
         data = {

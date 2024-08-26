@@ -8,4 +8,5 @@ def random_float(config: Config):
 
 
 def random_nd_array(config: Config, size: int):
+    # TODO fix this, this is wrong
     return np.random.default_rng(seed=config.general.random_seed).random(size)

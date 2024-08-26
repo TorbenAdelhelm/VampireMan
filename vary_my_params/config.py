@@ -338,8 +338,10 @@ class GeneralConfig:
 @dataclass
 class Config:
     # Need to use field here, as otherwise it would be the same dict across several objects
+    # fluidsimulation hat man immer: zeit, solver
     general: GeneralConfig = field(default_factory=lambda: GeneralConfig())
     steps: list[str] = field(default_factory=lambda: ["global"])
+    # boundary conditions, maybe time??
     parameters: dict[str, Parameter] = field(default_factory=lambda: {})
     # TODO split this in datapoints_fixed, datapoint_const_within_datapoint, ...
     datapoints: list[Datapoint] = field(default_factory=lambda: [])
