@@ -1,0 +1,5 @@
+# This is the default use case. All the default values come from the defaults defined by the program.
+# It provides a small domain (32, 128, 1) with a resolution of (5, 5, 5) meters per cell.
+# There is a constant temperature, pressure and permeability and a single heat pump with a fix position.
+general:
+  output_directory: ./datasets_out/case1_default

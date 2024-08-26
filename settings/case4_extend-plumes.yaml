@@ -1,0 +1,20 @@
+# This setting has one hp in a long domain using const pressure and const pressure.
+general:
+  number_datapoints: 3
+  output_directory: ./datasets_out/case4_extend-plumes
+  number_cells:
+    data_type: array
+    value: [16, 128, 1]
+parameters:
+  permeability:
+    data_type: perlin
+    vary: spatially_vary_within_datapoint
+    distribution: logarithmic
+    value:
+      frequency: [1.8, 1.8, 1.8]
+      min: 1.2882090745857623e-10
+      max: 1.2882090745857623e-1
+  pressure:
+    data_type: array
+    vary: const_within_datapoint
+    value: [-0.0015, -0.0035]

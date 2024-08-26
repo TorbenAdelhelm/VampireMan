@@ -1,0 +1,30 @@
+# This setting is larger than the default case and has several heat pumps.
+general:
+  number_datapoints: 2
+  output_directory: ./datasets_out/case2_vary-hp-positions
+  random_seed: null
+  number_cells:
+    value: [64, 256, 1]
+    data_type: array
+parameters:
+  # This overrides the default heatpump defined in the code
+  hp1:
+    data_type: heatpump
+    value:
+      location: [32, 64, 1]
+      injection_temp: 15.6
+      injection_rate: 0.00002
+  hp2:
+    data_type: heatpump
+    vary: const_within_datapoint
+    value:
+      location: [16, 64, 1] # Gets overwritten
+      injection_temp: 15.6
+      injection_rate: 0.00002
+  hp3:
+    data_type: heatpump
+    vary: const_within_datapoint
+    value:
+      location: [16, 92, 1] # Gets overwritten
+      injection_temp: 15.6
+      injection_rate: 0.00005
