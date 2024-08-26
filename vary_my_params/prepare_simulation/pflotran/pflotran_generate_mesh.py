@@ -26,8 +26,8 @@ def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: P
 
 
 def render_mesh(config: Config) -> list[str]:
-    xGrid, yGrid, zGrid = config.general.number_cells.value
-    cellXWidth, cellYWidth, cellZWidth = config.general.cell_resolution.value
+    xGrid, yGrid, zGrid = config.general.number_cells
+    cellXWidth, cellYWidth, cellZWidth = config.general.cell_resolution
 
     volume = cellXWidth * cellYWidth * cellZWidth
     if cellXWidth == cellYWidth == cellZWidth:
@@ -88,8 +88,8 @@ def render_mesh(config: Config) -> list[str]:
 
 
 def render_borders(config: Config):
-    xGrid, yGrid, zGrid = config.general.number_cells.value
-    cellXWidth, cellYWidth, cellZWidth = config.general.cell_resolution.value
+    xGrid, yGrid, zGrid = config.general.number_cells
+    cellXWidth, cellYWidth, cellZWidth = config.general.cell_resolution
 
     if cellXWidth == cellYWidth == cellZWidth:
         faceArea = cellXWidth**2

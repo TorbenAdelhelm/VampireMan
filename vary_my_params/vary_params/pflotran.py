@@ -10,9 +10,9 @@ def copy_parameter(parameter: Parameter) -> Data:
     return Data(parameter.name, parameter.data_type, parameter.value)
 
 
-def vary_heatpump(config: Config, parameter: ParameterHeatPump) -> Data:
-    resolution = np.array(config.general.cell_resolution.value)
-    number_cells = np.array(config.general.number_cells.value)
+def vary_heatpump(config: Config, parameter: Parameter) -> Data:
+    resolution = np.array(config.general.cell_resolution)
+    number_cells = np.array(config.general.number_cells)
 
     hp = parameter.value
     result_location = np.zeros(3)

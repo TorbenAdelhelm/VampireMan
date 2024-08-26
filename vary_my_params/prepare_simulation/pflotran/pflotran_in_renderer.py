@@ -39,7 +39,7 @@ def render(config: Config):
 
         save_vary_field(
             datapoint_dir / "permeability_field.h5",
-            config.general.number_cells.value,
+            config.general.number_cells,
             permeability.value,
             "permeability",
         )

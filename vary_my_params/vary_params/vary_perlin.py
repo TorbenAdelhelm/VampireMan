@@ -15,7 +15,7 @@ def make_perlin_grid(
     offset: NDArray[Any],
     freq: list[float],
 ) -> NDArray[np.floating[Any]]:
-    grid_dimensions: list[int] = config.general.number_cells.value
+    grid_dimensions: list[int] = config.general.number_cells
 
     # adapted by Manuel Hirche
 
@@ -96,7 +96,7 @@ def create_vary_field(config: Config, parameter: Parameter):
 
 def create_const_field(config: Config, value: float):
     # TODO think about pressure
-    return np.full(config.general.number_cells.value, value)
+    return np.full(config.general.number_cells, value)
 
 
 def calc_pressure_from_gradient_field(gradient_field: NDArray[Any], config: Config, parameter: Parameter):
@@ -113,7 +113,7 @@ def calc_pressure_from_gradient_field(gradient_field: NDArray[Any], config: Conf
     gradient_field = (gradient_field - current_min) / (current_max - current_min) * (new_max - new_min) + new_min
 
     reference = 101325  # Standard atmosphere pressure in Pa
-    resolution = config.general.cell_resolution.value
+    resolution = config.general.cell_resolution
 
     pressure_field = np.zeros_like(gradient_field)
     pressure_field[:, 0] = reference

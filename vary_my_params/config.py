@@ -228,20 +228,8 @@ class Datapoint:
 
 @dataclass
 class GeneralConfig:
-    number_cells: ParameterListInt = field(
-        default_factory=lambda: ParameterListInt(
-            name="number_cells",
-            data_type=DataType.ARRAY,
-            value=[32, 128, 1],
-        )
-    )
-    cell_resolution: ParameterListFloat = field(
-        default_factory=lambda: ParameterListFloat(
-            name="cell_resolution",
-            data_type=DataType.ARRAY,
-            value=[5, 5, 5],
-        )
-    )
+    number_cells: list[int] = field(default_factory=lambda: [32, 128, 1])
+    cell_resolution: list[float] = field(default_factory=lambda: [5.0, 5.0, 5.0])
     interactive: bool = True
     # XXX: Hopefully the format `2024-08-17T10:06:15+00:00` is supported by the common file systems
     output_directory: Path = Path(f"./datasets_out/{datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")}")
@@ -268,21 +256,17 @@ class GeneralConfig:
 
         number_cells = conf.pop("number_cells", None)
         if number_cells is not None:
-            result.number_cells = ParameterListInt.from_dict("number_cells", number_cells, ParameterListInt)
-            value = result.number_cells.value
-            if len(value) != 3:
+            if len(number_cells) != 3:
                 logging.warning("`number_cells` only works with three dimensions. Assuming three dimensions.")
-                result.number_cells.value = [value[0], value[1], 1]
+                number_cells = [number_cells[0], number_cells[1], 1]
+            result.number_cells = number_cells
 
         cell_resolution = conf.pop("cell_resolution", None)
         if cell_resolution is not None:
-            result.cell_resolution = ParameterListFloat.from_dict(
-                "cell_resolution", cell_resolution, ParameterListFloat
-            )
-            value = result.cell_resolution.value
-            if len(value) != 3:
+            if len(cell_resolution) != 3:
                 logging.warning("`cell_resolution` only works with three dimensions. Assuming three dimensions.")
-                result.cell_resolution.value = [value[0], value[1], 1]
+                cell_resolution = [cell_resolution[0], cell_resolution[1], 1]
+            result.cell_resolution = cell_resolution
 
         interactive = conf.pop("interactive", None)
         if interactive is not None:

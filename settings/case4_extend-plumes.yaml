@@ -2,9 +2,7 @@
 general:
   number_datapoints: 3
   output_directory: ./datasets_out/case4_extend-plumes
-  number_cells:
-    data_type: array
-    value: [16, 128, 1]
+  number_cells: [16, 128, 1]
 parameters:
   permeability:
     data_type: perlin

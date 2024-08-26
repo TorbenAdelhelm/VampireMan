@@ -51,7 +51,7 @@ def print_heatpump_temp(config: Config, data: TimeData):
 
 
 def make_plottable_and_2D(config: Config, hdf5_file: h5py.File) -> TimeData:
-    dimensions = config.general.number_cells.value
+    dimensions = config.general.number_cells
 
     datapoints_to_plot: TimeData = OrderedDict()
 
