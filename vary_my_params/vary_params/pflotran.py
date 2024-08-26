@@ -49,7 +49,8 @@ def vary_params(config: Config) -> Config:
                 case Vary.SPACE:
                     match parameter.data_type:
                         case DataType.SCALAR:
-                            field = create_const_field(config, parameter)
+                            assert isinstance(parameter.value, float)
+                            field = create_const_field(config, parameter.value)
                         case DataType.PERLIN:
                             field = create_vary_field(config, parameter)
                         case _:

@@ -94,9 +94,9 @@ def create_vary_field(config: Config, parameter: Parameter):
     return cells
 
 
-def create_const_field(config: Config, parameter: Parameter):
+def create_const_field(config: Config, value: float):
     # TODO think about pressure
-    return np.full(config.general.number_cells.value, parameter.value)
+    return np.full(config.general.number_cells.value, value)
 
 
 def calc_pressure_from_gradient_field(gradient_field: NDArray[Any], config: Config, parameter: Parameter):
