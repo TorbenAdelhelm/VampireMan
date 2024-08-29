@@ -41,6 +41,17 @@ def ensure_config_is_valid(config: Config):
     ]:
         ensure_parameter_isset(config, item)
 
+    pressure = config.parameters.get("pressure")
+    if pressure is not None:
+        pressure_correct = True
+        try:
+            if not (isinstance(pressure.value["min"], float) and isinstance(pressure.value["max"], float)):
+                pressure_correct = False
+        except KeyError:
+            pressure_correct = False
+        if not pressure_correct:
+            raise ValueError("`pressure` doesn't have min or max values that are floats")
+
     # Simulation without heatpumps doesn't make much sense
     heatpumps = [{name: d.name} for name, d in config.parameters.items() if d.data_type == DataType.HEATPUMP]
     if len(heatpumps) < 1:

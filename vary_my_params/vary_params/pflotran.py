@@ -69,8 +69,19 @@ def vary_params(config: Config) -> Config:
                         case DataType.HEATPUMP:
                             data[parameter.name] = vary_heatpump(config, parameter)
                         case DataType.ARRAY:
-                            value = np.arange(parameter.value[0], parameter.value[1])
-                            data[parameter.name] = create_const_field(config, value)
+                            # TODO: what needs to be done here?
+                            max_pressure = parameter.value["max"]
+                            min_pressure = parameter.value["min"]
+                            assert isinstance(max_pressure, float)
+                            assert isinstance(min_pressure, float)
+                            distance = max_pressure - min_pressure
+                            step_width = distance / config.general.number_datapoints
+                            value = min_pressure + step_width * index
+                            data[parameter.name] = Data(
+                                name=parameter.name,
+                                data_type=parameter.data_type,
+                                value=create_const_field(config, value),
+                            )
                         case _:
                             raise NotImplementedError()
                 case _:
