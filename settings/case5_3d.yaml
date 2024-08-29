@@ -1,0 +1,12 @@
+# This setting is the same as case 1 but in 3D
+general:
+  output_directory: ./datasets_out/case5_3d
+  number_datapoints: 1
+  number_cells: [16, 64, 16]
+parameters:
+  hp1:
+    data_type: heatpump
+    value:
+      location: [8, 16, 8]
+      injection_temp: 15.6
+      injection_rate: 0.00002
