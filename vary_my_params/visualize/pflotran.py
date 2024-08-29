@@ -18,12 +18,40 @@ def pflotran_time_to_year(time_step: str) -> float:
     return float(time_step.split(" ")[-2])
 
 
+# This doesn't work
+# def asdf(data: TimeData, path: Path):
+#     time_steps = len(data)
+#     key, val = data.popitem()
+#     cols = len(val)
+#     data[key] = val
+#
+#     _, axes = plt.subplots(time_steps, cols, figsize=(20 * cols, 5 * time_steps))
+#
+#     for index, (time_step, time_data) in enumerate(data.items()):
+#         temp_data = time_data.get("Temperature [C]")
+#         for level in range(len(temp_data[2])):
+#             plt.subplot()
+#             set_trace()
+#
+#             # Make the 3D data 2D so it can be plotted
+#             plot_data = temp_data[:, :, level]
+#             plt.imshow(plot_data)
+#
+#             plt.xlabel("cells y")
+#             plt.ylabel("cells x or z")
+#             aligned_colorbar(label=f"Temp in C at z = {level}")
+#
+#         pic_file_name = path / "Pflotran_properties_2d-{row}.jpg"
+#         logging.info(f"Resulting picture is at {pic_file_name}")
+#         plt.savefig(pic_file_name)
+
+
 def plot_sim(config: Config):
     for datapoint in config.datapoints:
         datapoint_path = config.general.output_directory / f"datapoint-{datapoint.index}"
 
         with h5py.File(datapoint_path / "pflotran.h5") as file:
-            list_to_plot = make_plottable_and_2D(config, file)
+            list_to_plot = make_plottable(config, file)
 
         plot_y(list_to_plot, datapoint_path)
         plot_isolines(config, list_to_plot, datapoint_path)
@@ -50,7 +78,7 @@ def print_heatpump_temp(config: Config, data: TimeData):
                 logging.error("Could not get HP temp: %s", err)
 
 
-def make_plottable_and_2D(config: Config, hdf5_file: h5py.File) -> TimeData:
+def make_plottable(config: Config, hdf5_file: h5py.File) -> TimeData:
     dimensions = config.general.number_cells
 
     datapoints_to_plot: TimeData = OrderedDict()
@@ -66,9 +94,6 @@ def make_plottable_and_2D(config: Config, hdf5_file: h5py.File) -> TimeData:
             # Reshape the data to match the 3D space of the domain
             data = data.reshape(dimensions, order="F")
 
-            # Make the 3D data 2D so it can be plotted
-            data = data[:, :, 0]
-
             datapoints_to_plot[time_step][property] = data
     return datapoints_to_plot
 
@@ -82,16 +107,19 @@ def plot_y(data: TimeData, path: Path):
     _, axes = plt.subplots(rows, cols, figsize=(20 * cols, 5 * rows))
 
     for row, (_, time_data) in enumerate(data.items()):
-        for col, (property, property_data) in enumerate(time_data.items()):
+        for col, (property_name, property_data) in enumerate(time_data.items()):
             plt.sca(axes[row][col])
-            plt.imshow(property_data)
-            # XXX why this?
-            plt.gca().invert_yaxis()
+
+            # Make the 3D data 2D so it can be plotted
+            level = int((property_data.shape[2] - 1) / 2)
+            plot_data = property_data[:, :, level]
+            plt.imshow(plot_data)
+
             plt.xlabel("cells y")
             plt.ylabel("cells x or z")
-            aligned_colorbar(label=property)
+            aligned_colorbar(label=property_name)
 
-    pic_file_name = path / "Pflotran_properties.jpg"
+    pic_file_name = path / "Pflotran_properties_2d.jpg"
     logging.info(f"Resulting picture is at {pic_file_name}")
     plt.savefig(pic_file_name)
 
@@ -102,14 +130,17 @@ def plot_isolines(config: Config, data: TimeData, path: Path):
     # TODO read min/max from the data
     levels = np.arange(10.6, 15.6, 0.25)
 
-    # XXX why do we skip timestep 0 again?
     for index, (time_step, time_data) in enumerate(data.items()):
-        temp = time_data.get("Temperature [C]")
+        property_data = time_data.get("Temperature [C]")
+
+        assert property_data is not None
+        # Make the 3D data 2D so it can be plotted
+        level = int((property_data.shape[2] - 1) / 2)
+        plot_data = property_data[:, :, level]
+        plt.imshow(plot_data)
 
         plt.sca(axes[index])
-        plt.contourf(temp, levels=levels, cmap="RdBu_r")
-        # XXX why?
-        plt.gca().invert_yaxis()
+        plt.contourf(plot_data, levels=levels, cmap="RdBu_r")
 
         plt.title(f"{pflotran_time_to_year(time_step)} years")
         # XXX this is not meters, it is cells. Should be number_cells * cell_resolution
