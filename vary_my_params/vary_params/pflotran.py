@@ -50,7 +50,7 @@ def vary_params(config: Config) -> Config:
                 case Vary.NONE:
                     match parameter.data_type:
                         case DataType.HEATPUMP:
-                            data[parameter.name] = vary_heatpump(config, parameter)  # type: ignore
+                            data[parameter.name] = vary_heatpump(config, parameter)
                         case _:
                             data[parameter.name] = copy_parameter(parameter)
                 case Vary.SPACE:
