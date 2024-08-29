@@ -1,13 +1,13 @@
 import numpy as np
 
-from ..config import Config, Data, Datapoint, DataType, HeatPump, Parameter, ParameterHeatPump, Vary
+from ..config import Config, Data, Datapoint, DataType, HeatPump, Parameter, Vary
 from ..utils import random_nd_array
 from .vary_perlin import create_const_field, create_vary_field
 
 
 def copy_parameter(parameter: Parameter) -> Data:
     """This function simply copies all values from a `Parameter` to a `Data` object without any transformation"""
-    return Data(parameter.name, parameter.data_type, parameter.value)
+    return Data(name=parameter.name, data_type=parameter.data_type, value=parameter.value)
 
 
 def vary_heatpump(config: Config, parameter: Parameter) -> Data:
@@ -15,6 +15,7 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
     number_cells = np.array(config.general.number_cells)
 
     hp = parameter.value
+    assert isinstance(hp, HeatPump)
     result_location = np.zeros(3)
 
     # XXX is this needed?
@@ -27,7 +28,11 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
             raise NotImplementedError()
 
     return Data(
-        parameter.name, parameter.data_type, HeatPump(result_location.tolist(), hp.injection_temp, hp.injection_rate)
+        name=parameter.name,
+        data_type=parameter.data_type,
+        value=HeatPump(
+            location=result_location.tolist(), injection_temp=hp.injection_temp, injection_rate=hp.injection_rate
+        ),
     )
 
 
@@ -37,7 +42,7 @@ def vary_params(config: Config) -> Config:
     for index in range(config.general.number_datapoints):
         # TODO split into data_fixed etc
         data = {
-            "time": Data("time", DataType.STRUCT, {"final_time": 27.5}),
+            "final_time": Data(name="final_time", data_type=DataType.STRUCT, value=27.5),
         }
 
         for _, parameter in config.parameters.items():
@@ -57,17 +62,20 @@ def vary_params(config: Config) -> Config:
                             field = create_vary_field(config, parameter)
                         case _:
                             raise NotImplementedError()
-                    data[parameter.name] = Data(parameter.name, parameter.data_type, field)
+                    data[parameter.name] = Data(name=parameter.name, data_type=parameter.data_type, value=field)
                 # TODO make this less copy paste
                 case Vary.CONST:
                     match parameter.data_type:
                         case DataType.HEATPUMP:
-                            data[parameter.name] = vary_heatpump(config, parameter)  # type: ignore
+                            data[parameter.name] = vary_heatpump(config, parameter)
+                        case DataType.ARRAY:
+                            value = np.arange(parameter.value[0], parameter.value[1])
+                            data[parameter.name] = create_const_field(config, value)
                         case _:
                             raise NotImplementedError()
                 case _:
                     raise ValueError()
 
-        config.datapoints.append(Datapoint(index, data))
+        config.datapoints.append(Datapoint(index=index, data=data))
 
     return config

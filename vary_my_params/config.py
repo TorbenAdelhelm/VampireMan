@@ -2,10 +2,10 @@ import argparse
 import datetime
 import enum
 import logging
-from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from ruamel.yaml import YAML
 
 yaml = YAML(typ="safe")
@@ -42,72 +42,22 @@ class Workflow(enum.StrEnum):
     PFLOTRAN = "pflotran"
 
 
-@dataclass
-class BaseParameter:
+class HeatPump(BaseModel):
+    location: list[float]
+    # TODO make this list[float]
+    injection_temp: float
+    # TODO make this list[float]
+    injection_rate: float
+
+
+class Parameter(BaseModel):
     name: str
     data_type: DataType
-    value: Any
+    value: float | list[int] | HeatPump | dict[str, float | list[float]]
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.NONE
     input_source: InputSource = InputSource.MANUAL  # TODO is this really needed?
-
-    T = TypeVar("T", bound="BaseParameter")
-
-    @staticmethod
-    def parameter_type_from_dict(conf: dict[str, Any]) -> type:
-        if conf == {}:
-            raise ValueError("Parameter config is empty")
-
-        data_type = conf.get("data_type")
-        if data_type is None:
-            raise ValueError("`data_type` missing from parameter")
-
-        match DataType(data_type):
-            case DataType.HEATPUMP:
-                return ParameterHeatPump
-            case _:
-                return Parameter
-
-    @staticmethod
-    def from_dict(name: str, conf: dict[str, Any], cls: type[T]) -> T:
-        if conf == {}:
-            raise ValueError("Parameter config is empty")
-
-        if not isinstance(name, str):
-            raise ValueError("`name` is not of type str")
-
-        data_type = conf.pop("data_type", None)
-        if data_type is None:
-            raise ValueError("`data_type` missing from parameter")
-        data_type = DataType(data_type)
-
-        # Value could probably be None, so we can't use the same logic here
-        if "value" not in conf:
-            raise ValueError("`value` missing from parameter")
-        value = conf.pop("value")
-
-        # If the parameter should be varied as perlin, the keys must be in place
-        if data_type is DataType.PERLIN and (
-            not value or not ("frequency" in value and "min" in value and "max" in value)
-        ):
-            raise ValueError("`PERLIN` type must contain frequency, min and max")
-
-        result = cls(name, data_type, value=value)
-
-        distribution = conf.pop("distribution", None)
-        if distribution is not None:
-            result.distribution = Distribution(distribution)
-
-        vary = conf.pop("vary", None)
-        if vary is not None:
-            result.vary = Vary(vary)
-
-        input_source = conf.pop("input_source", None)
-        if input_source is not None:
-            result.input_source = InputSource(input_source)
-
-        return result
 
     def __str__(self) -> str:
         return (
@@ -120,103 +70,18 @@ class BaseParameter:
         )
 
 
-@dataclass
-class Parameter(BaseParameter):
-    value: float | list[int] | dict[str, float | list[float]]
-
-
-@dataclass
-class ParameterListInt(BaseParameter):
-    value: list[int]
-
-
-@dataclass
-class ParameterListFloat(BaseParameter):
-    value: list[float]
-
-
-@dataclass
-class HeatPump:
-    location: list[float]
-    # TODO make this list[float]
-    injection_temp: float
-    # TODO make this list[float]
-    injection_rate: float
-
-    @staticmethod
-    def from_dict(conf: dict[str, dict[str, float | list[float]]]) -> "HeatPump":
-        try:
-            value = conf["value"]
-            if not isinstance(value, dict):
-                raise ValueError()
-
-            location = value["location"]
-            if not isinstance(value["location"], list):
-                raise ValueError("`location` value of HeatPump must be list[float]")
-            assert isinstance(location, list)  # Hack for pyright
-            if not all(isinstance(float(item), float) for item in location):
-                raise ValueError("`location` value of HeatPump must be list[float]")
-
-            injection_temp = value["injection_temp"]
-            if not isinstance(injection_temp, float):
-                raise ValueError("`injection_temp` value of HeatPump must be float")
-
-            injection_rate = value["injection_rate"]
-            if not isinstance(injection_rate, float):
-                raise ValueError("`injection_rate` value of HeatPump must be float")
-        except KeyError as err:
-            logging.critical("Could not parse HeatPump config")
-            raise err
-        return HeatPump(location, injection_temp, injection_rate)
-
-    def to_value(self) -> dict[str, Any]:
-        return {
-            "location": self.location,
-            "injection_temp": self.injection_temp,
-            "injection_rate": self.injection_rate,
-        }
-
-
-@dataclass
-class ParameterHeatPump(BaseParameter):
-    value: HeatPump
-
-    @staticmethod
-    def from_dict(name: str, conf: dict[str, Any]) -> "ParameterHeatPump":  # type: ignore
-        conf["value"] = HeatPump.from_dict(conf)
-        return BaseParameter.from_dict(name, conf, ParameterHeatPump)
-
-
-@dataclass
-class Data:
+class Data(BaseModel):
     name: str
     data_type: DataType
-    value: Any
-
-    def to_value(self) -> Any:
-        """Reduce data item to its value"""
-        try:
-            return self.value.to_value()
-        except AttributeError:
-            # self.value is probably a dict or a trivial datatype
-            return self.value
+    value: int | float | list[int] | list[float] | HeatPump | Any  # | np.ndarray
 
     def __str__(self) -> str:
         return f"====== {self.name} [{self.data_type}]: {self.value}"
 
 
-@dataclass
-class Datapoint:
+class Datapoint(BaseModel):
     index: int
     data: dict[str, Data]
-
-    def to_values(self) -> dict[str, Any]:
-        """Reduce all data items to only their values.
-        This is useful for rendering values in a .j2 file, as it expects a dict"""
-        values: dict[str, Any] = {}
-        for name, item in self.data.items():
-            values[name] = item.to_value()
-        return values
 
     def __str__(self) -> str:
         data_strings = []
@@ -226,10 +91,9 @@ class Datapoint:
         return f"=== Datapoint #{self.index}:\n" f"{"\n".join(data_strings)}"
 
 
-@dataclass
-class GeneralConfig:
-    number_cells: list[int] = field(default_factory=lambda: [32, 128, 1])
-    cell_resolution: list[float] = field(default_factory=lambda: [5.0, 5.0, 5.0])
+class GeneralConfig(BaseModel):
+    number_cells: list[int] = Field(default_factory=lambda: [32, 128, 1])
+    cell_resolution: list[float] = Field(default_factory=lambda: [5.0, 5.0, 5.0])
     interactive: bool = True
     # XXX: Hopefully the format `2024-08-17T10:06:15+00:00` is supported by the common file systems
     output_directory: Path = Path(f"./datasets_out/{datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")}")
@@ -238,75 +102,6 @@ class GeneralConfig:
     number_datapoints: int = 1
     workflow: Workflow = Workflow.PFLOTRAN
     profiling: bool = False
-
-    def override_with(self, other: "GeneralConfig"):
-        self.interactive = other.interactive
-        self.output_directory = other.output_directory
-        self.random_seed = other.random_seed
-        self.number_datapoints = other.number_datapoints
-        self.workflow = other.workflow
-        self.profiling = other.profiling
-
-    @staticmethod
-    def from_dict(conf: dict[str, Any]) -> "GeneralConfig":
-        result = GeneralConfig()
-
-        if conf == {}:
-            return result
-
-        number_cells = conf.pop("number_cells", None)
-        if number_cells is not None:
-            if len(number_cells) != 3:
-                logging.warning("`number_cells` only works with three dimensions. Assuming three dimensions.")
-                number_cells = [number_cells[0], number_cells[1], 1]
-            result.number_cells = number_cells
-
-        cell_resolution = conf.pop("cell_resolution", None)
-        if cell_resolution is not None:
-            if len(cell_resolution) != 3:
-                logging.warning("`cell_resolution` only works with three dimensions. Assuming three dimensions.")
-                cell_resolution = [cell_resolution[0], cell_resolution[1], 1]
-            result.cell_resolution = cell_resolution
-
-        interactive = conf.pop("interactive", None)
-        if interactive is not None:
-            if not isinstance(interactive, bool):
-                raise ValueError("`interactive` is not of type bool")
-            result.interactive = interactive
-
-        output_directory = conf.pop("output_directory", None)
-        if output_directory is not None:
-            result.output_directory = Path(output_directory)
-
-        try:
-            random_seed = conf["random_seed"]
-            random_seed = conf.pop("random_seed")
-            if random_seed is not None and not isinstance(random_seed, int):
-                raise ValueError("`random_seed` is not of type int or None")
-            result.random_seed = random_seed
-        except KeyError:
-            pass
-
-        number_datapoints = conf.pop("number_datapoints", None)
-        if number_datapoints is not None:
-            if not isinstance(number_datapoints, int):
-                raise ValueError("`number_datapoints` is not of type int")
-            result.number_datapoints = number_datapoints
-
-        workflow = conf.pop("workflow", None)
-        if workflow is not None:
-            result.workflow = Workflow(workflow)
-
-        profiling = conf.pop("profiling", None)
-        if profiling is not None:
-            if not isinstance(profiling, bool):
-                raise ValueError("`profiling` is not of type bool")
-            result.profiling = profiling
-
-        if conf:
-            raise ValueError(f"There was additional data in config dict: {conf}")
-
-        return result
 
     def __str__(self) -> str:
         return (
@@ -319,68 +114,36 @@ class GeneralConfig:
         )
 
 
-@dataclass
-class Config:
+class Config(BaseModel):
     # Need to use field here, as otherwise it would be the same dict across several objects
     # fluidsimulation hat man immer: zeit, solver
-    general: GeneralConfig = field(default_factory=lambda: GeneralConfig())
-    steps: list[str] = field(default_factory=lambda: ["global"])
+    general: GeneralConfig = Field(default_factory=lambda: GeneralConfig())
+    steps: list[str] = Field(default_factory=lambda: ["global"])
     # boundary conditions, maybe time??
-    parameters: dict[str, Parameter] = field(default_factory=lambda: {})
+    parameters: dict[str, Parameter] = Field(default_factory=lambda: {})
     # TODO split this in datapoints_fixed, datapoint_const_within_datapoint, ...
-    datapoints: list[Datapoint] = field(default_factory=lambda: [])
+    datapoints: list[Datapoint] = Field(default_factory=lambda: [])
+
+    model_config = ConfigDict(extra="forbid")
+
+    @model_validator(mode="before")
+    def put_parameter_name_into_data(cls, data):
+        """This "validator" only copies the name of a parameter into the dict so it is accessible"""
+        for name, parameter in data.get("parameters", {}).items():
+            parameter["name"] = name
+        return data
+
+    @field_validator("steps")
+    def non_empty_list(cls, value):
+        if not isinstance(value, list) or len(value) == 0:
+            raise ValueError("`steps` must be a non-empty list")
+        return value
 
     def override_with(self, other_config: "Config"):
         self.general = other_config.general
         self.steps = other_config.steps or self.steps
         self.parameters |= other_config.parameters
         self.datapoints = other_config.datapoints
-
-    @staticmethod
-    def from_dict(conf: dict[str, Any]) -> "Config":
-        result = Config()
-
-        if conf == {}:
-            return result
-
-        general = conf.pop("general", None)
-        if general is not None:
-            result.general = GeneralConfig.from_dict(general)
-
-        steps = conf.pop("steps", None)
-        if steps is not None:
-            if not isinstance(steps, list):
-                raise ValueError("`steps` is not of type list[str]")
-
-            if len(steps) < 1:
-                raise ValueError("`steps` must contain at least one entry")
-
-            for item in steps:
-                if not isinstance(item, str):
-                    raise ValueError("`steps` is not of type list[str]")
-
-            result.steps = steps
-
-        parameters = conf.pop("parameters", None)
-        if parameters is not None:
-            if not isinstance(parameters, dict):
-                raise ValueError("`parameters` is not of type dict")
-            typed_parameters = {}
-            for param_name, param_meta in parameters.items():
-                if BaseParameter.parameter_type_from_dict(param_meta) is ParameterHeatPump:
-                    typed_parameters[param_name] = ParameterHeatPump.from_dict(param_name, param_meta)
-                else:
-                    typed_parameters[param_name] = Parameter.from_dict(param_name, param_meta, Parameter)
-
-            result.parameters = typed_parameters
-
-        if conf.pop("data", None) is not None:
-            raise ValueError("`data` must not be given via a config file")
-
-        if conf:
-            raise ValueError(f"There was additional data in config dict: {conf}")
-
-        return result
 
     @staticmethod
     def from_yaml(config_file_path: str) -> "Config":
@@ -394,7 +157,7 @@ class Config:
         logging.debug("Loaded config from %s", config_file_path)
         logging.debug("Yaml: %s", yaml_values)
 
-        return Config.from_dict(yaml_values)
+        return Config(**yaml_values)
 
     def __str__(self) -> str:
         parameter_strings = []
@@ -415,18 +178,6 @@ class Config:
 
 
 def load_config(arguments: argparse.Namespace) -> Config:
-    # XXX: No idea if we can dynamically load other configs...
-    # ... also unsure if this is even a good idea
-    # import importlib
-    # try:
-    #     lib = importlib.import_module(args.workflow, "default_config")
-    #     importlib.invalidate_caches()
-    #     logging.info(lib.__name__)
-    #     logging.info(lib.pflotran.get_defaults())
-    #
-    # except Exception as err:
-    #     logging.error(err)
-
     # Get workflow specific defaults
     match arguments.workflow:
         case "pflotran":
@@ -435,10 +186,7 @@ def load_config(arguments: argparse.Namespace) -> Config:
             logging.error("%s workflow is not yet implemented", arguments.workflow)
             raise NotImplementedError("Workflow not implemented")
 
-    workflow_specific_default_config = config_module.get_defaults()
-
-    run_config = Config()
-    run_config.override_with(workflow_specific_default_config)
+    run_config = config_module.get_defaults()
 
     # Load config from file if provided
     config_file = arguments.config_file
@@ -452,7 +200,7 @@ def load_config(arguments: argparse.Namespace) -> Config:
         logging.debug("Running non-interactively")
 
     if arguments.datapoints is not None:
-        run_config.general.number_datapoints = arguments.datapoints
+        run_config.general.number_datapoints = int(arguments.datapoints)
 
     logging.debug("Config: %s", run_config)
 

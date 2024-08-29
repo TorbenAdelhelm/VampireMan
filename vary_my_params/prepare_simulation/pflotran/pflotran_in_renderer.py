@@ -25,8 +25,8 @@ def render(config: Config):
             logging.critical("Directory at %s could not be created, cannot proceed", datapoint_dir)
             raise error
 
-        values = datapoint.to_values()
-        heatpumps = [{name: d.to_value()} for name, d in datapoint.data.items() if d.data_type == DataType.HEATPUMP]
+        values = datapoint.data
+        heatpumps = [{name: d.value} for name, d in datapoint.data.items() if d.data_type == DataType.HEATPUMP]
         values["heatpumps"] = heatpumps
 
         with open(f"{datapoint_dir}/pflotran.in", "w") as file:

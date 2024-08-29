@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from ..config import Config, DataType
+from ..config import Config, DataType, HeatPump
 
 TimeData = OrderedDict[str, dict[str, Any]]
 
@@ -39,15 +39,15 @@ def print_heatpump_temp(config: Config, data: TimeData):
     years = pflotran_time_to_year(key)
 
     for index, datapoint in enumerate(config.datapoints):
-        heatpumps = [{name: d.to_value()} for name, d in datapoint.data.items() if d.data_type == DataType.HEATPUMP]
-        for heatpump in heatpumps:
-            for hp_name, hp_val in heatpump.items():
-                location = hp_val["location"]
-                try:
-                    temp = np.round(temp_data[location[0], location[1]], 4)
-                except Exception as err:
-                    logging.error("Could not get HP temp: %s", err)
-                logging.info(f"datapoint %s: Temperature at HP at '%s' (%s years): %s C", index, hp_name, years, temp)
+        heatpumps = [{name: d.value} for name, d in datapoint.data.items() if d.data_type == DataType.HEATPUMP]
+        for name, heatpump in heatpumps:
+            assert isinstance(heatpump, HeatPump)
+            location = heatpump.location
+            try:
+                temp = np.round(temp_data[location[0], location[1]], 4)
+                logging.info("datapoint %s: Temperature at HP at '%s' (%s years): %s C", index, name, years, temp)
+            except Exception as err:
+                logging.error("Could not get HP temp: %s", err)
 
 
 def make_plottable_and_2D(config: Config, hdf5_file: h5py.File) -> TimeData:

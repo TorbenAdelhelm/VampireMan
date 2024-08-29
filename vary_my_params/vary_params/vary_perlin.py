@@ -12,7 +12,7 @@ def make_perlin_grid(
     aimed_min: float,
     aimed_max: float,
     config: Config,
-    offset: NDArray[Any],
+    offset: NDArray[np.float64],
     freq: list[float],
 ) -> NDArray[np.floating[Any]]:
     grid_dimensions: list[int] = config.general.number_cells
@@ -99,10 +99,13 @@ def create_const_field(config: Config, value: float):
     return np.full(config.general.number_cells, value)
 
 
-def calc_pressure_from_gradient_field(gradient_field: NDArray[Any], config: Config, parameter: Parameter):
+def calc_pressure_from_gradient_field(
+    gradient_field: NDArray[np.float64], config: Config, parameter: Parameter
+) -> NDArray[np.float64]:
     # XXX: is this function correctly implemented?
 
-    pressure = config.parameters.get("pressure").value
+    pressure = parameter.value
+    assert isinstance(pressure, dict)
 
     # scale pressure field to min and max values from config
     current_min = np.min(gradient_field)
@@ -110,6 +113,9 @@ def calc_pressure_from_gradient_field(gradient_field: NDArray[Any], config: Conf
 
     new_min = pressure["min"]
     new_max = pressure["max"]
+    assert isinstance(new_min, float)
+    assert isinstance(new_max, float)
+
     gradient_field = (gradient_field - current_min) / (current_max - current_min) * (new_max - new_min) + new_min
 
     reference = 101325  # Standard atmosphere pressure in Pa

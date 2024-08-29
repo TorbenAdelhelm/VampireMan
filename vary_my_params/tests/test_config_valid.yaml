@@ -7,13 +7,12 @@ parameters:
     value: [64, 256, 1]
   permeability:
     data_type: array
-    vary: null
+    vary: spatially_vary_within_datapoint
     value: [1, 1, 1]
   pressure:
     data_type: array
-    vary: null
     input_source: manual
     value: [1, 1, 1]
   none:
     data_type: scalar
-    value: null
+    value: 3.2

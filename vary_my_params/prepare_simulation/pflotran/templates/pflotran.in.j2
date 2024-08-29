@@ -14,7 +14,7 @@ SUBSURFACE
 #=========================== times ============================================
 
   TIME
-    FINAL_TIME {{ time.final_time }} year
+    FINAL_TIME {{ final_time.value }} year
     MAXIMUM_TIMESTEP_SIZE 1.0 year
   END
 
@@ -152,7 +152,7 @@ SUBSURFACE
       LIQUID_PRESSURE 0 -0.0024757478454929577 0
     /
     LIQUID_PRESSURE 101325.d0
-    TEMPERATURE {{ temperature }} C
+    TEMPERATURE {{ temperature.value }} C
   /
 
   {% for heatpump in heatpumps -%}
