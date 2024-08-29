@@ -49,3 +49,7 @@ select = [
 [tool.ruff.format]
 docstring-code-format = true
 docstring-code-line-length = 120
+
+[tool.pyright]
+include = [ "./vary_my_params" ]
+exclude = [ "./vary_my_params/tests" ]
