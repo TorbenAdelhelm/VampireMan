@@ -45,7 +45,11 @@ def ensure_config_is_valid(config: Config):
     if pressure is not None:
         pressure_correct = True
         try:
-            if not (isinstance(pressure.value["min"], float) and isinstance(pressure.value["max"], float)):
+            if not (
+                isinstance(pressure.value, dict)
+                and isinstance(pressure.value["min"], float)
+                and isinstance(pressure.value["max"], float)
+            ):
                 pressure_correct = False
         except KeyError:
             pressure_correct = False

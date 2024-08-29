@@ -27,7 +27,7 @@ def render(config: Config):
 
         values = datapoint.data
         heatpumps = [{name: d.value} for name, d in datapoint.data.items() if d.data_type == DataType.HEATPUMP]
-        values["heatpumps"] = heatpumps
+        values["heatpumps"] = heatpumps  # type: ignore
 
         with open(f"{datapoint_dir}/pflotran.in", "w") as file:
             file.write(template.render(values))

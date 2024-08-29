@@ -70,6 +70,7 @@ def vary_params(config: Config) -> Config:
                             data[parameter.name] = vary_heatpump(config, parameter)
                         case DataType.ARRAY:
                             # TODO: what needs to be done here?
+                            assert isinstance(parameter.value, dict)
                             max_pressure = parameter.value["max"]
                             min_pressure = parameter.value["min"]
                             assert isinstance(max_pressure, float)
