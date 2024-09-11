@@ -61,6 +61,10 @@ SUBSURFACE
     TRANSVERSE_DISPERSIVITY_H 0.1       #[m]
     PERMEABILITY                        #[m^2] #TESTCASE
       DATASET perm
+      {%- if vertical_anisotropy_ratio %}
+      {#- what about PERM_ISO here? https://www.pflotran.org/documentation/user_guide/cards/subsurface/material_property_card.html #}
+      VERTICAL_ANISOTROPY_RATIO {{ vertical_anisotropy_ratio.value }}
+      {%- endif %}
     /
     CHARACTERISTIC_CURVES cc1
   END
