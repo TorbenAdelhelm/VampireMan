@@ -5,7 +5,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..config import Config, Distribution, Parameter
-from ..utils import random_nd_array
 
 
 def make_perlin_grid(
@@ -57,7 +56,7 @@ def make_perlin_grid(
 
 
 def create_vary_field(config: Config, parameter: Parameter):
-    base_offset = random_nd_array(config, 3) * 4242
+    base_offset = config.get_rng().random(3) * 4242
 
     if not isinstance(parameter.value, dict):
         raise ValueError()

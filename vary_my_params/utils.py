@@ -1,18 +1,7 @@
 import logging
 import sys
 
-import numpy as np
-
 from .config import Config
-
-
-def random_float(config: Config):
-    return np.random.default_rng(seed=config.general.random_seed).random()
-
-
-def random_nd_array(config: Config, size: int):
-    # TODO fix this, this is wrong
-    return np.random.default_rng(seed=config.general.random_seed).random(size)
 
 
 def get_answer(config: Config, question: str, exit_if_no: bool = False) -> bool:

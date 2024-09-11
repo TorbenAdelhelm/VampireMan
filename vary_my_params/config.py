@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from ruamel.yaml import YAML
 
@@ -123,6 +124,7 @@ class Config(BaseModel):
     parameters: dict[str, Parameter] = Field(default_factory=lambda: {})
     # TODO split this in datapoints_fixed, datapoint_const_within_datapoint, ...
     datapoints: list[Datapoint] = Field(default_factory=lambda: [])
+    _rng: np.random.Generator = np.random.default_rng(seed=0)
 
     model_config = ConfigDict(extra="forbid")
 
@@ -132,6 +134,12 @@ class Config(BaseModel):
         for name, parameter in data.get("parameters", {}).items():
             parameter["name"] = name
         return data
+
+    @model_validator(mode="after")
+    def instantiate_random_number_generator(self):
+        """This "validator" instantiates the global rng"""
+        self._rng = np.random.default_rng(seed=self.general.random_seed)
+        return self
 
     @field_validator("steps")
     def non_empty_list(cls, value):
@@ -144,6 +152,9 @@ class Config(BaseModel):
         self.steps = other_config.steps or self.steps
         self.parameters |= other_config.parameters
         self.datapoints = other_config.datapoints
+
+    def get_rng(self) -> np.random.Generator:
+        return self._rng
 
     @staticmethod
     def from_yaml(config_file_path: str) -> "Config":

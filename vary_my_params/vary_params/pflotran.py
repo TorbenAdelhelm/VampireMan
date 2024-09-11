@@ -1,7 +1,6 @@
 import numpy as np
 
 from ..config import Config, Data, Datapoint, DataType, HeatPump, Parameter, Vary
-from ..utils import random_nd_array
 from .vary_perlin import create_const_field, create_vary_field
 
 
@@ -21,7 +20,7 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
     # XXX is this needed?
     match parameter.vary:
         case Vary.CONST:
-            result_location = (number_cells - 1) * random_nd_array(config, 3) * resolution + (resolution * 0.5)
+            result_location = (number_cells - 1) * config.get_rng().random(3) * resolution + (resolution * 0.5)
         case Vary.NONE:
             result_location = (np.array(hp.location) - 1) * resolution + (resolution * 0.5)
         case _:
