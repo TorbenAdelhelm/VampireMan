@@ -10,27 +10,13 @@ from .config import Config, Workflow, load_config
 from .load_config.pflotran import ensure_config_is_valid
 from .prepare_simulation.pflotran.pflotran_in_renderer import render
 from .run_simulation.pflotran import run_simulation as run_pflotran
+from .utils import get_answer
 from .vary_params import pflotran
 from .visualize.pflotran import plot_sim
 
 
-def wait_for_confirmation(config: Config, next_stage: str = ""):
-    if not config.general.interactive:
-        return
-    try:
-        match input(f"Do you want to continue? {f"Next stage: {next_stage} " if next_stage else ""}Y/n "):
-            case "n" | "N" | "no" | "q":
-                logging.info("Exiting as instructed")
-                exit(0)
-            case _:
-                pass
-    except KeyboardInterrupt:
-        logging.info("Exiting as instructed")
-        exit(0)
-
-
 def run_vary_params(config: Config) -> Config:
-    wait_for_confirmation(config, "Running stage parameter variation")
+    get_answer(config, "Do you want to run the stage parameter variation?", True)
 
     match config.general.workflow:
         case Workflow.PFLOTRAN:
@@ -45,17 +31,17 @@ def run_vary_params(config: Config) -> Config:
 
 
 def run_render(config: Config):
-    wait_for_confirmation(config, "Running stage prepare_simulation")
+    get_answer(config, "Do you want to run the stage prepare_simulation?", True)
     render(config)
 
 
 def run_simulation(config: Config):
-    wait_for_confirmation(config, "Running stage run_simulation")
+    get_answer(config, "Do you want to run the stage run_simulation?", True)
     run_pflotran(config)
 
 
 def run_visualization(config: Config):
-    wait_for_confirmation(config, "Running stage run_visualization")
+    get_answer(config, "Do you want to run the stage run_visualization?", True)
     plot_sim(config)
 
 
