@@ -129,7 +129,7 @@ def plot_isolines(config: Config, data: TimeData, path: Path):
     rows = len(data)
     _, axes = plt.subplots(rows, 1, figsize=(20, 5 * rows))
     # TODO read min/max from the data
-    levels = np.arange(10.6, 15.6, 0.25)
+    levels = np.arange(10.6, 16.6, 0.25)
 
     for index, (time_step, time_data) in enumerate(data.items()):
         property_data = time_data.get("Temperature [C]")
