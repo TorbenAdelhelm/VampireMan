@@ -47,7 +47,7 @@ def pflotran_time_to_year(time_step: str) -> float:
 #         plt.savefig(pic_file_name)
 
 
-def plot_sim(config: Config):
+def plot_simulation(config: Config):
     for datapoint in config.datapoints:
         datapoint_path = config.general.output_directory / f"datapoint-{datapoint.index}"
 

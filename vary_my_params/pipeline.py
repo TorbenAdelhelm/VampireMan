@@ -6,43 +6,32 @@ from argparse import Namespace
 from collections.abc import Callable
 from pstats import SortKey
 
-from .config import Config, Workflow, load_config
-from .load_config.pflotran import ensure_config_is_valid
-from .prepare_simulation.pflotran.pflotran_in_renderer import render
-from .run_simulation.pflotran import run_simulation as run_pflotran
-from .utils import get_answer
-from .vary_params import pflotran
-from .visualize.pflotran import plot_sim
+from .config import Config, load_config
+from .utils import get_answer, get_workflow_module
 
 
 def run_vary_params(config: Config) -> Config:
     get_answer(config, "Do you want to run the stage parameter variation?", True)
-
-    match config.general.workflow:
-        case Workflow.PFLOTRAN:
-            data = pflotran.vary_params(config)
-            print("Following datapoints will be used")
-            for datapoint in data.datapoints:
-                print(datapoint)
-            return data
-        case _:
-            logging.error("%s varying is not yet implemented", config.general.workflow)
-            raise NotImplementedError()
+    config = get_workflow_module(config.general.workflow).vary_params(config)
+    print("Following datapoints will be used")
+    for datapoint in config.datapoints:
+        print(datapoint)
+    return config
 
 
 def run_render(config: Config):
     get_answer(config, "Do you want to run the stage prepare_simulation?", True)
-    render(config)
+    get_workflow_module(config.general.workflow).render(config)
 
 
 def run_simulation(config: Config):
     get_answer(config, "Do you want to run the stage run_simulation?", True)
-    run_pflotran(config)
+    get_workflow_module(config.general.workflow).run_simulation(config)
 
 
 def run_visualization(config: Config):
     get_answer(config, "Do you want to run the stage run_visualization?", True)
-    plot_sim(config)
+    get_workflow_module(config.general.workflow).plot_simulation(config)
 
 
 def profile_stage(config: Config, stage: Callable[[Config], None | Config]):
@@ -68,8 +57,11 @@ def profile_stage(config: Config, stage: Callable[[Config], None | Config]):
 
 
 def run(args: Namespace):
-    config = load_config(args)
-    profile_stage(config, ensure_config_is_valid)
+    workflow_module = get_workflow_module(args.workflow)
+
+    config = load_config(args, workflow_module)
+
+    profile_stage(config, workflow_module.ensure_config_is_valid)
 
     print(config)
     logging.debug("Will run all stages")

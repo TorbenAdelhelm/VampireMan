@@ -1,5 +1,6 @@
 import logging
 import sys
+from types import ModuleType
 
 from .config import Config
 
@@ -20,3 +21,15 @@ def get_answer(config: Config, question: str, exit_if_no: bool = False) -> bool:
     except KeyboardInterrupt:
         logging.info("Exiting as instructed")
         sys.exit(0)
+
+
+def get_workflow_module(workflow: str) -> ModuleType:
+    # Get workflow specific defaults
+    match workflow:
+        case "pflotran":
+            from . import pflotran
+
+            return pflotran
+        case _:
+            logging.error("%s workflow is not yet implemented", workflow)
+            raise NotImplementedError("Workflow not implemented")

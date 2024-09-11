@@ -3,6 +3,7 @@ import datetime
 import enum
 import logging
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
 import numpy as np
@@ -188,16 +189,8 @@ class Config(BaseModel):
         )
 
 
-def load_config(arguments: argparse.Namespace) -> Config:
-    # Get workflow specific defaults
-    match arguments.workflow:
-        case "pflotran":
-            from .load_config import pflotran as config_module
-        case _:
-            logging.error("%s workflow is not yet implemented", arguments.workflow)
-            raise NotImplementedError("Workflow not implemented")
-
-    run_config = config_module.get_defaults()
+def load_config(arguments: argparse.Namespace, workflow_module: ModuleType) -> Config:
+    run_config = workflow_module.get_defaults()
 
     # Load config from file if provided
     config_file = arguments.config_file
