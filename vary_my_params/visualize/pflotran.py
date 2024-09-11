@@ -5,6 +5,7 @@ from typing import Any
 
 import h5py
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -135,6 +136,11 @@ def plot_isolines(config: Config, data: TimeData, path: Path):
         assert property_data is not None
 
         plt.sca(axes[index])
+
+        x_ticks = ticker.FuncFormatter(lambda x, pos: f"{x*config.general.cell_resolution[0]:g}")
+        y_ticks = ticker.FuncFormatter(lambda y, pos: f"{y*config.general.cell_resolution[1]:g}")
+        axes[index].xaxis.set_major_formatter(x_ticks)
+        axes[index].yaxis.set_major_formatter(y_ticks)
 
         # Make the 3D data 2D so it can be plotted
         level = int((property_data.shape[2] - 1) / 2)
