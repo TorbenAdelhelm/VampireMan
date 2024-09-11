@@ -132,14 +132,15 @@ def plot_isolines(config: Config, data: TimeData, path: Path):
 
     for index, (time_step, time_data) in enumerate(data.items()):
         property_data = time_data.get("Temperature [C]")
-
         assert property_data is not None
+
+        plt.sca(axes[index])
+
         # Make the 3D data 2D so it can be plotted
         level = int((property_data.shape[2] - 1) / 2)
         plot_data = property_data[:, :, level]
         plt.imshow(plot_data)
 
-        plt.sca(axes[index])
         plt.contourf(plot_data, levels=levels, cmap="RdBu_r")
 
         plt.title(f"{pflotran_time_to_year(time_step)} years")
