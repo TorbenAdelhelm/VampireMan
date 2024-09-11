@@ -5,6 +5,7 @@ import pathlib
 import jinja2
 
 from ...config import Config, DataType
+from ...utils import get_answer
 from .pflotran_generate_mesh import write_mesh_and_border_files
 from .pflotran_write_permeability import plot_vary_field, save_vary_field
 
@@ -21,6 +22,8 @@ def render(config: Config):
             os.mkdir(datapoint_dir)
         except FileExistsError:
             logging.warning("The directory %s already exists, will override the contents", datapoint_dir)
+            if not get_answer(config, f"Should the directory {datapoint_dir} be overwritten?"):
+                continue
         except OSError as error:
             logging.critical("Directory at %s could not be created, cannot proceed", datapoint_dir)
             raise error
