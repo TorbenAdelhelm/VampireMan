@@ -9,7 +9,7 @@ from . import pipeline
 
 
 def main():
-    logging.info("staring up")
+    logging.info("Staring up")
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--config-file", type=pathlib.Path, help="number of datapoints to generate")

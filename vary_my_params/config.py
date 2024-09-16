@@ -104,6 +104,7 @@ class Datapoint(BaseModel):
 class GeneralConfig(BaseModel):
     number_cells: list[int] = Field(default_factory=lambda: [32, 128, 1])
     cell_resolution: list[float] = Field(default_factory=lambda: [5.0, 5.0, 5.0])
+    # XXX: distance to border in percent?
     interactive: bool = True
     # XXX: Hopefully the format `2024-08-17T10:06:15+00:00` is supported by the common file systems
     output_directory: Path = Path(f"./datasets_out/{datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")}")
@@ -136,6 +137,7 @@ class Config(BaseModel):
     datapoints: list[Datapoint] = Field(default_factory=lambda: [])
     _rng: np.random.Generator = np.random.default_rng(seed=0)
 
+    # This makes pydantic fail if there is extra data in the yaml config file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
 
     @model_validator(mode="before")
@@ -210,7 +212,7 @@ def load_config(arguments: argparse.Namespace, workflow_module: ModuleType) -> C
     # Also consider arguments from command line
     run_config.general.interactive = not arguments.non_interactive
     if arguments.non_interactive:
-        logging.debug("Running non-interactively")
+        logging.info("Running non-interactively")
 
     logging.debug("Config: %s", run_config)
 
