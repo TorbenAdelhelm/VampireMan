@@ -40,9 +40,7 @@ def vary_params(config: Config) -> Config:
     #     filter over params where step == param.step
     for index in range(config.general.number_datapoints):
         # TODO split into data_fixed etc
-        data = {
-            "final_time": Data(name="final_time", data_type=DataType.STRUCT, value=27.5),
-        }
+        data = {}
 
         for _, parameter in config.parameters.items():
             match parameter.vary:

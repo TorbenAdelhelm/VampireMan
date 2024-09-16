@@ -45,6 +45,11 @@ class Workflow(enum.StrEnum):
     PFLOTRAN = "pflotran"
 
 
+class TimeToSimulate(BaseModel):
+    final_time: float = 27.5
+    unit: str = "year"
+
+
 class HeatPump(BaseModel):
     location: list[float]
     # TODO make this list[float]
@@ -111,6 +116,7 @@ class GeneralConfig(BaseModel):
     # This forces every run to be reproducible by default
     random_seed: None | int = 0
     number_datapoints: int = 1
+    time_to_simulate: TimeToSimulate = Field(default_factory=lambda: TimeToSimulate())
     workflow: Workflow = Workflow.PFLOTRAN
     profiling: bool = False
 
