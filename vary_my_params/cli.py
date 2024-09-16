@@ -13,23 +13,17 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--config-file", type=pathlib.Path, help="number of datapoints to generate")
-    parser.add_argument("--datapoints", type=int, help="number of datapoints to generate")
-    parser.add_argument("--name", type=str, default="default", help="name of the simulation")
     parser.add_argument("--workflow", type=str, default="pflotran", help="name of the simulation workflow")
     parser.add_argument(
         "--non-interactive",
         action="store_true",
         help="don't ask for user confirmation to move to next stage",
     )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="enable debug logging",
-    )
+    parser.add_argument("--log-level", type=str, default="INFO", help="enable debug logging")
 
     args = parser.parse_args()
 
-    if args.verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
+    if args.log_level:
+        logging.getLogger().setLevel(args.log_level)
 
     pipeline.run(args)

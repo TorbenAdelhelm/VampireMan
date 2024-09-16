@@ -218,9 +218,6 @@ def load_config(arguments: argparse.Namespace, workflow_module: ModuleType) -> C
     if arguments.non_interactive:
         logging.debug("Running non-interactively")
 
-    if arguments.datapoints is not None:
-        run_config.general.number_datapoints = int(arguments.datapoints)
-
     logging.debug("Config: %s", run_config)
 
     return run_config
