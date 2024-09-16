@@ -17,6 +17,12 @@ def get_defaults() -> Config:
         data_type=DataType.SCALAR,
         value=10.6,
     )
+    config.parameters["pressure"] = Parameter(
+        name="pressure",
+        data_type=DataType.SCALAR,
+        vary=Vary.CONST,
+        value=-0.0024757478454929577,
+    )
     config.parameters["hp1"] = Parameter(
         name="hp1",
         data_type=DataType.HEATPUMP,
@@ -38,6 +44,7 @@ def ensure_config_is_valid(config: Config):
     # These parameters are mandatory
     for item in [
         "permeability",
+        "pressure",
     ]:
         ensure_parameter_isset(config, item)
 
@@ -53,17 +60,18 @@ def ensure_config_is_valid(config: Config):
 
     if pressure is not None:
         pressure_correct = True
-        try:
-            if not (
-                isinstance(pressure.value, dict)
-                and isinstance(pressure.value["min"], float)
-                and isinstance(pressure.value["max"], float)
-            ):
+        if pressure.data_type == DataType.ARRAY:
+            try:
+                if not (
+                    isinstance(pressure.value, dict)
+                    and isinstance(pressure.value["min"], float)
+                    and isinstance(pressure.value["max"], float)
+                ):
+                    pressure_correct = False
+            except KeyError:
                 pressure_correct = False
-        except KeyError:
-            pressure_correct = False
-        if not pressure_correct:
-            raise ValueError("`pressure` doesn't have min or max values that are floats")
+            if not pressure_correct:
+                raise ValueError("`pressure` doesn't have min or max values that are floats")
 
     # Simulation without heatpumps doesn't make much sense
     heatpumps = [{name: d.name} for name, d in config.parameters.items() if d.data_type == DataType.HEATPUMP]

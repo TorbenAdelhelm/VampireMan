@@ -80,6 +80,8 @@ def vary_params(config: Config) -> Config:
                                 data_type=parameter.data_type,
                                 value=create_const_field(config, value),
                             )
+                        case DataType.SCALAR:
+                            data[parameter.name] = copy_parameter(parameter)
                         case _:
                             raise NotImplementedError()
                 case _:
