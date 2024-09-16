@@ -22,6 +22,7 @@ class DataType(enum.StrEnum):
     PERLIN = "perlin"
     # This needs `location`, `injection_temp` and `injection_rate`
     HEATPUMP = "heatpump"
+    FILE = "file"
 
 
 class Distribution(enum.StrEnum):
@@ -55,11 +56,19 @@ class HeatPump(BaseModel):
 class Parameter(BaseModel):
     name: str
     data_type: DataType
-    value: float | list[int] | HeatPump | dict[str, float | list[float]]
+    value: str | float | list[int] | HeatPump | dict[str, float | list[float]]
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.NONE
     input_source: InputSource = InputSource.MANUAL  # TODO is this really needed?
+
+    @model_validator(mode="after")
+    def str_value_if_file_datatype(self):
+        if (isinstance(self.value, str) and not self.data_type == DataType.FILE) or (
+            self.data_type == DataType.FILE and not isinstance(self.value, str)
+        ):
+            raise ValueError("Only when input is a file, the value may be a str")
+        return self
 
     def __str__(self) -> str:
         return (

@@ -42,6 +42,15 @@ def ensure_config_is_valid(config: Config):
         ensure_parameter_isset(config, item)
 
     pressure = config.parameters.get("pressure")
+    permeability = config.parameters.get("permeability")
+    if (pressure is not None and pressure.data_type == DataType.FILE) or (
+        permeability is not None and permeability.data_type == DataType.FILE
+    ):
+        assert pressure is not None
+        assert permeability is not None
+        if pressure.data_type == permeability.data_type:
+            raise ValueError("If one of `pressure`, `permeability` is a file, all must be a file")
+
     if pressure is not None:
         pressure_correct = True
         try:
