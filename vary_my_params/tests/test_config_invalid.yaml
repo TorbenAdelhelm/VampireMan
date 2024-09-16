@@ -2,14 +2,11 @@ parameters:
   grid:
     data_type: array
     vary: null
-    input_source: manual
   permeability:
     data_type: array
     vary: null
-    input_source: manual
     value: [1, 1, 1]
   pressure:
     data_type: array
     vary: null
-    input_source: manual
     value: [1, 1, 1]

@@ -37,10 +37,6 @@ class Vary(enum.StrEnum):
     SPACE = "spatially_vary_within_datapoint"
 
 
-class InputSource(enum.StrEnum):
-    MANUAL = "manual"
-
-
 class Workflow(enum.StrEnum):
     PFLOTRAN = "pflotran"
 
@@ -65,7 +61,6 @@ class Parameter(BaseModel):
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.NONE
-    input_source: InputSource = InputSource.MANUAL  # TODO is this really needed?
 
     @model_validator(mode="after")
     def str_value_if_file_datatype(self):
@@ -82,7 +77,6 @@ class Parameter(BaseModel):
             f"       Value: {self.value}\n"
             f"       Distribution: {self.distribution}\n"
             f"       Vary: {self.vary}\n"
-            f"       Input source: {self.input_source}\n"
         )
 
 
