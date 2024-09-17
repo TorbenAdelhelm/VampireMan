@@ -21,7 +21,7 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
     match parameter.vary:
         case Vary.CONST:
             result_location = (number_cells - 1) * config.get_rng().random(3) * resolution + (resolution * 0.5)
-        case Vary.NONE:
+        case Vary.FIXED:
             result_location = (np.array(hp.location) - 1) * resolution + (resolution * 0.5)
         case _:
             raise NotImplementedError()
@@ -44,7 +44,7 @@ def vary_params(config: Config) -> Config:
 
         for _, parameter in config.parameters.items():
             match parameter.vary:
-                case Vary.NONE:
+                case Vary.FIXED:
                     match parameter.data_type:
                         case DataType.HEATPUMP:
                             data[parameter.name] = vary_heatpump(config, parameter)

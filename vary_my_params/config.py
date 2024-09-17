@@ -31,7 +31,7 @@ class Distribution(enum.StrEnum):
 
 
 class Vary(enum.StrEnum):
-    NONE = "none"
+    FIXED = "fixed"
     CONST = "const_within_datapoint"
     TIME = "timely_vary_within_datapoint"
     SPACE = "spatially_vary_within_datapoint"
@@ -60,7 +60,7 @@ class Parameter(BaseModel):
     value: str | float | list[int] | HeatPump | dict[str, float | list[float]]
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
-    vary: Vary = Vary.NONE
+    vary: Vary = Vary.FIXED
 
     @model_validator(mode="after")
     def str_value_if_file_datatype(self):
