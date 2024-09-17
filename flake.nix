@@ -31,8 +31,9 @@
 
         petsc =
           (pkgs.petsc.override {
-            petsc-optimized = true;
             hdf5-support = true;
+            petsc-optimized = true;
+            withParmetis = true;
             inherit hdf5;
           }).overrideAttrs
             { patches = [ ./filter_mpi_warnings.patch ]; };
