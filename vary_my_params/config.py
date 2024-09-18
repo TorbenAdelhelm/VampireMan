@@ -114,6 +114,9 @@ class GeneralConfig(BaseModel):
     workflow: Workflow = Workflow.PFLOTRAN
     profiling: bool = False
 
+    # This makes pydantic fail if there is extra data in the yaml config file that cannot be parsed
+    model_config = ConfigDict(extra="forbid")
+
     def __str__(self) -> str:
         return (
             f"=== GeneralConfig\n"
