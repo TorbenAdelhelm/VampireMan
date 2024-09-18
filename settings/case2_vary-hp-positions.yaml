@@ -4,7 +4,7 @@ general:
   output_directory: ./datasets_out/case2_vary-hp-positions
   random_seed: null
   number_cells: [64, 256, 1]
-parameters:
+heatpump_parameters:
   # This overrides the default heatpump defined in the code
   hp1:
     data_type: heatpump

@@ -1,4 +1,4 @@
-parameters:
+hydrogeological_parameters:
   grid:
     data_type: array
     vary: null

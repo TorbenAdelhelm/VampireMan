@@ -1,6 +1,6 @@
 general:
   interactive: false
-parameters:
+hydrogeological_parameters:
   grid:
     data_type: array
     value: [64, 256, 1]

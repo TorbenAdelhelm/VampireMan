@@ -2,7 +2,7 @@
 general:
   output_directory: ./datasets_out/case3_allin1
   number_datapoints: 3
-parameters:
+heatpump_parameters:
   hp1:
     data_type: heatpump
     vary: spatially_vary_within_datapoint
@@ -17,6 +17,7 @@ parameters:
       location: [16, 64, 1]
       injection_temp: 15.6
       injection_rate: 0.00024
+hydrogeological_parameters:
   permeability:
     data_type: perlin
     vary: spatially_vary_within_datapoint

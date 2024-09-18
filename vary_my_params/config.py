@@ -130,11 +130,10 @@ class GeneralConfig(BaseModel):
 
 class Config(BaseModel):
     # Need to use field here, as otherwise it would be the same dict across several objects
-    # fluidsimulation hat man immer: zeit, solver
     general: GeneralConfig = Field(default_factory=lambda: GeneralConfig())
     steps: list[str] = Field(default_factory=lambda: ["global"])
-    # boundary conditions, maybe time??
-    parameters: dict[str, Parameter] = Field(default_factory=lambda: {})
+    hydrogeological_parameters: dict[str, Parameter] = Field(default_factory=lambda: {})
+    heatpump_parameters: dict[str, Parameter] = Field(default_factory=lambda: {})
     # TODO split this in datapoints_fixed, datapoint_const_within_datapoint, ...
     datapoints: list[Datapoint] = Field(default_factory=lambda: [])
     _rng: np.random.Generator = np.random.default_rng(seed=0)
@@ -145,7 +144,9 @@ class Config(BaseModel):
     @model_validator(mode="before")
     def put_parameter_name_into_data(cls, data):
         """This "validator" only copies the name of a parameter into the dict so it is accessible"""
-        for name, parameter in data.get("parameters", {}).items():
+        for name, parameter in data.get("hydrogeological_parameters", {}).items():
+            parameter["name"] = name
+        for name, parameter in data.get("heatpump_parameters", {}).items():
             parameter["name"] = name
         return data
 
@@ -164,7 +165,8 @@ class Config(BaseModel):
     def override_with(self, other_config: "Config"):
         self.general = other_config.general
         self.steps = other_config.steps or self.steps
-        self.parameters |= other_config.parameters
+        self.hydrogeological_parameters |= other_config.hydrogeological_parameters
+        self.heatpump_parameters |= other_config.heatpump_parameters
         self.datapoints = other_config.datapoints
 
     def get_rng(self) -> np.random.Generator:
@@ -186,7 +188,9 @@ class Config(BaseModel):
 
     def __str__(self) -> str:
         parameter_strings = []
-        for _, param in self.parameters.items():
+        for _, param in self.hydrogeological_parameters.items():
+            parameter_strings.append(str(param))
+        for _, param in self.heatpump_parameters.items():
             parameter_strings.append(str(param))
 
         return (

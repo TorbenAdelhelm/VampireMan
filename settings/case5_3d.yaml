@@ -3,7 +3,7 @@ general:
   output_directory: ./datasets_out/case5_3d
   number_datapoints: 1
   number_cells: [16, 64, 16]
-parameters:
+heatpump_parameters:
   hp1:
     data_type: heatpump
     value:

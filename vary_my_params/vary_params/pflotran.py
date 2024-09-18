@@ -87,7 +87,14 @@ def vary_params(config: Config) -> Config:
     for datapoint_index in range(config.general.number_datapoints):
         data = {}
 
-        for _, parameter in config.parameters.items():
+        for _, parameter in config.hydrogeological_parameters.items():
+            parameter_data = vary_parameter(config, parameter, datapoint_index)
+            # XXX: Store this in the parameter?
+            # parameter.set_datapoint(datapoint_index, parameter_data)
+
+            data[parameter.name] = parameter_data
+
+        for _, parameter in config.heatpump_parameters.items():
             parameter_data = vary_parameter(config, parameter, datapoint_index)
             # XXX: Store this in the parameter?
             # parameter.set_datapoint(datapoint_index, parameter_data)

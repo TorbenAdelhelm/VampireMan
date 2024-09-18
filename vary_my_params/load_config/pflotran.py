@@ -6,24 +6,24 @@ from ..config import Config, DataType, HeatPump, Parameter, Vary
 def get_defaults() -> Config:
     config = Config()
 
-    config.parameters["permeability"] = Parameter(
+    config.hydrogeological_parameters["permeability"] = Parameter(
         name="permeability",
         data_type=DataType.SCALAR,
         value=1.2882090745857623e-10,
         vary=Vary.SPACE,
     )
-    config.parameters["temperature"] = Parameter(
+    config.hydrogeological_parameters["temperature"] = Parameter(
         name="temperature",
         data_type=DataType.SCALAR,
         value=10.6,
     )
-    config.parameters["pressure"] = Parameter(
+    config.hydrogeological_parameters["pressure"] = Parameter(
         name="pressure",
         data_type=DataType.SCALAR,
         vary=Vary.CONST,
         value=-0.0024757478454929577,
     )
-    config.parameters["hp1"] = Parameter(
+    config.heatpump_parameters["hp1"] = Parameter(
         name="hp1",
         data_type=DataType.HEATPUMP,
         value=HeatPump(location=[16, 32, 1], injection_temp=13.6, injection_rate=0.00024),
@@ -33,7 +33,7 @@ def get_defaults() -> Config:
 
 
 def ensure_parameter_isset(config: Config, name: str):
-    value = config.parameters.get(name)
+    value = config.hydrogeological_parameters.get(name)
     if value is None:
         raise ValueError(f"`{name}` must not be None")
 
@@ -48,8 +48,8 @@ def ensure_config_is_valid(config: Config) -> Config:
     ]:
         ensure_parameter_isset(config, item)
 
-    pressure = config.parameters.get("pressure")
-    permeability = config.parameters.get("permeability")
+    pressure = config.hydrogeological_parameters.get("pressure")
+    permeability = config.hydrogeological_parameters.get("permeability")
     if (pressure is not None and pressure.data_type == DataType.FILE) or (
         permeability is not None and permeability.data_type == DataType.FILE
     ):
@@ -74,7 +74,7 @@ def ensure_config_is_valid(config: Config) -> Config:
                 raise ValueError("`pressure` doesn't have min or max values that are floats")
 
     # Simulation without heatpumps doesn't make much sense
-    heatpumps = [{name: d.name} for name, d in config.parameters.items() if d.data_type == DataType.HEATPUMP]
+    heatpumps = [{name: d.name} for name, d in config.heatpump_parameters.items() if d.data_type == DataType.HEATPUMP]
     if len(heatpumps) < 1:
         logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
 
