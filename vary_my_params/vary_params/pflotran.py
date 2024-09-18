@@ -35,58 +35,67 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
     )
 
 
+def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
+    match parameter.vary:
+        case Vary.FIXED:
+            match parameter.data_type:
+                case DataType.HEATPUMP:
+                    return vary_heatpump(config, parameter)
+                case _:
+                    return copy_parameter(parameter)
+        case Vary.SPACE:
+            match parameter.data_type:
+                case DataType.SCALAR:
+                    assert isinstance(parameter.value, float)
+                    field = create_const_field(config, parameter.value)
+                case DataType.PERLIN:
+                    field = create_vary_field(config, parameter)
+                case DataType.HEATPUMP:
+                    return vary_heatpump(config, parameter)
+                case _:
+                    raise NotImplementedError()
+            return Data(name=parameter.name, data_type=parameter.data_type, value=field)
+        # TODO make this less copy paste
+        case Vary.CONST:
+            match parameter.data_type:
+                case DataType.ARRAY:
+                    # TODO: what needs to be done here?
+                    assert isinstance(parameter.value, dict)
+                    max_pressure = parameter.value["max"]
+                    min_pressure = parameter.value["min"]
+                    assert isinstance(max_pressure, float)
+                    assert isinstance(min_pressure, float)
+                    distance = max_pressure - min_pressure
+                    step_width = distance / config.general.number_datapoints
+                    value = min_pressure + step_width * index
+                    return Data(
+                        name=parameter.name,
+                        data_type=parameter.data_type,
+                        value=create_const_field(config, value),
+                    )
+                case DataType.SCALAR:
+                    return copy_parameter(parameter)
+                case _:
+                    raise NotImplementedError()
+        case _:
+            raise ValueError()
+
+
 def vary_params(config: Config) -> Config:
     # for step in config.steps:
     #     filter over params where step == param.step
-    for index in range(config.general.number_datapoints):
-        # TODO split into data_fixed etc
+    for datapoint_index in range(config.general.number_datapoints):
         data = {}
 
         for _, parameter in config.parameters.items():
-            match parameter.vary:
-                case Vary.FIXED:
-                    match parameter.data_type:
-                        case DataType.HEATPUMP:
-                            data[parameter.name] = vary_heatpump(config, parameter)
-                        case _:
-                            data[parameter.name] = copy_parameter(parameter)
-                case Vary.SPACE:
-                    match parameter.data_type:
-                        case DataType.SCALAR:
-                            assert isinstance(parameter.value, float)
-                            field = create_const_field(config, parameter.value)
-                        case DataType.PERLIN:
-                            field = create_vary_field(config, parameter)
-                        case DataType.HEATPUMP:
-                            data[parameter.name] = vary_heatpump(config, parameter)
-                        case _:
-                            raise NotImplementedError()
-                    data[parameter.name] = Data(name=parameter.name, data_type=parameter.data_type, value=field)
-                # TODO make this less copy paste
-                case Vary.CONST:
-                    match parameter.data_type:
-                        case DataType.ARRAY:
-                            # TODO: what needs to be done here?
-                            assert isinstance(parameter.value, dict)
-                            max_pressure = parameter.value["max"]
-                            min_pressure = parameter.value["min"]
-                            assert isinstance(max_pressure, float)
-                            assert isinstance(min_pressure, float)
-                            distance = max_pressure - min_pressure
-                            step_width = distance / config.general.number_datapoints
-                            value = min_pressure + step_width * index
-                            data[parameter.name] = Data(
-                                name=parameter.name,
-                                data_type=parameter.data_type,
-                                value=create_const_field(config, value),
-                            )
-                        case DataType.SCALAR:
-                            data[parameter.name] = copy_parameter(parameter)
-                        case _:
-                            raise NotImplementedError()
-                case _:
-                    raise ValueError()
+            parameter_data = vary_parameter(config, parameter, datapoint_index)
+            # XXX: Store this in the parameter?
+            # parameter.set_datapoint(datapoint_index, parameter_data)
 
-        config.datapoints.append(Datapoint(index=index, data=data))
+            data[parameter.name] = parameter_data
+
+        # TODO: do we need to shuffle the datapoints for each parameter here?
+        # TODO split into data_fixed etc
+        config.datapoints.append(Datapoint(index=datapoint_index, data=data))
 
     return config
