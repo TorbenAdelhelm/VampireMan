@@ -38,7 +38,7 @@ def ensure_parameter_isset(config: Config, name: str):
         raise ValueError(f"`{name}` must not be None")
 
 
-def ensure_config_is_valid(config: Config):
+def ensure_config_is_valid(config: Config) -> Config:
     # TODO make this more extensive
 
     # These parameters are mandatory
@@ -77,3 +77,5 @@ def ensure_config_is_valid(config: Config):
     heatpumps = [{name: d.name} for name, d in config.parameters.items() if d.data_type == DataType.HEATPUMP]
     if len(heatpumps) < 1:
         logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
+
+    return config
