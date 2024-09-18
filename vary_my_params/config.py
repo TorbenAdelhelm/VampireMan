@@ -210,8 +210,10 @@ def load_config(arguments: argparse.Namespace, workflow_module: ModuleType) -> C
         run_config.override_with(user_config)
 
     # Also consider arguments from command line
-    run_config.general.interactive = not arguments.non_interactive
     if arguments.non_interactive:
+        run_config.general.interactive = False
+
+    if run_config.general.interactive:
         logging.info("Running non-interactively")
 
     logging.debug("Config: %s", run_config)
