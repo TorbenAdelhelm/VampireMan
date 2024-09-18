@@ -17,7 +17,6 @@ class DataType(enum.StrEnum):
     # XXX is this even needed?
     SCALAR = "scalar"
     ARRAY = "array"
-    STRUCT = "structure"
     # This needs to be a dict with the keys `frequency`, `max` and `min`
     PERLIN = "perlin"
     # This needs `location`, `injection_temp` and `injection_rate`
