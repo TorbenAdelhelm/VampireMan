@@ -5,14 +5,14 @@ general:
 parameters:
   hp1:
     data_type: heatpump
-    vary: const_within_datapoint
+    vary: spatially_vary_within_datapoint
     value:
       location: [16, 32, 1]
       injection_temp: 15.6
       injection_rate: 0.00024
   hp2:
     data_type: heatpump
-    vary: const_within_datapoint
+    vary: spatially_vary_within_datapoint
     value:
       location: [16, 64, 1]
       injection_temp: 15.6

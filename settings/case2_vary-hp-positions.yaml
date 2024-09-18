@@ -14,14 +14,14 @@ parameters:
       injection_rate: 0.00002
   hp2:
     data_type: heatpump
-    vary: const_within_datapoint
+    vary: spatially_vary_within_datapoint
     value:
       location: [16, 64, 1] # Gets overwritten
       injection_temp: 15.6
       injection_rate: 0.00002
   hp3:
     data_type: heatpump
-    vary: const_within_datapoint
+    vary: spatially_vary_within_datapoint
     value:
       location: [16, 92, 1] # Gets overwritten
       injection_temp: 15.6

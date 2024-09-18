@@ -17,12 +17,12 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
     assert isinstance(hp, HeatPump)
     result_location = np.zeros(3)
 
-    # XXX is this needed?
+    # This is needed as we need to calculate the heatpump coordinates for pflotran.in
     match parameter.vary:
-        case Vary.CONST:
-            result_location = (number_cells - 1) * config.get_rng().random(3) * resolution + (resolution * 0.5)
         case Vary.FIXED:
             result_location = (np.array(hp.location) - 1) * resolution + (resolution * 0.5)
+        case Vary.SPACE:
+            result_location = (number_cells - 1) * config.get_rng().random(3) * resolution + (resolution * 0.5)
         case _:
             raise NotImplementedError()
 
@@ -57,14 +57,14 @@ def vary_params(config: Config) -> Config:
                             field = create_const_field(config, parameter.value)
                         case DataType.PERLIN:
                             field = create_vary_field(config, parameter)
+                        case DataType.HEATPUMP:
+                            data[parameter.name] = vary_heatpump(config, parameter)
                         case _:
                             raise NotImplementedError()
                     data[parameter.name] = Data(name=parameter.name, data_type=parameter.data_type, value=field)
                 # TODO make this less copy paste
                 case Vary.CONST:
                     match parameter.data_type:
-                        case DataType.HEATPUMP:
-                            data[parameter.name] = vary_heatpump(config, parameter)
                         case DataType.ARRAY:
                             # TODO: what needs to be done here?
                             assert isinstance(parameter.value, dict)
