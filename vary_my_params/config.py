@@ -44,6 +44,9 @@ class TimeToSimulate(BaseModel):
     final_time: float = 27.5
     unit: str = "year"
 
+    def __str__(self) -> str:
+        return f"{self.final_time} [{self.unit}]"
+
 
 class HeatPump(BaseModel):
     location: list[float]
@@ -125,6 +128,10 @@ class GeneralConfig(BaseModel):
             f"    Random seed: {self.random_seed}\n"
             f"    Number of datapoints: {self.number_datapoints}\n"
             f"    Using workflow: {self.workflow}\n"
+            f"    Number of cells: {self.number_cells}\n"
+            f"    Cell resolution: {self.cell_resolution}\n"
+            f"    Time to simulate: {str(self.time_to_simulate)}\n"
+            f"    Profiling: {self.profiling}\n"
         )
 
 
