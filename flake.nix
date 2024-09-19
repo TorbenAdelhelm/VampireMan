@@ -36,16 +36,23 @@
             withParmetis = true;
             inherit hdf5;
           }).overrideAttrs
-            { patches = [ ./filter_mpi_warnings.patch ]; };
+            rec {
+              version = "3.21.5";
+              src = pkgs.fetchzip {
+                url = "https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-${version}.tar.gz";
+                hash = "sha256-D/QgCcq81Ym9uF+6n2uFj+vPrXHCrIUwCtXW0E1f1FQ=";
+              };
+              patches = [ ./filter_mpi_warnings.patch ];
+            };
 
         pflotran = pkgs.stdenv.mkDerivation rec {
           name = "pflotran";
-          version = "5.0.0";
+          version = "6.0.0";
           src = pkgs.fetchFromBitbucket {
             owner = "pflotran";
             repo = "pflotran";
             rev = "v${version}";
-            hash = "sha256-j934pPT9zSbRgV4xgwJtycYcaq9Qs7Hgpxc5e6dKPdM=";
+            hash = "sha256-pIaHlAT3lMx7Uc3gIwMBnsVePIVv71fec1QYXmrj2jA=";
           };
           enableParallelBuilding = true;
           PETSC_DIR = petsc;
