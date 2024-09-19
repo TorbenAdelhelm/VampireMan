@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 
 from ..config import Config, Data, Datapoint, DataType, HeatPump, Parameter, Vary
@@ -35,7 +37,7 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
     )
 
 
-def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
+def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | None:
     match parameter.vary:
         case Vary.FIXED:
             match parameter.data_type:
@@ -52,6 +54,8 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
                     field = create_vary_field(config, parameter)
                 case DataType.HEATPUMP:
                     return vary_heatpump(config, parameter)
+                case DataType.HEATPUMPS:
+                    return None
                 case _:
                     raise NotImplementedError()
             return Data(name=parameter.name, data_type=parameter.data_type, value=field)
@@ -81,9 +85,53 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
             raise ValueError()
 
 
+def prepare_heatpumps(config: Config):
+    heatpumps_to_generate = [d for name, d in config.heatpump_parameters.items() if d.data_type == DataType.HEATPUMPS]
+    heatpumps = [{name: d} for name, d in config.heatpump_parameters.items() if d.data_type == DataType.HEATPUMP]
+
+    # TODO: Prevent naming clashes in the generated vs given heatpumps
+    if len(heatpumps_to_generate) > 0 and len(heatpumps) > 0:
+        logging.warn("Heatpumps will be generated and there are also given heatpumps. Check for naming clashes!")
+
+    rand = config.get_rng()
+    for hps in heatpumps_to_generate:
+        # TODO: calculate relevant parameters
+        assert isinstance(hps.value, dict)
+        for index in range(int(hps.value["number"])):  # type:ignore
+            injection_temp_min = hps.value["injection_temp_min"]
+            injection_temp_max = hps.value["injection_temp_max"]
+            injection_rate_min = hps.value["injection_rate_min"]
+            injection_rate_max = hps.value["injection_rate_max"]
+
+            assert isinstance(injection_temp_min, float)
+            assert isinstance(injection_temp_max, float)
+            assert isinstance(injection_rate_min, float)
+            assert isinstance(injection_rate_max, float)
+
+            location = np.ceil(rand.random(3) * config.general.number_cells).tolist()
+            injection_temp = injection_temp_max - (rand.random() * (injection_temp_max - injection_temp_min))
+            injection_rate = injection_rate_max - (rand.random() * (injection_rate_max - injection_rate_min))
+            logging.debug(
+                "Generating heatpump with location %s, injection_temp %s, injection_rate %s",
+                location,
+                injection_temp,
+                injection_rate,
+            )
+            name = f"{hps.name}_{index}"
+            config.heatpump_parameters[name] = Parameter(
+                name=name,
+                data_type=DataType.HEATPUMP,
+                value=HeatPump(location=location, injection_temp=injection_temp, injection_rate=injection_rate),
+            )
+
+    # XXX: Here leftoff
+
+
 def vary_params(config: Config) -> Config:
     # for step in config.steps:
     #     filter over params where step == param.step
+    prepare_heatpumps(config)
+
     for datapoint_index in range(config.general.number_datapoints):
         data = {}
 
@@ -96,6 +144,8 @@ def vary_params(config: Config) -> Config:
 
         for _, parameter in config.heatpump_parameters.items():
             parameter_data = vary_parameter(config, parameter, datapoint_index)
+            if parameter_data is None:
+                continue
             # XXX: Store this in the parameter?
             # parameter.set_datapoint(datapoint_index, parameter_data)
 

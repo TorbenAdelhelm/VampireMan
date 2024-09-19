@@ -21,6 +21,7 @@ class DataType(enum.StrEnum):
     PERLIN = "perlin"
     # This needs `location`, `injection_temp` and `injection_rate`
     HEATPUMP = "heatpump"
+    HEATPUMPS = "heatpumps"
     FILE = "file"
 
 
