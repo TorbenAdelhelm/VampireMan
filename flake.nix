@@ -60,7 +60,10 @@
             pkgs.mpi
             pkgs.pkg-config
           ];
-          buildInputs = [ hdf5 ];
+          buildInputs = [
+            hdf5
+            pkgs.parmetis
+          ];
           patches = [ ./pflotran.patch ];
           doCheck = false;
         };
