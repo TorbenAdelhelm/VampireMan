@@ -1,19 +1,15 @@
 import logging
 from argparse import Namespace
 
-from .config import Config, load_config
+from .config import Config, ensure_config_is_valid, load_config
 from .utils import get_answer, get_workflow_module, profile_function
-
-
-@profile_function
-def ensure_config_is_valid(config: Config) -> Config:
-    return get_workflow_module(config.general.workflow).ensure_config_is_valid(config)
+from .vary_params.vary import vary_params
 
 
 @profile_function
 def run_vary_params(config: Config) -> Config:
     get_answer(config, "Do you want to run the stage parameter variation?", True)
-    config = get_workflow_module(config.general.workflow).vary_params(config)
+    config = vary_params(config)
     print("Following datapoints will be used")
     for datapoint in config.datapoints:
         print(datapoint)

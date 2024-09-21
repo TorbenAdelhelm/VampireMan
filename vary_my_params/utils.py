@@ -6,11 +6,13 @@ import sys
 import time
 from pstats import SortKey
 from types import ModuleType
+from typing import TYPE_CHECKING
 
-from .config import Config
+if TYPE_CHECKING:
+    from .config import Config
 
 
-def get_answer(config: Config, question: str, exit_if_no: bool = False) -> bool:
+def get_answer(config: "Config", question: str, exit_if_no: bool = False) -> bool:
     """Ask a yes/no question on the command line and return True if the answer is yes and False if the answer is no"""
     if not config.general.interactive:
         return True

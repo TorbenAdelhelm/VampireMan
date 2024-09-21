@@ -124,8 +124,6 @@ def prepare_heatpumps(config: Config):
                 value=HeatPump(location=location, injection_temp=injection_temp, injection_rate=injection_rate),
             )
 
-    # XXX: Here leftoff
-
 
 def vary_params(config: Config) -> Config:
     # for step in config.steps:

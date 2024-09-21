@@ -10,6 +10,8 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from ruamel.yaml import YAML
 
+from .utils import profile_function
+
 yaml = YAML(typ="safe")
 
 
@@ -214,8 +216,87 @@ class Config(BaseModel):
         )
 
 
+def get_defaults() -> Config:
+    config = Config()
+
+    config.hydrogeological_parameters["permeability"] = Parameter(
+        name="permeability",
+        data_type=DataType.SCALAR,
+        value=1.2882090745857623e-10,
+        vary=Vary.SPACE,
+    )
+    config.hydrogeological_parameters["temperature"] = Parameter(
+        name="temperature",
+        data_type=DataType.SCALAR,
+        value=10.6,
+    )
+    config.hydrogeological_parameters["pressure"] = Parameter(
+        name="pressure",
+        data_type=DataType.SCALAR,
+        vary=Vary.CONST,
+        value=-0.0024757478454929577,
+    )
+    config.heatpump_parameters["hp1"] = Parameter(
+        name="hp1",
+        data_type=DataType.HEATPUMP,
+        value=HeatPump(location=[16, 32, 1], injection_temp=13.6, injection_rate=0.00024),
+    )
+
+    return config
+
+
+def ensure_parameter_isset(config: Config, name: str):
+    value = config.hydrogeological_parameters.get(name)
+    if value is None:
+        raise ValueError(f"`{name}` must not be None")
+
+
+@profile_function
+def ensure_config_is_valid(config: Config) -> Config:
+    # TODO make this more extensive
+
+    # These parameters are mandatory
+    for item in [
+        "permeability",
+        "pressure",
+    ]:
+        ensure_parameter_isset(config, item)
+
+    pressure = config.hydrogeological_parameters.get("pressure")
+    permeability = config.hydrogeological_parameters.get("permeability")
+    if (pressure is not None and pressure.data_type == DataType.FILE) or (
+        permeability is not None and permeability.data_type == DataType.FILE
+    ):
+        assert pressure is not None
+        assert permeability is not None
+        if pressure.data_type == permeability.data_type:
+            raise ValueError("If one of `pressure`, `permeability` is a file, all must be a file")
+
+    if pressure is not None:
+        pressure_correct = True
+        if pressure.data_type == DataType.ARRAY:
+            try:
+                if not (
+                    isinstance(pressure.value, dict)
+                    and isinstance(pressure.value["min"], float)
+                    and isinstance(pressure.value["max"], float)
+                ):
+                    pressure_correct = False
+            except KeyError:
+                pressure_correct = False
+            if not pressure_correct:
+                raise ValueError("`pressure` doesn't have min or max values that are floats")
+
+    # Simulation without heatpumps doesn't make much sense
+    heatpumps = [{name: d.name} for name, d in config.heatpump_parameters.items() if d.data_type == DataType.HEATPUMP]
+    if len(heatpumps) < 1:
+        logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
+
+    return config
+
+
 def load_config(arguments: argparse.Namespace, workflow_module: ModuleType) -> Config:
-    run_config = workflow_module.get_defaults()
+    run_config = get_defaults()
 
     # Load config from file if provided
     config_file = arguments.config_file
