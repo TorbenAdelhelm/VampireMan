@@ -35,12 +35,11 @@ def run_visualization(config: Config):
 
 
 def run(args: Namespace):
-    workflow_module = get_workflow_module(args.workflow)
-
-    config = load_config(args, workflow_module)
+    config = load_config(args)
     config = ensure_config_is_valid(config)
 
     print(config)
+    # Where do we check this?
     logging.debug("Will run all stages")
 
     config = run_vary_params(config)

@@ -295,7 +295,7 @@ def ensure_config_is_valid(config: Config) -> Config:
     return config
 
 
-def load_config(arguments: argparse.Namespace, workflow_module: ModuleType) -> Config:
+def load_config(arguments: argparse.Namespace) -> Config:
     run_config = get_defaults()
 
     # Load config from file if provided
