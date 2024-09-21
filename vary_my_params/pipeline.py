@@ -2,15 +2,15 @@ import logging
 from argparse import Namespace
 
 from .config import Config, load_config
-from .utils import get_answer, get_workflow_module, profile_stage
+from .utils import get_answer, get_workflow_module, profile_function
 
 
-@profile_stage
+@profile_function
 def ensure_config_is_valid(config: Config) -> Config:
     return get_workflow_module(config.general.workflow).ensure_config_is_valid(config)
 
 
-@profile_stage
+@profile_function
 def run_vary_params(config: Config) -> Config:
     get_answer(config, "Do you want to run the stage parameter variation?", True)
     config = get_workflow_module(config.general.workflow).vary_params(config)
@@ -20,19 +20,19 @@ def run_vary_params(config: Config) -> Config:
     return config
 
 
-@profile_stage
+@profile_function
 def run_render(config: Config):
     get_answer(config, "Do you want to run the stage prepare_simulation?", True)
     get_workflow_module(config.general.workflow).render(config)
 
 
-@profile_stage
+@profile_function
 def run_simulation(config: Config):
     get_answer(config, "Do you want to run the stage run_simulation?", True)
     get_workflow_module(config.general.workflow).run_simulation(config)
 
 
-@profile_stage
+@profile_function
 def run_visualization(config: Config):
     get_answer(config, "Do you want to run the stage run_visualization?", True)
     get_workflow_module(config.general.workflow).plot_simulation(config)

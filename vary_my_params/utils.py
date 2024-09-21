@@ -40,9 +40,9 @@ def get_workflow_module(workflow: str) -> ModuleType:
             raise NotImplementedError("Workflow not implemented")
 
 
-def profile_stage(stage):
+def profile_function(function):
     def wrapper(*args):
-        config = args[0]
+        config: Config = args[0]
 
         if config.general.profiling:
             profile = cProfile.Profile()
@@ -51,22 +51,22 @@ def profile_stage(stage):
 
             profile.enable()
 
-            result = stage(*args)
+            result = function(*args)
 
             profile.disable()
 
             end_time = time.perf_counter()
             run_time = end_time - start_time
-            logging.info("Stage %s took %s", stage.__name__, run_time)
+            logging.info("Function %s.%s took %s", function.__module__, function.__name__, run_time)
 
             s = io.StringIO()
             ps = pstats.Stats(profile, stream=s).sort_stats(SortKey.CUMULATIVE)
             ps.print_stats()
 
-            with open(f"profiling_{stage.__name__}.txt", "w") as file:
+            with open(f"profiling_{function.__module__}.{function.__name__}.txt", "w") as file:
                 file.write(s.getvalue())
         else:
-            result = stage(*args)
+            result = function(*args)
 
         return result
 
