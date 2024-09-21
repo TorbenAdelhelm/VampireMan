@@ -87,11 +87,6 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
 
 def prepare_heatpumps(config: Config):
     heatpumps_to_generate = [d for name, d in config.heatpump_parameters.items() if d.data_type == DataType.HEATPUMPS]
-    heatpumps = [{name: d} for name, d in config.heatpump_parameters.items() if d.data_type == DataType.HEATPUMP]
-
-    # TODO: Prevent naming clashes in the generated vs given heatpumps
-    if len(heatpumps_to_generate) > 0 and len(heatpumps) > 0:
-        logging.warn("Heatpumps will be generated and there are also given heatpumps. Check for naming clashes!")
 
     rand = config.get_rng()
     for hps in heatpumps_to_generate:
@@ -118,6 +113,11 @@ def prepare_heatpumps(config: Config):
                 injection_rate,
             )
             name = f"{hps.name}_{index}"
+            if config.heatpump_parameters.get(name) is not None:
+                # TODO write test for this
+                msg = f"There is a naming clash for generated heatpump {name}"
+                logging.error(msg)
+                raise ValueError(msg)
             config.heatpump_parameters[name] = Parameter(
                 name=name,
                 data_type=DataType.HEATPUMP,
