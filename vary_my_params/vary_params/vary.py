@@ -38,13 +38,14 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
 
 
 def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | None:
+    data = None
     match parameter.vary:
         case Vary.FIXED:
             match parameter.data_type:
                 case DataType.HEATPUMP:
-                    return vary_heatpump(config, parameter)
+                    data = vary_heatpump(config, parameter)
                 case _:
-                    return copy_parameter(parameter)
+                    data = copy_parameter(parameter)
         case Vary.SPACE:
             match parameter.data_type:
                 case DataType.SCALAR:
@@ -53,12 +54,12 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
                 case DataType.PERLIN:
                     field = create_vary_field(config, parameter)
                 case DataType.HEATPUMP:
-                    return vary_heatpump(config, parameter)
+                    data = vary_heatpump(config, parameter)
                 case DataType.HEATPUMPS:
-                    return None
+                    data = None
                 case _:
                     raise NotImplementedError()
-            return Data(name=parameter.name, data_type=parameter.data_type, value=field)
+            data = Data(name=parameter.name, data_type=parameter.data_type, value=field)
         # TODO make this less copy paste
         case Vary.CONST:
             match parameter.data_type:
@@ -72,17 +73,18 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
                     distance = max_pressure - min_pressure
                     step_width = distance / config.general.number_datapoints
                     value = min_pressure + step_width * index
-                    return Data(
+                    data = Data(
                         name=parameter.name,
                         data_type=parameter.data_type,
                         value=create_const_field(config, value),
                     )
                 case DataType.SCALAR:
-                    return copy_parameter(parameter)
+                    data = copy_parameter(parameter)
                 case _:
                     raise NotImplementedError()
         case _:
             raise ValueError()
+    return data
 
 
 def prepare_heatpumps(config: Config):
@@ -123,13 +125,12 @@ def prepare_heatpumps(config: Config):
                 data_type=DataType.HEATPUMP,
                 value=HeatPump(location=location, injection_temp=injection_temp, injection_rate=injection_rate),
             )
+    return config
 
 
 def vary_params(config: Config) -> Config:
     # for step in config.steps:
     #     filter over params where step == param.step
-    prepare_heatpumps(config)
-
     for datapoint_index in range(config.general.number_datapoints):
         data = {}
 

@@ -3,7 +3,13 @@ from argparse import Namespace
 
 from .config import Config, ensure_config_is_valid, load_config
 from .utils import get_answer, get_workflow_module, profile_function
-from .vary_params.vary import vary_params
+from .vary_params.vary import prepare_heatpumps, vary_params
+
+
+@profile_function
+def prepare_parameters(config: Config) -> Config:
+    config = prepare_heatpumps(config)
+    return config
 
 
 @profile_function
@@ -42,6 +48,7 @@ def run(args: Namespace):
     # Where do we check this?
     logging.debug("Will run all stages")
 
+    config = prepare_parameters(config)
     config = run_vary_params(config)
 
     run_render(config)
