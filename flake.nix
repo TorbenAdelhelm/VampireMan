@@ -58,6 +58,26 @@
           doCheck = false;
         };
 
+        build_h5_file = pkgs.stdenvNoCC.mkDerivation {
+          name = "buildH5File";
+          src = ./.;
+
+          nativeBuildInputs = [
+            self.packages.x86_64-linux.default
+            pkgs.mpi
+            python3_env
+          ];
+
+          buildPhase = ''
+            python -m vary_my_params --non-interactive
+          '';
+
+          installPhase = ''
+            mkdir -p $out
+            mv datasets_out/*/datapoint-0/pflotran.h5 $out/pflotran.h5
+          '';
+        };
+
         inherit python3_env;
       };
 
