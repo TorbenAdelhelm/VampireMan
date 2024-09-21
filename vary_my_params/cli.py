@@ -17,17 +17,15 @@ def main():
 
     parser.add_argument("--config-file", type=pathlib.Path, help="number of datapoints to generate")
     parser.add_argument("--workflow", type=str, default="pflotran", help="name of the simulation workflow")
-    parser.add_argument(
-        "--non-interactive",
-        action="store_true",
-        default=None,
-        help="don't ask for user confirmation to move to next stage",
-    )
+    parser.add_argument("--non-interactive", action="store_true", default=None, help="don't ask for user confirmation")
     parser.add_argument("--log-level", type=str, default="INFO", help="enable debug logging")
 
     args = parser.parse_args()
 
     if args.log_level:
         logging.getLogger().setLevel(args.log_level)
+        logging.debug("Set logger to level %s", args.log_level)
+
+    logging.debug("Arguments are: %s", args)
 
     pipeline.run(args)
