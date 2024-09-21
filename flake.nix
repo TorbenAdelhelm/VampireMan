@@ -168,7 +168,7 @@
           nativeBuildInputs = [
             self.packages.x86_64-linux.default
             pkgs.mpi
-            pkgs.hdf5
+            self.packages.x86_64-linux.hdf5
             pkgs.openssh
             python3_env
           ];
