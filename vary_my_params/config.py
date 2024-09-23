@@ -99,7 +99,8 @@ class Data(BaseModel):
     value: int | float | list[int] | list[float] | HeatPump | Any  # | np.ndarray
 
     def __str__(self) -> str:
-        return f"====== {self.name} [{self.data_type}]: {self.value}"
+        value = "ndarray" if isinstance(self.value, np.ndarray) else self.value
+        return f"====== {self.name} [{self.data_type}]: {value}"
 
 
 class Datapoint(BaseModel):
