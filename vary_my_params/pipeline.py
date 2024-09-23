@@ -3,12 +3,13 @@ from argparse import Namespace
 
 from .config import Config, ensure_config_is_valid, load_config
 from .utils import get_answer, get_workflow_module, profile_function
-from .vary_params.vary import prepare_heatpumps, vary_params
+from .vary_params.vary import calculate_hp_coordinates, generate_heatpumps, vary_params
 
 
 @profile_function
 def prepare_parameters(config: Config) -> Config:
-    config = prepare_heatpumps(config)
+    config = generate_heatpumps(config)
+    config = calculate_hp_coordinates(config)
     return config
 
 

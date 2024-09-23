@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 
-from ..config import Config, Data, Datapoint, DataType, HeatPump, Parameter, Vary
+from ..config import Config, Data, Datapoint, DataType, HeatPump, HeatPumps, Parameter, Vary
 from .vary_perlin import create_const_field, create_vary_field
 
 
@@ -17,16 +17,9 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
 
     hp = parameter.value
     assert isinstance(hp, HeatPump)
-    result_location = np.zeros(3)
 
     # This is needed as we need to calculate the heatpump coordinates for pflotran.in
-    match parameter.vary:
-        case Vary.FIXED:
-            result_location = (np.array(hp.location) - 1) * resolution + (resolution * 0.5)
-        case Vary.SPACE:
-            result_location = (number_cells - 1) * config.get_rng().random(3) * resolution + (resolution * 0.5)
-        case _:
-            raise NotImplementedError()
+    result_location = (number_cells - 1) * config.get_rng().random(3) * resolution + (resolution * 0.5)
 
     return Data(
         name=parameter.name,
@@ -41,25 +34,28 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
     data = None
     match parameter.vary:
         case Vary.FIXED:
-            match parameter.data_type:
-                case DataType.HEATPUMP:
-                    data = vary_heatpump(config, parameter)
-                case _:
-                    data = copy_parameter(parameter)
+            data = copy_parameter(parameter)
         case Vary.SPACE:
             match parameter.data_type:
                 case DataType.SCALAR:
                     assert isinstance(parameter.value, float)
-                    field = create_const_field(config, parameter.value)
+                    data = Data(
+                        name=parameter.name,
+                        data_type=parameter.data_type,
+                        value=create_const_field(config, parameter.value),
+                    )
                 case DataType.PERLIN:
-                    field = create_vary_field(config, parameter)
+                    data = Data(
+                        name=parameter.name,
+                        data_type=parameter.data_type,
+                        value=create_vary_field(config, parameter),
+                    )
                 case DataType.HEATPUMP:
                     data = vary_heatpump(config, parameter)
                 case DataType.HEATPUMPS:
                     data = None
                 case _:
                     raise NotImplementedError()
-            data = Data(name=parameter.name, data_type=parameter.data_type, value=field)
         # TODO make this less copy paste
         case Vary.CONST:
             match parameter.data_type:
@@ -87,23 +83,42 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
     return data
 
 
-def prepare_heatpumps(config: Config):
-    heatpumps_to_generate = [d for name, d in config.heatpump_parameters.items() if d.data_type == DataType.HEATPUMPS]
+def calculate_hp_coordinates(config: Config) -> Config:
+    """Calculate the coordinates of each heatpump by multiplying with the cell_resolution"""
 
+    for _, hp_data in config.heatpump_parameters.items():
+        if hp_data.data_type == DataType.HEATPUMPS:
+            continue
+        resolution = np.array(config.general.cell_resolution)
+
+        hp = hp_data.value
+        assert isinstance(hp, HeatPump)
+
+        # This is needed as we need to calculate the heatpump coordinates for pflotran.in
+        result_location = (np.array(hp.location) - 1) * resolution + (resolution * 0.5)
+
+        hp.location = result_location.tolist()
+
+    return config
+
+
+def generate_heatpumps(config: Config):
     rand = config.get_rng()
-    for hps in heatpumps_to_generate:
-        # TODO: calculate relevant parameters
-        assert isinstance(hps.value, dict)
-        for index in range(int(hps.value["number"])):  # type:ignore
-            injection_temp_min = hps.value["injection_temp_min"]
-            injection_temp_max = hps.value["injection_temp_max"]
-            injection_rate_min = hps.value["injection_rate_min"]
-            injection_rate_max = hps.value["injection_rate_max"]
+    new_heatpumps: dict[str, Parameter] = {}
+    for _, hps in config.heatpump_parameters.items():
+        if isinstance(hps.value, HeatPump):
+            new_heatpumps[hps.name] = hps
+            continue
 
-            assert isinstance(injection_temp_min, float)
-            assert isinstance(injection_temp_max, float)
-            assert isinstance(injection_rate_min, float)
-            assert isinstance(injection_rate_max, float)
+        if not isinstance(hps.value, HeatPumps):
+            raise ValueError()
+
+        # TODO: calculate relevant parameters
+        for index in range(hps.value.number):  # type:ignore
+            injection_temp_min = hps.value.injection_temp_min
+            injection_temp_max = hps.value.injection_temp_max
+            injection_rate_min = hps.value.injection_rate_min
+            injection_rate_max = hps.value.injection_rate_max
 
             location = np.ceil(rand.random(3) * config.general.number_cells).tolist()
             injection_temp = injection_temp_max - (rand.random() * (injection_temp_max - injection_temp_min))
@@ -115,16 +130,18 @@ def prepare_heatpumps(config: Config):
                 injection_rate,
             )
             name = f"{hps.name}_{index}"
-            if config.heatpump_parameters.get(name) is not None:
+            if (config.heatpump_parameters.get(name) is not None) and (new_heatpumps.get(name) is not None):
                 # TODO write test for this
                 msg = f"There is a naming clash for generated heatpump {name}"
                 logging.error(msg)
                 raise ValueError(msg)
-            config.heatpump_parameters[name] = Parameter(
+            new_heatpumps[name] = Parameter(
                 name=name,
                 data_type=DataType.HEATPUMP,
+                vary=hps.vary,
                 value=HeatPump(location=location, injection_temp=injection_temp, injection_rate=injection_rate),
             )
+    config.heatpump_parameters = new_heatpumps
     return config
 
 

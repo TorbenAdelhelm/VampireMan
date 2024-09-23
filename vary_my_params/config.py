@@ -59,10 +59,18 @@ class HeatPump(BaseModel):
     injection_rate: float
 
 
+class HeatPumps(BaseModel):
+    number: int
+    injection_temp_min: float
+    injection_temp_max: float
+    injection_rate_min: float
+    injection_rate_max: float
+
+
 class Parameter(BaseModel):
     name: str
     data_type: DataType
-    value: str | float | list[int] | HeatPump | dict[str, float | list[float]]
+    value: str | float | list[int] | HeatPumps | HeatPump | dict[str, float | list[float]]
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
@@ -288,8 +296,9 @@ def ensure_config_is_valid(config: Config) -> Config:
     ensure_parameter_correct(pressure)
 
     # Simulation without heatpumps doesn't make much sense
-    heatpumps = [{name: d.name} for name, d in config.heatpump_parameters.items() if d.data_type == DataType.HEATPUMP]
-    if len(heatpumps) < 1:
+    heatpumps = [{name: d.name} for name, d in config.heatpump_parameters.items() if isinstance(d, HeatPump)]
+    heatpumps_gen = [{name: d.name} for name, d in config.heatpump_parameters.items() if isinstance(d, HeatPumps)]
+    if len(heatpumps) + len(heatpumps_gen) < 1:
         logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
 
     return config
