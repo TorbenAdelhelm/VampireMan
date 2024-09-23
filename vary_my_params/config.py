@@ -242,7 +242,7 @@ def get_defaults() -> Config:
     config.hydrogeological_parameters["pressure"] = Parameter(
         name="pressure",
         data_type=DataType.SCALAR,
-        vary=Vary.CONST,
+        vary=Vary.FIXED,
         value=-0.0024757478454929577,
     )
     config.heatpump_parameters["hp1"] = Parameter(

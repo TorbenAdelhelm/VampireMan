@@ -74,9 +74,13 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
                         data_type=parameter.data_type,
                         value=create_const_field(config, value),
                     )
-                case DataType.SCALAR:
-                    data = copy_parameter(parameter)
                 case _:
+                    logging.error(
+                        "No implementation for %s and %s in parameter %s",
+                        parameter.data_type,
+                        parameter.vary,
+                        parameter.name,
+                    )
                     raise NotImplementedError()
         case _:
             raise ValueError()
