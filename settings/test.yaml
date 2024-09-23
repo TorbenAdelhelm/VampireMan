@@ -3,11 +3,12 @@ general:
   output_directory: ./datasets_out/test
   number_datapoints: 3
   time_to_simulate:
-    final_time: 2
+    final_time: 27.5
+  profiling: true
 heatpump_parameters:
   hp1:
     data_type: heatpump
-    vary: spatially_vary_within_datapoint
+    vary: fixed
     value:
       location: [16, 32, 1]
       injection_temp: 15.6
@@ -20,7 +21,6 @@ heatpump_parameters:
       injection_temp: 15.6
       injection_rate: 0.00024
   hps:
-    # ein datenpunkt mit 100 hp
     data_type: heatpumps
     vary: spatially_vary_within_datapoint
     value:
@@ -28,20 +28,16 @@ heatpump_parameters:
       injection_temp_max: 15.6
       injection_rate_min: 0.00002
       injection_rate_max: 0.0001
-      number: 10
+      number: 5
   hps2:
-    # ein datenpunkt mit 100 hp
     data_type: heatpumps
     vary: spatially_vary_within_datapoint
     value:
-      # injection_temp:
-      #   max: 15.6
-      #   min: 13.6
       injection_temp_min: 10.6
       injection_temp_max: 12.6
       injection_rate_min: 0.00002
       injection_rate_max: 0.0001
-      number: 10
+      number: 5
 hydrogeological_parameters:
   permeability:
     data_type: perlin
