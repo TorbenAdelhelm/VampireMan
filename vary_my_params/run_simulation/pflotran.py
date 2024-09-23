@@ -14,7 +14,7 @@ def run_simulation(config: Config):
         os.chdir(datapoint_path)
         if os.path.exists("pflotran.out") and os.path.exists("pflotran.h5"):
             logging.warn(f"pflotran.out and pflotran.h5 files present in {datapoint_path}")
-            if get_answer(config, "Looks like the simulation already ran, skip simulation?"):
+            if not get_answer(config, "Looks like the simulation already ran, run simulation again?"):
                 os.chdir(original_dir)
                 continue
         subprocess.run(["mpirun", "-n", "1", "pflotran"], check=True, close_fds=True)
