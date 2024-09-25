@@ -187,6 +187,7 @@ class Config(BaseModel):
             ),
             "temperature": Parameter(
                 name="temperature",
+                vary=Vary.FIXED,
                 value=10.6,
             ),
         }
@@ -195,6 +196,7 @@ class Config(BaseModel):
         default_factory=lambda: {
             "hp1": Parameter(
                 name="hp1",
+                vary=Vary.FIXED,
                 value=HeatPump(
                     location=[16, 32, 1],
                     injection_temp=13.6,
