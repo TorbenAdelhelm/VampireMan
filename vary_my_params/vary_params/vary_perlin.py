@@ -4,7 +4,7 @@ import noise
 import numpy as np
 from numpy.typing import NDArray
 
-from ..config import Config, Distribution, Parameter, ParameterValuePerlin
+from ..config import Config, Distribution, Parameter, ParameterValueMinMax, ParameterValuePerlin
 
 
 def make_perlin_grid(
@@ -97,17 +97,15 @@ def calc_pressure_from_gradient_field(
 ) -> NDArray[np.float64]:
     # XXX: is this function correctly implemented?
 
-    pressure = parameter.value
-    assert isinstance(pressure, dict)
+    value = parameter.value
+    assert isinstance(value, ParameterValueMinMax)
 
     # scale pressure field to min and max values from config
     current_min = np.min(gradient_field)
     current_max = np.max(gradient_field)
 
-    new_min = pressure["min"]
-    new_max = pressure["max"]
-    assert isinstance(new_min, float)
-    assert isinstance(new_max, float)
+    new_min = value.min
+    new_max = value.max
 
     gradient_field = (gradient_field - current_min) / (current_max - current_min) * (new_max - new_min) + new_min
 

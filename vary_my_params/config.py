@@ -84,10 +84,21 @@ class ParameterValuePerlin(BaseModel):
         return self
 
 
+class ParameterValueMinMax(BaseModel):
+    min: float
+    max: float
+
+    @model_validator(mode="after")
+    def ensure_max_ge_min(self):
+        if self.max < self.min:
+            raise ValueError("`max` value must be greater or equal to `min`")
+        return self
+
+
 class Parameter(BaseModel):
     name: str
     data_type: DataType
-    value: float | list[int] | HeatPumps | HeatPump | ParameterValuePerlin | FilePath
+    value: float | list[int] | HeatPumps | HeatPump | ParameterValuePerlin | ParameterValueMinMax | FilePath
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
