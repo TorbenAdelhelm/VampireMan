@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 
 import numpy as np
 
@@ -18,14 +19,14 @@ from .vary_perlin import create_const_field, create_vary_field
 
 def copy_parameter(parameter: Parameter) -> Data:
     """This function simply copies all values from a `Parameter` to a `Data` object without any transformation"""
-    return Data(name=parameter.name, value=parameter.value)
+    return Data(name=parameter.name, value=deepcopy(parameter.value))
 
 
 def vary_heatpump(config: Config, parameter: Parameter) -> Data:
     resolution = np.array(config.general.cell_resolution)
     number_cells = np.array(config.general.number_cells)
 
-    hp = parameter.value
+    hp = deepcopy(parameter.value)
     assert isinstance(hp, HeatPump)
 
     # This is needed as we need to calculate the heatpump coordinates for pflotran.in
@@ -66,7 +67,6 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
             else:
                 raise NotImplementedError(f"Dont know how to vary {parameter}")
 
-        # TODO make this less copy paste
         case Vary.CONST:
             if isinstance(parameter.value, ParameterValueMinMax):
                 # XXX: This will generate one float per datapoint, between min and max values
