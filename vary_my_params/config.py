@@ -14,18 +14,6 @@ from .utils import profile_function
 yaml = YAML(typ="safe")
 
 
-class DataType(enum.StrEnum):
-    # XXX is this even needed?
-    SCALAR = "scalar"
-    ARRAY = "array"
-    # This needs to be a dict with the keys `frequency`, `max` and `min`
-    PERLIN = "perlin"
-    # This needs `location`, `injection_temp` and `injection_rate`
-    HEATPUMP = "heatpump"
-    HEATPUMPS = "heatpumps"
-    FILE = "file"
-
-
 class Distribution(enum.StrEnum):
     UNIFORM = "uniform"
     LOG = "logarithmic"
@@ -97,24 +85,15 @@ class ParameterValueMinMax(BaseModel):
 
 class Parameter(BaseModel):
     name: str
-    data_type: DataType
     value: float | list[int] | HeatPumps | HeatPump | ParameterValuePerlin | ParameterValueMinMax | FilePath
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
 
-    @model_validator(mode="after")
-    def str_value_if_file_datatype(self):
-        if (isinstance(self.value, Path) and not self.data_type == DataType.FILE) or (
-            self.data_type == DataType.FILE and not isinstance(self.value, Path)
-        ):
-            raise ValueError("Only when input is a file, the value may be a str")
-        return self
-
     def __str__(self) -> str:
         return (
             f"====== Parameter {self.name}\n"
-            f"       DataType: {self.data_type}\n"
+            f"       type(): {type(self.value)}\n"
             f"       Value: {self.value}\n"
             f"       Distribution: {self.distribution}\n"
             f"       Vary: {self.vary}\n"
@@ -123,12 +102,11 @@ class Parameter(BaseModel):
 
 class Data(BaseModel):
     name: str
-    data_type: DataType
     value: int | float | list[int] | list[float] | HeatPump | Any  # | np.ndarray
 
     def __str__(self) -> str:
         value = "ndarray" if isinstance(self.value, np.ndarray) else self.value
-        return f"====== {self.name} [{self.data_type}]: {value}"
+        return f"====== {self.name} [{type(self.value)}]: {value}"
 
 
 class Datapoint(BaseModel):
@@ -183,19 +161,16 @@ class Config(BaseModel):
         default_factory=lambda: {
             "permeability": Parameter(
                 name="permeability",
-                data_type=DataType.SCALAR,
                 vary=Vary.SPACE,
                 value=1.2882090745857623e-10,
             ),
             "pressure": Parameter(
                 name="pressure",
-                data_type=DataType.SCALAR,
                 vary=Vary.FIXED,
                 value=-0.0024757478454929577,
             ),
             "temperature": Parameter(
                 name="temperature",
-                data_type=DataType.SCALAR,
                 value=10.6,
             ),
         }
@@ -204,7 +179,6 @@ class Config(BaseModel):
         default_factory=lambda: {
             "hp1": Parameter(
                 name="hp1",
-                data_type=DataType.HEATPUMP,
                 value=HeatPump(
                     location=[16, 32, 1],
                     injection_temp=13.6,

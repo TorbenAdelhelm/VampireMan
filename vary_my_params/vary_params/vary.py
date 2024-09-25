@@ -10,7 +10,6 @@ from ..config import (
     HeatPumps,
     Parameter,
     ParameterValueMinMax,
-    ParameterValueMinMaxArray,
     ParameterValuePerlin,
     Vary,
 )
@@ -19,7 +18,7 @@ from .vary_perlin import create_const_field, create_vary_field
 
 def copy_parameter(parameter: Parameter) -> Data:
     """This function simply copies all values from a `Parameter` to a `Data` object without any transformation"""
-    return Data(name=parameter.name, data_type=parameter.data_type, value=parameter.value)
+    return Data(name=parameter.name, value=parameter.value)
 
 
 def vary_heatpump(config: Config, parameter: Parameter) -> Data:
@@ -34,7 +33,6 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
 
     return Data(
         name=parameter.name,
-        data_type=parameter.data_type,
         value=HeatPump(
             location=result_location.tolist(), injection_temp=hp.injection_temp, injection_rate=hp.injection_rate
         ),
@@ -51,13 +49,11 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
             if isinstance(parameter.value, ParameterValuePerlin):
                 data = Data(
                     name=parameter.name,
-                    data_type=parameter.data_type,
                     value=create_vary_field(config, parameter),
                 )
             elif isinstance(parameter.value, float):
                 data = Data(
                     name=parameter.name,
-                    data_type=parameter.data_type,
                     value=create_const_field(config, parameter.value),
                 )
             elif isinstance(parameter.value, HeatPump):
@@ -81,13 +77,12 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
                 value = parameter.value.min + step_width * index
                 data = Data(
                     name=parameter.name,
-                    data_type=parameter.data_type,
                     value=value,
                 )
             else:
                 logging.error(
                     "No implementation for %s and %s in parameter %s",
-                    parameter.data_type,
+                    type(parameter.value),
                     parameter.vary,
                     parameter.name,
                 )

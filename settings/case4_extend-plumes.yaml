@@ -5,14 +5,12 @@ general:
   number_cells: [16, 128, 1]
 heatpump_parameters:
   hp1:
-    data_type: heatpump
     value:
       location: [8, 16, 1]
       injection_temp: 15.6
       injection_rate: 0.00024
 hydrogeological_parameters:
   permeability:
-    data_type: perlin
     vary: spatially_vary_within_datapoint
     distribution: logarithmic
     value:
@@ -20,7 +18,6 @@ hydrogeological_parameters:
       max: 5.09683995922528e-09
       min: 1.0193679918450561e-11
   pressure:
-    data_type: scalar
     vary: const_within_datapoint
     value:
       max: -0.0015

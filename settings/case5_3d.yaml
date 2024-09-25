@@ -5,7 +5,6 @@ general:
   number_cells: [16, 64, 16]
 heatpump_parameters:
   hp1:
-    data_type: heatpump
     value:
       location: [8, 16, 8]
       injection_temp: 15.6

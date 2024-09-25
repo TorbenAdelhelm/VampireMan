@@ -2,15 +2,11 @@ general:
   interactive: false
 hydrogeological_parameters:
   grid:
-    data_type: array
     value: [64, 256, 1]
   permeability:
-    data_type: array
     vary: spatially_vary_within_datapoint
     value: [1, 1, 1]
   pressure:
-    data_type: array
     value: [1, 1, 1]
   none:
-    data_type: scalar
     value: 3.2

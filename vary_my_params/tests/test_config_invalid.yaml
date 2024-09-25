@@ -1,12 +1,9 @@
 hydrogeological_parameters:
   grid:
-    data_type: array
     vary: null
   permeability:
-    data_type: array
     vary: null
     value: [1, 1, 1]
   pressure:
-    data_type: array
     vary: null
     value: [1, 1, 1]
