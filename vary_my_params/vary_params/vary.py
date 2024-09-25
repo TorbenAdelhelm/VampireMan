@@ -2,7 +2,18 @@ import logging
 
 import numpy as np
 
-from ..config import Config, Data, Datapoint, DataType, HeatPump, HeatPumps, Parameter, Vary
+from ..config import (
+    Config,
+    Data,
+    Datapoint,
+    HeatPump,
+    HeatPumps,
+    Parameter,
+    ParameterValueMinMax,
+    ParameterValueMinMaxArray,
+    ParameterValuePerlin,
+    Vary,
+)
 from .vary_perlin import create_const_field, create_vary_field
 
 
@@ -32,56 +43,55 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
 
 def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | None:
     data = None
+    assert not isinstance(parameter.value, HeatPumps)
     match parameter.vary:
         case Vary.FIXED:
             data = copy_parameter(parameter)
         case Vary.SPACE:
-            match parameter.data_type:
-                case DataType.SCALAR:
-                    assert isinstance(parameter.value, float)
-                    data = Data(
-                        name=parameter.name,
-                        data_type=parameter.data_type,
-                        value=create_const_field(config, parameter.value),
-                    )
-                case DataType.PERLIN:
-                    data = Data(
-                        name=parameter.name,
-                        data_type=parameter.data_type,
-                        value=create_vary_field(config, parameter),
-                    )
-                case DataType.HEATPUMP:
-                    data = vary_heatpump(config, parameter)
-                case DataType.HEATPUMPS:
-                    data = None
-                case _:
-                    raise NotImplementedError()
+            if isinstance(parameter.value, ParameterValuePerlin):
+                data = Data(
+                    name=parameter.name,
+                    data_type=parameter.data_type,
+                    value=create_vary_field(config, parameter),
+                )
+            elif isinstance(parameter.value, float):
+                data = Data(
+                    name=parameter.name,
+                    data_type=parameter.data_type,
+                    value=create_const_field(config, parameter.value),
+                )
+            elif isinstance(parameter.value, HeatPump):
+                data = vary_heatpump(config, parameter)
+            elif isinstance(parameter.value, ParameterValueMinMax):
+                raise ValueError(
+                    f"Parameter {parameter.name} is vary.space and has min/max values, "
+                    f"it should be set to vary.perlin instead; {parameter}"
+                )
+            else:
+                raise NotImplementedError(f"Dont know how to vary {parameter}")
+
         # TODO make this less copy paste
         case Vary.CONST:
-            match parameter.data_type:
-                case DataType.ARRAY:
-                    # TODO: what needs to be done here?
-                    assert isinstance(parameter.value, dict)
-                    max_pressure = parameter.value["max"]
-                    min_pressure = parameter.value["min"]
-                    assert isinstance(max_pressure, float)
-                    assert isinstance(min_pressure, float)
-                    distance = max_pressure - min_pressure
-                    step_width = distance / config.general.number_datapoints
-                    value = min_pressure + step_width * index
-                    data = Data(
-                        name=parameter.name,
-                        data_type=parameter.data_type,
-                        value=create_const_field(config, value),
-                    )
-                case _:
-                    logging.error(
-                        "No implementation for %s and %s in parameter %s",
-                        parameter.data_type,
-                        parameter.vary,
-                        parameter.name,
-                    )
-                    raise NotImplementedError()
+            if isinstance(parameter.value, ParameterValueMinMax):
+                # XXX: This will generate one float per datapoint, between min and max values
+                # Currently, there is no shuffling implemented
+                # XXX: somehow, the values are not reaching the max value
+                distance = parameter.value.max - parameter.value.min
+                step_width = distance / (config.general.number_datapoints + 1)
+                value = parameter.value.min + step_width * index
+                data = Data(
+                    name=parameter.name,
+                    data_type=parameter.data_type,
+                    value=value,
+                )
+            else:
+                logging.error(
+                    "No implementation for %s and %s in parameter %s",
+                    parameter.data_type,
+                    parameter.vary,
+                    parameter.name,
+                )
+                raise NotImplementedError()
         case _:
             raise ValueError()
     return data
@@ -140,10 +150,14 @@ def generate_heatpumps(config: Config):
                 raise ValueError(msg)
             new_heatpumps[name] = Parameter(
                 name=name,
-                data_type=DataType.HEATPUMP,
                 vary=hps.vary,
                 value=HeatPump(location=location, injection_temp=injection_temp, injection_rate=injection_rate),
             )
+
+    for name, value in new_heatpumps.items():
+        if isinstance(value, HeatPumps):
+            raise ValueError(f"There should be no HeatPumps in the new_heatpumps dict, but {name} is.")
+
     config.heatpump_parameters = new_heatpumps
     return config
 
