@@ -4,7 +4,7 @@ import pathlib
 
 import jinja2
 
-from ...config import Config, DataType
+from ...config import Config, HeatPump
 from ...utils import get_answer
 from .pflotran_generate_mesh import write_mesh_and_border_files
 from .pflotran_write_permeability import plot_vary_field, save_vary_field
@@ -29,7 +29,7 @@ def render(config: Config):
             raise error
 
         values = datapoint.data
-        heatpumps = [{name: d.value} for name, d in datapoint.data.items() if d.data_type == DataType.HEATPUMP]
+        heatpumps = [{name: d.value} for name, d in datapoint.data.items() if isinstance(d.value, HeatPump)]
         values["heatpumps"] = heatpumps  # type: ignore
         values["time_to_simulate"] = config.general.time_to_simulate  # type: ignore
 

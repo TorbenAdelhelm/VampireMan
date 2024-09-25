@@ -9,7 +9,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from ..config import Config, DataType, HeatPump
+from ..config import Config, HeatPump
 
 TimeData = OrderedDict[str, dict[str, Any]]
 
@@ -68,7 +68,7 @@ def print_heatpump_temp(config: Config, data: TimeData):
     years = pflotran_time_to_year(key)
 
     for index, datapoint in enumerate(config.datapoints):
-        heatpumps = [{name: d.value} for name, d in datapoint.data.items() if d.data_type == DataType.HEATPUMP]
+        heatpumps = [{name: d.value} for name, d in datapoint.data.items() if isinstance(d.value, HeatPump)]
         for name, heatpump in heatpumps:
             assert isinstance(heatpump, HeatPump)
             location = heatpump.location

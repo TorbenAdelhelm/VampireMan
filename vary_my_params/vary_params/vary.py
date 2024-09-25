@@ -91,8 +91,7 @@ def calculate_hp_coordinates(config: Config) -> Config:
     """Calculate the coordinates of each heatpump by multiplying with the cell_resolution"""
 
     for _, hp_data in config.heatpump_parameters.items():
-        if hp_data.data_type == DataType.HEATPUMPS:
-            continue
+        assert not isinstance(hp_data.value, HeatPumps)
         resolution = np.array(config.general.cell_resolution)
 
         hp = hp_data.value

@@ -321,8 +321,8 @@ def ensure_config_is_valid(config: Config) -> Config:
     ensure_parameter_correct(pressure)
 
     # Simulation without heatpumps doesn't make much sense
-    heatpumps = [{name: d.name} for name, d in config.heatpump_parameters.items() if isinstance(d, HeatPump)]
-    heatpumps_gen = [{name: d.name} for name, d in config.heatpump_parameters.items() if isinstance(d, HeatPumps)]
+    heatpumps = [{name: d.name} for name, d in config.heatpump_parameters.items() if isinstance(d.value, HeatPump)]
+    heatpumps_gen = [{name: d.name} for name, d in config.heatpump_parameters.items() if isinstance(d.value, HeatPumps)]
     if len(heatpumps) + len(heatpumps_gen) < 1:
         logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
 
