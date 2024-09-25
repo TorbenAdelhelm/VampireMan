@@ -151,8 +151,40 @@ class Config(BaseModel):
     # Need to use field here, as otherwise it would be the same dict across several objects
     general: GeneralConfig = Field(default_factory=lambda: GeneralConfig())
     steps: list[str] = Field(default_factory=lambda: ["global"])
-    hydrogeological_parameters: dict[str, Parameter] = Field(default_factory=lambda: {})
-    heatpump_parameters: dict[str, Parameter] = Field(default_factory=lambda: {})
+    hydrogeological_parameters: dict[str, Parameter] = Field(
+        default_factory=lambda: {
+            "permeability": Parameter(
+                name="permeability",
+                data_type=DataType.SCALAR,
+                vary=Vary.SPACE,
+                value=1.2882090745857623e-10,
+            ),
+            "pressure": Parameter(
+                name="pressure",
+                data_type=DataType.SCALAR,
+                vary=Vary.FIXED,
+                value=-0.0024757478454929577,
+            ),
+            "temperature": Parameter(
+                name="temperature",
+                data_type=DataType.SCALAR,
+                value=10.6,
+            ),
+        }
+    )
+    heatpump_parameters: dict[str, Parameter] = Field(
+        default_factory=lambda: {
+            "hp1": Parameter(
+                name="hp1",
+                data_type=DataType.HEATPUMP,
+                value=HeatPump(
+                    location=[16, 32, 1],
+                    injection_temp=13.6,
+                    injection_rate=0.00024,
+                ),
+            )
+        }
+    )
     # TODO split this in datapoints_fixed, datapoint_const_within_datapoint, ...
     datapoints: list[Datapoint] = Field(default_factory=lambda: [])
     _rng: np.random.Generator = np.random.default_rng(seed=0)
@@ -250,35 +282,6 @@ class Config(BaseModel):
         )
 
 
-def get_defaults() -> Config:
-    config = Config()
-
-    config.hydrogeological_parameters["permeability"] = Parameter(
-        name="permeability",
-        data_type=DataType.SCALAR,
-        value=1.2882090745857623e-10,
-        vary=Vary.SPACE,
-    )
-    config.hydrogeological_parameters["temperature"] = Parameter(
-        name="temperature",
-        data_type=DataType.SCALAR,
-        value=10.6,
-    )
-    config.hydrogeological_parameters["pressure"] = Parameter(
-        name="pressure",
-        data_type=DataType.SCALAR,
-        vary=Vary.FIXED,
-        value=-0.0024757478454929577,
-    )
-    config.heatpump_parameters["hp1"] = Parameter(
-        name="hp1",
-        data_type=DataType.HEATPUMP,
-        value=HeatPump(location=[16, 32, 1], injection_temp=13.6, injection_rate=0.00024),
-    )
-
-    return config
-
-
 def ensure_parameter_correct(parameter: Parameter):
     pressure_correct = True
     if parameter.data_type == DataType.ARRAY:
@@ -328,7 +331,7 @@ def ensure_config_is_valid(config: Config) -> Config:
 
 
 def load_config(arguments: argparse.Namespace) -> Config:
-    run_config = get_defaults()
+    run_config = Config()
 
     # Load config from file if provided
     config_file = arguments.config_file
