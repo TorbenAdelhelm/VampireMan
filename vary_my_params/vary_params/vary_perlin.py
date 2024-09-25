@@ -4,7 +4,7 @@ import noise
 import numpy as np
 from numpy.typing import NDArray
 
-from ..config import Config, Distribution, Parameter
+from ..config import Config, Distribution, Parameter, ParameterValuePerlin
 
 
 def make_perlin_grid(
@@ -58,19 +58,13 @@ def make_perlin_grid(
 def create_vary_field(config: Config, parameter: Parameter):
     base_offset = config.get_rng().random(3) * 4242
 
-    if not isinstance(parameter.value, dict):
-        raise ValueError()
-    if not isinstance(parameter.value["frequency"], list):
-        raise ValueError()
-    if not isinstance(parameter.value["min"], float):
-        raise ValueError()
-    if not isinstance(parameter.value["max"], float):
+    if not isinstance(parameter.value, ParameterValuePerlin):
         raise ValueError()
 
-    freq_factor = parameter.value["frequency"]
+    freq_factor = parameter.value.frequency
 
-    vary_min = parameter.value["min"]
-    vary_max = parameter.value["max"]
+    vary_min = parameter.value.min
+    vary_max = parameter.value.max
 
     if parameter.distribution == Distribution.LOG:
         vary_min = np.log10(vary_min)

@@ -66,10 +66,28 @@ class HeatPumps(BaseModel):
     injection_rate_max: float
 
 
+class ParameterValuePerlin(BaseModel):
+    frequency: list[float]
+    max: float
+    min: float
+
+    @model_validator(mode="after")
+    def frequency_len_three(self):
+        if len(self.frequency) != 3:
+            raise ValueError("`frequency` must have exactly three values")
+        return self
+
+    @model_validator(mode="after")
+    def ensure_max_ge_min(self):
+        if self.max < self.min:
+            raise ValueError("`max` value must be greater or equal to `min`")
+        return self
+
+
 class Parameter(BaseModel):
     name: str
     data_type: DataType
-    value: float | list[int] | HeatPumps | HeatPump | dict[str, float | list[float]] | FilePath
+    value: float | list[int] | HeatPumps | HeatPump | ParameterValuePerlin | FilePath
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
@@ -281,22 +299,6 @@ class Config(BaseModel):
         )
 
 
-def ensure_parameter_correct(parameter: Parameter):
-    pressure_correct = True
-    if parameter.data_type == DataType.ARRAY:
-        try:
-            if not (
-                isinstance(parameter.value, dict)
-                and isinstance(parameter.value["min"], float)
-                and isinstance(parameter.value["max"], float)
-            ):
-                pressure_correct = False
-        except KeyError:
-            pressure_correct = False
-        if not pressure_correct:
-            raise ValueError(f"`{parameter.name}` doesn't have min or max values that are floats")
-
-
 @profile_function
 def ensure_config_is_valid(config: Config) -> Config:
     # TODO make this more extensive
@@ -305,20 +307,12 @@ def ensure_config_is_valid(config: Config) -> Config:
     permeability = config.hydrogeological_parameters.get("permeability")
     temperature = config.hydrogeological_parameters.get("temperature")
 
-    # These hydrogeological parameters are mandatory
-    for name, item in [
-        ("pressure", pressure),
-        ("permeability", permeability),
-        ("temperature", temperature),
-    ]:
-        if item is None:
-            raise ValueError(f"`{name}` must not be None")
-
-    assert pressure is not None
-    assert permeability is not None
-    assert temperature is not None
-
-    ensure_parameter_correct(pressure)
+    if permeability is None:
+        raise ValueError("`permeability` must not be None")
+    if pressure is None:
+        raise ValueError("`pressure` must not be None")
+    if temperature is None:
+        raise ValueError("`temperature` must not be None")
 
     # Simulation without heatpumps doesn't make much sense
     heatpumps = [{name: d.name} for name, d in config.heatpump_parameters.items() if isinstance(d.value, HeatPump)]
