@@ -47,9 +47,7 @@ hydrogeological_parameters:
       frequency: [18, 18, 18]
       max: 5.09683995922528e-09
       min: 1.0193679918450561e-11
-  # pressure:
-  #   data_type: array
-  #   vary: spatially_vary_within_datapoint
-  #   value:
-  #     max: -0.003
-  #     min: -0.003
+  pressure:
+    data_type: scalar
+    vary: fixed
+    value: -0.003
