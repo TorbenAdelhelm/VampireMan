@@ -34,6 +34,8 @@ class TimeToSimulate(BaseModel):
     final_time: float = 27.5
     unit: str = "year"
 
+    model_config = ConfigDict(extra="forbid")
+
     def __str__(self) -> str:
         return f"{self.final_time} [{self.unit}]"
 
@@ -45,6 +47,8 @@ class HeatPump(BaseModel):
     # TODO make this list[float]
     injection_rate: float
 
+    model_config = ConfigDict(extra="forbid")
+
 
 class HeatPumps(BaseModel):
     number: int
@@ -53,11 +57,15 @@ class HeatPumps(BaseModel):
     injection_rate_min: float
     injection_rate_max: float
 
+    model_config = ConfigDict(extra="forbid")
+
 
 class ParameterValuePerlin(BaseModel):
     frequency: list[float]
     max: float
     min: float
+
+    model_config = ConfigDict(extra="forbid")
 
     @model_validator(mode="after")
     def frequency_len_three(self):
@@ -76,6 +84,8 @@ class ParameterValueMinMax(BaseModel):
     min: float
     max: float
 
+    model_config = ConfigDict(extra="forbid")
+
     @model_validator(mode="after")
     def ensure_max_ge_min(self):
         if self.max < self.min:
@@ -89,6 +99,8 @@ class Parameter(BaseModel):
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
+
+    model_config = ConfigDict(extra="forbid")
 
     def __str__(self) -> str:
         return (
@@ -104,6 +116,8 @@ class Data(BaseModel):
     name: str
     value: int | float | list[int] | list[float] | HeatPump | Any  # | np.ndarray
 
+    model_config = ConfigDict(extra="forbid")
+
     def __str__(self) -> str:
         value = "ndarray" if isinstance(self.value, np.ndarray) else self.value
         return f"====== {self.name} [{type(self.value)}]: {value}"
@@ -112,6 +126,8 @@ class Data(BaseModel):
 class Datapoint(BaseModel):
     index: int
     data: dict[str, Data]
+
+    model_config = ConfigDict(extra="forbid")
 
     def __str__(self) -> str:
         data_strings = []
