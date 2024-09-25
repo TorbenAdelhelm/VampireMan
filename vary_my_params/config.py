@@ -3,7 +3,6 @@ import datetime
 import enum
 import logging
 from pathlib import Path
-from types import ModuleType
 from typing import Any
 
 import numpy as np
