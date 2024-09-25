@@ -153,7 +153,7 @@
           ];
 
           checkPhase = ''
-            pyright .
+            pyright
           '';
 
           installPhase = "mkdir -p $out";
