@@ -71,9 +71,8 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
             if isinstance(parameter.value, ParameterValueMinMax):
                 # XXX: This will generate one float per datapoint, between min and max values
                 # Currently, there is no shuffling implemented
-                # XXX: somehow, the values are not reaching the max value
                 distance = parameter.value.max - parameter.value.min
-                step_width = distance / (config.general.number_datapoints + 1)
+                step_width = distance / (config.general.number_datapoints - 1)
                 value = parameter.value.min + step_width * index
                 data = Data(
                     name=parameter.name,
