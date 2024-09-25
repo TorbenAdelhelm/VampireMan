@@ -7,7 +7,7 @@ from types import ModuleType
 from typing import Any
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, FilePath, field_validator, model_validator
 from ruamel.yaml import YAML
 
 from .utils import profile_function
@@ -70,15 +70,15 @@ class HeatPumps(BaseModel):
 class Parameter(BaseModel):
     name: str
     data_type: DataType
-    value: str | float | list[int] | HeatPumps | HeatPump | dict[str, float | list[float]]
+    value: float | list[int] | HeatPumps | HeatPump | dict[str, float | list[float]] | FilePath
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
 
     @model_validator(mode="after")
     def str_value_if_file_datatype(self):
-        if (isinstance(self.value, str) and not self.data_type == DataType.FILE) or (
-            self.data_type == DataType.FILE and not isinstance(self.value, str)
+        if (isinstance(self.value, Path) and not self.data_type == DataType.FILE) or (
+            self.data_type == DataType.FILE and not isinstance(self.value, Path)
         ):
             raise ValueError("Only when input is a file, the value may be a str")
         return self
@@ -173,6 +173,31 @@ class Config(BaseModel):
     def instantiate_random_number_generator(self):
         """This "validator" instantiates the global rng"""
         self._rng = np.random.default_rng(seed=self.general.random_seed)
+        return self
+
+    @model_validator(mode="after")
+    def check_all_or_none_file_paths(self):
+        """Check if one parameter is a file, then all must be"""
+
+        # Get all parameters
+        permeability = self.hydrogeological_parameters.get("permeability", False)
+        pressure = self.hydrogeological_parameters.get("pressure", False)
+        temperature = self.hydrogeological_parameters.get("temperature", False)
+
+        # Override with True where value is a Path to a file
+        if permeability:
+            permeability = isinstance(permeability, Path)
+        if pressure:
+            pressure = isinstance(pressure, Path)
+        if temperature:
+            temperature = isinstance(temperature, Path)
+
+        # If any of the parameters is True, all must be. Otherwise if none is True, its also fine
+        if not (permeability == pressure == temperature):
+            raise ValueError(
+                "If any of the parameters `permeability`, `pressure` or `temperature` is a Path, all must be"
+            )
+
         return self
 
     @field_validator("steps")
@@ -290,9 +315,6 @@ def ensure_config_is_valid(config: Config) -> Config:
     assert pressure is not None
     assert permeability is not None
     assert temperature is not None
-
-    if (DataType.FILE in (pressure.data_type, permeability.data_type)) and pressure.data_type != permeability.data_type:
-        raise ValueError("If one of `pressure`, `permeability` is a file, all must be a file")
 
     ensure_parameter_correct(pressure)
 
