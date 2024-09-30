@@ -6,6 +6,7 @@ import jinja2
 
 from ...config import Config, HeatPump, ParameterValueXYZ
 from ...utils import get_answer
+from ...vary_params.vary_perlin import create_const_field
 from .pflotran_generate_mesh import write_mesh_and_border_files
 from .pflotran_write_permeability import plot_vary_field, save_vary_field
 
@@ -29,8 +30,7 @@ def render(config: Config):
             raise error
 
         # Ensure hydraulic_head is x, y, z
-        hydraulic_head = datapoint.data.get("hydraulic_head")
-        assert hydraulic_head is not None
+        hydraulic_head = datapoint.data["hydraulic_head"]
         if isinstance(hydraulic_head.value, float):
             hydraulic_head.value = ParameterValueXYZ(x=0, y=hydraulic_head.value, z=0)
 
@@ -46,6 +46,10 @@ def render(config: Config):
         # TODO move this to ensure config
         # Raise if permeability is not in data
         permeability = datapoint.data["permeability"]
+
+        # Is the permeability already a 3d field? If not, create one
+        if isinstance(permeability.value, float):
+            permeability.value = create_const_field(config, permeability.value)
 
         save_vary_field(
             datapoint_dir / "permeability_field.h5",

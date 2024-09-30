@@ -7,6 +7,7 @@ from ..config import (
     Config,
     Data,
     Datapoint,
+    Distribution,
     HeatPump,
     HeatPumps,
     Parameter,
@@ -71,9 +72,20 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
             if isinstance(parameter.value, ParameterValueMinMax):
                 # XXX: This will generate one float per datapoint, between min and max values
                 # Currently, there is no shuffling implemented
-                distance = parameter.value.max - parameter.value.min
+                max = deepcopy(parameter.value.max)
+                min = deepcopy(parameter.value.min)
+
+                if parameter.distribution == Distribution.LOG:
+                    max = np.log10(max)
+                    min = np.log10(min)
+
+                distance = max - min
                 step_width = distance / (config.general.number_datapoints - 1)
-                value = parameter.value.min + step_width * index
+                value = min + step_width * index
+
+                if parameter.distribution == Distribution.LOG:
+                    value = 10**value
+
                 data = Data(
                     name=parameter.name,
                     value=value,
