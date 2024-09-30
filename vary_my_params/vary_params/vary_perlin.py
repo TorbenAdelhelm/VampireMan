@@ -55,7 +55,7 @@ def make_perlin_grid(
     return values
 
 
-def create_vary_field(config: Config, parameter: Parameter):
+def create_perlin_field(config: Config, parameter: Parameter):
     base_offset = config.get_rng().random(3) * 4242
 
     if not isinstance(parameter.value, ParameterValuePerlin):

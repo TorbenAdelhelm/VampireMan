@@ -14,7 +14,7 @@ from ..config import (
     ParameterValuePerlin,
     Vary,
 )
-from .vary_perlin import create_const_field, create_vary_field
+from .vary_perlin import create_const_field, create_perlin_field
 
 
 def copy_parameter(parameter: Parameter) -> Data:
@@ -50,7 +50,7 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
             if isinstance(parameter.value, ParameterValuePerlin):
                 data = Data(
                     name=parameter.name,
-                    value=create_vary_field(config, parameter),
+                    value=create_perlin_field(config, parameter),
                 )
             elif isinstance(parameter.value, float):
                 data = Data(
