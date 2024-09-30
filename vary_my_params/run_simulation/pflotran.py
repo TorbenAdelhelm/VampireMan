@@ -17,6 +17,14 @@ def run_simulation(config: Config):
             if not get_answer(config, "Looks like the simulation already ran, run simulation again?"):
                 os.chdir(original_dir)
                 continue
-        subprocess.run(["mpirun", "-n", "1", "pflotran"], check=True, close_fds=True)
+
+        command: list[str] = []
+        if config.general.mpirun:
+            command += ["mpirun", "-n", str(config.general.mpirun_procs)]
+        command += ["pflotran"]
+        if config.general.mute_simulation_output:
+            command += ["-screen_output", "off"]
+        subprocess.run(command, check=True, close_fds=True)
+
         # always go back to the original_dir as we use relative paths
         os.chdir(original_dir)

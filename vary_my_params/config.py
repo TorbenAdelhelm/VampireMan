@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, Field, FilePath, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, FilePath, PositiveInt, field_validator, model_validator
 from ruamel.yaml import YAML
 
 from .utils import profile_function
@@ -150,6 +150,9 @@ class GeneralConfig(BaseModel):
     time_to_simulate: TimeToSimulate = Field(default_factory=lambda: TimeToSimulate())
     workflow: Workflow = Workflow.PFLOTRAN
     profiling: bool = False
+    mpirun: bool = True
+    mpirun_procs: PositiveInt = 1
+    mute_simulation_output: bool = False
 
     # This makes pydantic fail if there is extra data in the yaml config file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
