@@ -6,7 +6,7 @@ hydrogeological_parameters:
   permeability:
     vary: spatially_vary_within_datapoint
     value: [1, 1, 1]
-  pressure:
+  hydraulic_head:
     value: [1, 1, 1]
   none:
     value: 3.2

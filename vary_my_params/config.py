@@ -200,8 +200,8 @@ class Config(BaseModel):
                 vary=Vary.SPACE,
                 value=1.2882090745857623e-10,
             ),
-            "pressure": Parameter(
-                name="pressure",
+            "hydraulic_head": Parameter(
+                name="hydraulic_head",
                 vary=Vary.FIXED,
                 value=-0.0024757478454929577,
             ),
@@ -253,21 +253,21 @@ class Config(BaseModel):
 
         # Get all parameters
         permeability = self.hydrogeological_parameters.get("permeability", False)
-        pressure = self.hydrogeological_parameters.get("pressure", False)
+        hydraulic_head = self.hydrogeological_parameters.get("hydraulic_head", False)
         temperature = self.hydrogeological_parameters.get("temperature", False)
 
         # Override with True where value is a Path to a file
         if permeability:
             permeability = isinstance(permeability, Path)
-        if pressure:
-            pressure = isinstance(pressure, Path)
+        if hydraulic_head:
+            hydraulic_head = isinstance(hydraulic_head, Path)
         if temperature:
             temperature = isinstance(temperature, Path)
 
         # If any of the parameters is True, all must be. Otherwise if none is True, its also fine
-        if not (permeability == pressure == temperature):
+        if not (permeability == hydraulic_head == temperature):
             raise ValueError(
-                "If any of the parameters `permeability`, `pressure` or `temperature` is a Path, all must be"
+                "If any of the parameters `permeability`, `hydraulic_head` or `temperature` is a Path, all must be"
             )
 
         return self
@@ -326,14 +326,14 @@ class Config(BaseModel):
 def ensure_config_is_valid(config: Config) -> Config:
     # TODO make this more extensive
 
-    pressure = config.hydrogeological_parameters.get("pressure")
+    hydraulic_head = config.hydrogeological_parameters.get("hydraulic_head")
     permeability = config.hydrogeological_parameters.get("permeability")
     temperature = config.hydrogeological_parameters.get("temperature")
 
     if permeability is None:
         raise ValueError("`permeability` must not be None")
-    if pressure is None:
-        raise ValueError("`pressure` must not be None")
+    if hydraulic_head is None:
+        raise ValueError("`hydraulic_head` must not be None")
     if temperature is None:
         raise ValueError("`temperature` must not be None")
 

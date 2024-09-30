@@ -4,7 +4,7 @@ import pathlib
 
 import jinja2
 
-from ...config import Config, HeatPump
+from ...config import Config, HeatPump, ParameterValueXYZ
 from ...utils import get_answer
 from .pflotran_generate_mesh import write_mesh_and_border_files
 from .pflotran_write_permeability import plot_vary_field, save_vary_field
@@ -27,6 +27,12 @@ def render(config: Config):
         except OSError as error:
             logging.critical("Directory at %s could not be created, cannot proceed", datapoint_dir)
             raise error
+
+        # Ensure hydraulic_head is x, y, z
+        hydraulic_head = datapoint.data.get("hydraulic_head")
+        assert hydraulic_head is not None
+        if isinstance(hydraulic_head.value, float):
+            hydraulic_head.value = ParameterValueXYZ(x=0, y=hydraulic_head.value, z=0)
 
         values = datapoint.data
         heatpumps = [{name: d.value} for name, d in datapoint.data.items() if isinstance(d.value, HeatPump)]

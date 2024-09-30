@@ -43,6 +43,9 @@ hydrogeological_parameters:
       frequency: [18, 18, 18]
       max: 5.09683995922528e-09
       min: 1.0193679918450561e-11
-  pressure:
+  hydraulic_head:
     vary: fixed
-    value: -0.003
+    value:
+      x: -0.0008
+      y: -0.003
+      z: 0

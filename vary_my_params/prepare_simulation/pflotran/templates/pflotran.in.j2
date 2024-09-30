@@ -153,7 +153,7 @@ SUBSURFACE
     /
     DATUM 200.d0 0.d0 85.d0
     GRADIENT
-      LIQUID_PRESSURE 0 {{ pressure.value }} 0
+      LIQUID_PRESSURE {{ hydraulic_head.value.x }} {{ hydraulic_head.value.y }} {{ hydraulic_head.value.z }}
     /
     LIQUID_PRESSURE 101325.d0
     TEMPERATURE {{ temperature.value }} C

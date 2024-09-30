@@ -1,9 +1,9 @@
-# In addition to case0, there is one more datapoint and a const varying pressure.
+# In addition to case0, there is one more datapoint and a const varying hydraulic_head.
 general:
-  output_directory: ./datasets_out/case1_vary-pressure-const
+  output_directory: ./datasets_out/case1_vary-hydraulic_head-const
   number_datapoints: 2
 hydrogeological_parameters:
-  pressure:
+  hydraulic_head:
     vary: const_within_datapoint
     value:
       max: -0.0015

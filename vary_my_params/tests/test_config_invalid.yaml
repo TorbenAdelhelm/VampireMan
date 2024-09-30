@@ -4,6 +4,6 @@ hydrogeological_parameters:
   permeability:
     vary: null
     value: [1, 1, 1]
-  pressure:
+  hydraulic_head:
     vary: null
     value: [1, 1, 1]
