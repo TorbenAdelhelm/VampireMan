@@ -80,6 +80,14 @@ class ParameterValuePerlin(BaseModel):
         return self
 
 
+class ParameterValueXYZ(BaseModel):
+    x: float
+    y: float
+    z: float
+
+    model_config = ConfigDict(extra="forbid")
+
+
 class ParameterValueMinMax(BaseModel):
     min: float
     max: float
@@ -95,7 +103,16 @@ class ParameterValueMinMax(BaseModel):
 
 class Parameter(BaseModel):
     name: str
-    value: float | list[int] | HeatPumps | HeatPump | ParameterValuePerlin | ParameterValueMinMax | FilePath
+    value: (
+        float
+        | list[int]
+        | HeatPumps
+        | HeatPump
+        | ParameterValuePerlin
+        | ParameterValueMinMax
+        | FilePath
+        | ParameterValueXYZ
+    )
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
