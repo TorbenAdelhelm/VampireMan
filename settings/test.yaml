@@ -5,6 +5,7 @@ general:
   time_to_simulate:
     final_time: 27.5
   profiling: true
+  mute_simulation_output: true
 heatpump_parameters:
   hp1:
     vary: fixed
