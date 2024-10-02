@@ -156,6 +156,7 @@ class Datapoint(BaseModel):
 
 class GeneralConfig(BaseModel):
     number_cells: list[int] = Field(default_factory=lambda: [32, 128, 1])
+    shuffle_datapoints: bool = False
     cell_resolution: list[float] = Field(default_factory=lambda: [5.0, 5.0, 5.0])
     # XXX: distance to border in percent?
     interactive: bool = True

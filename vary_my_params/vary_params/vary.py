@@ -190,8 +190,33 @@ def vary_params(config: Config) -> Config:
 
             data[parameter.name] = parameter_data
 
-        # TODO: do we need to shuffle the datapoints for each parameter here?
         # TODO split into data_fixed etc
         config.datapoints.append(Datapoint(index=datapoint_index, data=data))
+
+    if config.general.shuffle_datapoints:
+        config = shuffle_datapoints(config)
+
+    return config
+
+
+def shuffle_datapoints(config: Config) -> Config:
+    parameters: dict[str, list[Data]] = {}
+
+    parameter_names = list(config.datapoints[0].data)
+    for parameter in parameter_names:
+        for datapoint in config.datapoints:
+            param_list = parameters.get(parameter, [])
+            param_list.append(datapoint.data[parameter])
+            parameters[parameter] = param_list
+        # This np.array -> shuffle -> array.tolist is necessary as, for some
+        # reason, pyright doesn't get that list[Data] is an ArrayLike...
+        array = parameters[parameter]
+        array = np.array(array)
+        config.get_rng().shuffle(array)
+        parameters[parameter] = array.tolist()
+
+    for parameter in parameter_names:
+        for index in range(config.general.number_datapoints):
+            config.datapoints[index].data[parameter] = parameters[parameter][index]
 
     return config
