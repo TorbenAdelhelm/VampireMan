@@ -3,3 +3,4 @@
 # There is a constant temperature, pressure and permeability and a single heat pump with a fix position.
 general:
   output_directory: ./datasets_out/case0_default
+  mpirun: false

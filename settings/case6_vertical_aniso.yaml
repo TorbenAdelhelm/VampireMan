@@ -3,6 +3,7 @@ general:
   output_directory: ./datasets_out/case6_vertical_aniso
   number_datapoints: 1
   number_cells: [16, 64, 16]
+  mpirun: false
 heatpump_parameters:
   hp1:
     value:

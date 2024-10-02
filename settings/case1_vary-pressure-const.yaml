@@ -2,6 +2,7 @@
 general:
   output_directory: ./datasets_out/case1_vary-hydraulic_head-const
   number_datapoints: 2
+  mpirun: false
 hydrogeological_parameters:
   hydraulic_head:
     vary: const_within_datapoint

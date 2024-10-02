@@ -3,6 +3,7 @@ general:
   number_datapoints: 3
   output_directory: ./datasets_out/case4_extend-plumes
   number_cells: [16, 128, 1]
+  mpirun: false
 heatpump_parameters:
   hp1:
     value:
