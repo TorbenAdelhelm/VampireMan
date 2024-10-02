@@ -7,6 +7,7 @@ general:
   profiling: true
   mute_simulation_output: true
   mpirun: false
+  shuffle_datapoints: true
 heatpump_parameters:
   hp1:
     vary: fixed
