@@ -4,3 +4,4 @@
 general:
   output_directory: ./datasets_out/case0_default
   mpirun: false
+  mute_simulation_output: true

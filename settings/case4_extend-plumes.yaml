@@ -4,6 +4,7 @@ general:
   output_directory: ./datasets_out/case4_extend-plumes
   number_cells: [16, 128, 1]
   mpirun: false
+  mute_simulation_output: true
 heatpump_parameters:
   hp1:
     value:
