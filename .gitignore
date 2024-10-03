@@ -174,3 +174,5 @@ pflotran.h5
 
 # Profiling files
 /profiling_*
+
+/html

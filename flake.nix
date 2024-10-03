@@ -2,7 +2,7 @@
   description = "Pflotran flake";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-  inputs.poetry2nix.url = "github:nix-community/poetry2nix";
+  inputs.poetry2nix.url = "github:cheriimoya/poetry2nix";
 
   outputs =
     {
@@ -98,6 +98,8 @@
             self.packages.x86_64-linux.default
             pkgs.mpi
             pkgs.poetry
+            pkgs.ruff
+            pkgs.pyright
             pkgs.nixfmt-rfc-style
             pkgs.treefmt
             python3_env
