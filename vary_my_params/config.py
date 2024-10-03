@@ -186,6 +186,15 @@ class GeneralConfig(BaseModel):
 
     _validated_3d = field_validator("number_cells", "cell_resolution")(value_is_3d)
 
+    @field_validator("cell_resolution")
+    @classmethod
+    def cell_resolution_is_cubic(cls, param: list[int]):
+        """Ensure cell_resolution is cubic."""
+        if not (param[0] == param[1] == param[2]):
+            raise ValueError("Cells must be cubic")
+
+        return param
+
     def __str__(self) -> str:
         return (
             f"=== GeneralConfig\n"
