@@ -14,6 +14,17 @@ from .utils import profile_function
 yaml = YAML(typ="safe")
 
 
+def value_is_3d(value: list[int]):
+    """Ensure value is given in three dimensional space."""
+    if len(value) == 2:
+        value.append(1)
+
+    if len(value) != 3:
+        raise ValueError("Value must be given in three dimensional space")
+
+    return value
+
+
 class Distribution(enum.StrEnum):
     UNIFORM = "uniform"
     LOG = "logarithmic"
@@ -49,6 +60,8 @@ class HeatPump(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
+    _validated_3d = field_validator("location")(value_is_3d)
+
 
 class HeatPumps(BaseModel):
     number: int
@@ -67,11 +80,7 @@ class ParameterValuePerlin(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    @model_validator(mode="after")
-    def frequency_len_three(self):
-        if len(self.frequency) != 3:
-            raise ValueError("`frequency` must have exactly three values")
-        return self
+    _validated_3d = field_validator("frequency")(value_is_3d)
 
     @model_validator(mode="after")
     def ensure_max_ge_min(self):
@@ -174,6 +183,8 @@ class GeneralConfig(BaseModel):
 
     # This makes pydantic fail if there is extra data in the yaml config file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
+
+    _validated_3d = field_validator("number_cells", "cell_resolution")(value_is_3d)
 
     def __str__(self) -> str:
         return (
