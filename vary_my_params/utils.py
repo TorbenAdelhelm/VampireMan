@@ -1,4 +1,5 @@
 import cProfile
+import functools
 import io
 import logging
 import pstats
@@ -43,6 +44,7 @@ def get_workflow_module(workflow: str) -> ModuleType:
 
 
 def profile_function(function):
+    @functools.wraps(function)
     def wrapper(*args):
         config: Config = args[0]
 
