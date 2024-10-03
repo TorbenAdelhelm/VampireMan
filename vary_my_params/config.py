@@ -38,25 +38,42 @@ class Vary(enum.StrEnum):
 
 
 class Workflow(enum.StrEnum):
+    """Enum behind `GeneralConfig.workflow`."""
+
     PFLOTRAN = "pflotran"
 
 
 class TimeToSimulate(BaseModel):
+    """The timespan that the simulation tool should simulate. Value and unit are separated for more flexibility."""
+
     final_time: float = 27.5
+    """Value component."""
+
     unit: str = "year"
+    """The default unit is `year`, so when the value is omitted in the config file, years is assumed."""
 
     model_config = ConfigDict(extra="forbid")
 
     def __str__(self) -> str:
+        """Returns time including unit, e.g., `27.5 [year]`."""
         return f"{self.final_time} [{self.unit}]"
 
 
 class HeatPump(BaseModel):
+    """Datastructure representing a single heat pump. A heat pump has a location, an injection temperature and an
+    injection rate."""
+
     location: list[float]
+    """The location where the `HeatPump` should be. It is given in cells, the program translates the cell-based location
+    into coordinates matching the domain by multiplying it by the `GeneralConfig.cell_resolution`."""
+
     # TODO make this list[float]
     injection_temp: float
+    """The injection temperature of the `HeatPump` in degree Celsius."""
+
     # TODO make this list[float]
     injection_rate: float
+    """The injection rate of the `HeatPump` in m^3/s."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -64,7 +81,15 @@ class HeatPump(BaseModel):
 
 
 class HeatPumps(BaseModel):
-    number: int
+    """Datastructure representing a set of heat pumps. During the `vary_my_params.pipeline.prepare_parameters` stage,
+    the individual `HeatPump`s will be generated from this.
+
+    Using `Config.get_rng`, values between min and max are chosen for each of the generated `HeatPump`s.
+    """
+
+    number: PositiveInt
+    """How many `HeatPump`s to generate."""
+
     injection_temp_min: float
     injection_temp_max: float
     injection_rate_min: float
@@ -74,7 +99,12 @@ class HeatPumps(BaseModel):
 
 
 class ParameterValuePerlin(BaseModel):
+    """Datastructure to represent a perlin noise value for `Parameter.value`."""
+
     frequency: list[float]
+    """The larger these values are, the more fine grained the perlin field will
+    be (i.e., the smaller the "dots" are and how many of them)."""
+
     max: float
     min: float
 
@@ -84,12 +114,15 @@ class ParameterValuePerlin(BaseModel):
 
     @model_validator(mode="after")
     def ensure_max_ge_min(self):
+        """Ensure the `min` value is smaller or equal to the `max` value."""
         if self.max < self.min:
             raise ValueError("`max` value must be greater or equal to `min`")
         return self
 
 
 class ParameterValueXYZ(BaseModel):
+    """Datastructure to represent a vector of three float values."""
+
     x: float
     y: float
     z: float
@@ -98,6 +131,8 @@ class ParameterValueXYZ(BaseModel):
 
 
 class ParameterValueMinMax(BaseModel):
+    """Datastructure to represent a `min` and a `max` value for `Parameter.value`."""
+
     min: float
     max: float
 
@@ -105,6 +140,7 @@ class ParameterValueMinMax(BaseModel):
 
     @model_validator(mode="after")
     def ensure_max_ge_min(self):
+        """Ensure the `min` value is smaller or equal to the `max` value."""
         if self.max < self.min:
             raise ValueError("`max` value must be greater or equal to `min`")
         return self
@@ -164,22 +200,73 @@ class Datapoint(BaseModel):
 
 
 class GeneralConfig(BaseModel):
+    """The `GeneralConfig` doesn't change during execution of the program."""
+
     number_cells: list[int] = Field(default_factory=lambda: [32, 128, 1])
-    shuffle_datapoints: bool = False
+    """Specifies the number of cells for the simulation."""
+
     cell_resolution: list[float] = Field(default_factory=lambda: [5.0, 5.0, 5.0])
-    # XXX: distance to border in percent?
+    """Resolution of each of the cells. Cells must be cubic currently."""
+
+    shuffle_datapoints: bool = False
+    """Whether or not to shuffle the order the calculated data from each parameter appears in the datapoints."""
+
     interactive: bool = True
-    # XXX: Hopefully the format `2024-08-17T10:06:15+00:00` is supported by the common file systems
+    """Whether or not to run interactively. Setting this to `False` is useful in a CI or an unattended run on an HPC
+    Cluster.
+
+    When running in interactive mode, the execution halts between each of the selected stages and asks the user for
+    confirmation to proceed. Also, if any expected problems occur during execution, e.g., the `pflotran.h5` file is
+    already present, the user is asked what to do.
+
+    When running in non-interactive mode, like a `--force` option, data loss can happen.
+    """
+
     output_directory: Path = Path(f"./datasets_out/{datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")}")
+    """The directory to output the generated datasets. Will be created if not existing.
+
+    The default is in the format `2024-08-17T10:06:15+00:00` and is hopefully supported by the common file systems.
+    """
+
     # This forces every run to be reproducible by default
     random_seed: None | int = 0
-    number_datapoints: int = 1
+    """This random seed will be passed to the numpy random number generator. By default the value is 0, meaning that a
+    given set of input parameters (read from a config file) always produces the same outputs. If the used simulation
+    tool is deterministic, then the same inputs yield the same simulation results.
+
+    Setting this to another fixed value will yield (still deterministic) different results.
+
+    Setting this value to `None`, or rather `null` in a yaml config file, will always use a random value for the random
+    seed, making it nondeterministic.
+    """
+
+    number_datapoints: PositiveInt = 1
+    """The number of datapoints to be generated."""
+
     time_to_simulate: TimeToSimulate = Field(default_factory=lambda: TimeToSimulate())
+    """Influences the timespan of the simulation."""
+
     workflow: Workflow = Workflow.PFLOTRAN
+    """In essence, this states which simulation tool specific functions should be called during later stages of the
+    pipeline."""
+
     profiling: bool = False
+    """If set to `True`, the stages are being profiled and `profiling_<stagename>.txt` files are being written in the
+    root of the project. Also, the execution time of the stages are logged. This can help during development but is
+    probably not something a user of the program should use."""
+
     mpirun: bool = True
+    """If the simulation tool should be called by running `mpirun -n x <simulationtool>` or simply
+    `<simulationtool>`."""
+
     mpirun_procs: PositiveInt = 1
+    """When `mpirun` is set to `True`, specifies the number of ranks being used, i.e. the `x` in `mpirun -n x
+    <simulationtool>`."""
+
     mute_simulation_output: bool = False
+    """Some simulation tools produce output that can be muted. This option disables the output."""
+
+    # XXX: distance to border in percent?
 
     # This makes pydantic fail if there is extra data in the yaml config file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
@@ -213,7 +300,11 @@ class GeneralConfig(BaseModel):
 class Config(BaseModel):
     # Need to use field here, as otherwise it would be the same dict across several objects
     general: GeneralConfig = Field(default_factory=lambda: GeneralConfig())
+    """The `GeneralConfig`."""
+
     steps: list[str] = Field(default_factory=lambda: ["global"])
+    """This is actually unused atm..."""
+
     hydrogeological_parameters: dict[str, Parameter] = Field(
         default_factory=lambda: {
             "permeability": Parameter(
@@ -246,9 +337,12 @@ class Config(BaseModel):
             )
         }
     )
+
     # TODO split this in datapoints_fixed, datapoint_const_within_datapoint, ...
     datapoints: list[Datapoint] = Field(default_factory=lambda: [])
+
     _rng: np.random.Generator = np.random.default_rng(seed=0)
+    """The execution wide random number generator."""
 
     # This makes pydantic fail if there is extra data in the yaml config file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
@@ -295,6 +389,7 @@ class Config(BaseModel):
 
     @field_validator("steps")
     def non_empty_list(cls, value):
+        """Ensure `steps` is not empty."""
         if not isinstance(value, list) or len(value) == 0:
             raise ValueError("`steps` must be a non-empty list")
         return value
@@ -307,6 +402,9 @@ class Config(BaseModel):
         self.datapoints = other_config.datapoints
 
     def get_rng(self) -> np.random.Generator:
+        """Returns the execution-wide same instance of the random number generator instantiated with
+        `GeneralConfig.random_seed`. If using randomness of any kind, the rng returned by this function should be used
+        to make results as reproducible as possible."""
         return self._rng
 
     @staticmethod
