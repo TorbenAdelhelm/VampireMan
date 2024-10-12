@@ -87,3 +87,13 @@ def test_config_rng():
     # These value should always be the same, due to the fixed seed
     assert config.get_rng().random() == 0.6369616873214543
     assert config.get_rng().random(3).tolist() == [0.2697867137638703, 0.04097352393619469, 0.016527635528529094]
+
+
+def test_3d_param():
+    config = Config(**{"general": {"number_cells": [3, 2]}})
+    assert config.general.number_cells == [3, 2, 1]
+
+    with pytest.raises(ValidationError):
+        config = Config(**{"general": {"number_cells": [3]}})
+    with pytest.raises(ValidationError):
+        config = Config(**{"general": {"number_cells": [1, 2, 3, 4]}})
