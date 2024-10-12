@@ -309,7 +309,7 @@ class Config(BaseModel):
         default_factory=lambda: {
             "permeability": Parameter(
                 name="permeability",
-                vary=Vary.SPACE,
+                vary=Vary.FIXED,
                 value=1.2882090745857623e-10,
             ),
             "hydraulic_head": Parameter(

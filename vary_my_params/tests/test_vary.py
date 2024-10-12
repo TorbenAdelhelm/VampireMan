@@ -53,7 +53,7 @@ def test_vary_space():
 
     config.hydrogeological_parameters["param_scalar"] = Parameter(
         name="param_scalar",
-        vary=Vary.SPACE,
+        vary=Vary.FIXED,
         value=1,
     )
     config.hydrogeological_parameters["param_perlin"] = Parameter(
@@ -76,9 +76,8 @@ def test_vary_space():
     data_perlin_1 = config.datapoints[1].data.get("param_perlin")
 
     # Should be equal across dataset
-    assert np.array_equal(data_scalar_0.value, data_scalar_1.value)
-    assert param_scalar.value == data_scalar_0.value[0][0][0]
-    assert param_scalar.value == data_scalar_0.value[5][5][0]
+    assert data_scalar_0.value == data_scalar_1.value
+    assert param_scalar.value == data_scalar_0.value
 
     # TODO: Write a better test
     assert not np.array_equal(data_perlin_0.value, data_perlin_1.value)

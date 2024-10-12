@@ -54,9 +54,9 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | N
                     value=create_perlin_field(config, parameter),
                 )
             elif isinstance(parameter.value, float):
-                data = Data(
-                    name=parameter.name,
-                    value=create_const_field(config, parameter.value),
+                raise ValueError(
+                    f"Parameter {parameter.name} is vary.space and has a float value, "
+                    f"it should be set to vary.fixed or vary.const with a min/max value instead; {parameter}"
                 )
             elif isinstance(parameter.value, HeatPump):
                 data = vary_heatpump(config, parameter)
