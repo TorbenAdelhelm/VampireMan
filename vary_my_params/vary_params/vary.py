@@ -15,7 +15,7 @@ from ..config import (
     ParameterValuePerlin,
     Vary,
 )
-from .vary_perlin import create_const_field, create_perlin_field
+from .vary_perlin import create_perlin_field
 
 
 def copy_parameter(parameter: Parameter) -> Data:
@@ -157,7 +157,6 @@ def generate_heatpumps(config: Config) -> Config:
             )
             name = f"{hps.name}_{index}"
             if (config.heatpump_parameters.get(name) is not None) and (new_heatpumps.get(name) is not None):
-                # TODO write test for this
                 msg = f"There is a naming clash for generated heatpump {name}"
                 logging.error(msg)
                 raise ValueError(msg)

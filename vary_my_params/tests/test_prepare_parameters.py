@@ -1,3 +1,5 @@
+import pytest
+
 from vary_my_params.config import Config, HeatPump, HeatPumps, Parameter, Vary
 from vary_my_params.pipeline import prepare_parameters
 
@@ -50,3 +52,24 @@ def test_prepare_heatpump_generation():
     assert len(config.heatpump_parameters) == 10
     assert config.heatpump_parameters.get("hps_0").value.location == [102.5, 172.5, 2.5]
     assert config.heatpump_parameters.get("hps_9").value.location == [142.5, 147.5, 2.5]
+
+
+def test_prepare_heatpump_name_clash():
+    config = Config()
+    config.heatpump_parameters = {
+        "hp_0": Parameter(
+            name="hp_0",
+            vary=Vary.FIXED,
+            value=HeatPump(location=[16, 32, 1], injection_temp=10.5, injection_rate=0.002),
+        ),
+        "hp": Parameter(
+            name="hp",
+            vary=Vary.FIXED,
+            value=HeatPumps(
+                number=1, injection_temp_min=1, injection_temp_max=2, injection_rate_min=1, injection_rate_max=2
+            ),
+        ),
+    }
+
+    with pytest.raises(ValueError):
+        prepare_parameters(config)
