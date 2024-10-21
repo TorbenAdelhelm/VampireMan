@@ -12,6 +12,10 @@ from .pflotran_write_permeability import save_vary_field
 
 
 def render(config: Config):
+    """Render all files needed for pflotran to run. This means, `write_mesh_and_border_files`, rendering the
+    pflotran.in file and rendering the permeability field with `save_vary_field`.
+    """
+
     write_mesh_and_border_files(config, config.general.output_directory)
 
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(pathlib.Path(__file__).parent / "templates"))
@@ -43,8 +47,6 @@ def render(config: Config):
             file.write(template.render(values))
             logging.debug("Rendered pflotran-%s.in", index)
 
-        # TODO move this to ensure config
-        # Raise if permeability is not in data
         permeability = datapoint.data["permeability"]
 
         # Is the permeability already a 3d field? If not, create one

@@ -45,14 +45,15 @@ def run(args: Namespace):
     config = load_config(args)
     config = ensure_config_is_valid(config)
 
-    print(config)
     # Where do we check this?
     logging.debug("Will run all stages")
+
+    print("This is the config that is going to be used:")
+    print(config)
 
     config = prepare_parameters(config)
     config = run_vary_params(config)
 
     run_render(config)
     run_simulation(config)
-    # XXX: visualize in between the steps
     run_visualization(config)

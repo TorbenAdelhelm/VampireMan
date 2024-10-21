@@ -14,7 +14,10 @@ if TYPE_CHECKING:
 
 
 def get_answer(config: "Config", question: str, exit_if_no: bool = False) -> bool:
-    """Ask a yes/no question on the command line and return True if the answer is yes and False if the answer is no"""
+    """Ask a yes/no question on the command line and return True if the answer is yes and False if the answer is
+    no. When CTRL+C is detected, the function will terminate the whole program returning an exit code of 0.
+    """
+
     if not config.general.interactive:
         return True
     try:

@@ -41,8 +41,10 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
     )
 
 
-def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data | None:
-    data = None
+def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
+    """This function does the variation of `Parameter`s. It does so by implementing a large match-case that in turn
+    invokes other functions that then work on the `Parameter.value` based on the `Parameter.vary` type.
+    """
     assert not isinstance(parameter.value, HeatPumps)
     match parameter.vary:
         case Vary.FIXED:
@@ -121,7 +123,12 @@ def calculate_hp_coordinates(config: Config) -> Config:
     return config
 
 
-def generate_heatpumps(config: Config):
+def generate_heatpumps(config: Config) -> Config:
+    """Generate `HeatPump`s from the given `HeatPumps` parameter. This function will remove all `HeatPumps` from
+    `Config.heatpump_parameters` and add `HeatPumps.number` `HeatPump`s to the dict. The `HeatPump.injection_temp` and
+    `HeatPump.injection_rate` values are simply taken from a random number between the respective min and max values.
+    """
+
     rand = config.get_rng()
     new_heatpumps: dict[str, Parameter] = {}
     for _, hps in config.heatpump_parameters.items():
@@ -130,7 +137,7 @@ def generate_heatpumps(config: Config):
             continue
 
         if not isinstance(hps.value, HeatPumps):
-            raise ValueError()
+            raise ValueError("There was a non HeatPumps item in heatpump_parameters")
 
         # TODO: calculate relevant parameters
         for index in range(hps.value.number):  # type:ignore
@@ -164,27 +171,24 @@ def generate_heatpumps(config: Config):
         if isinstance(value, HeatPumps):
             raise ValueError(f"There should be no HeatPumps in the new_heatpumps dict, but {name} is.")
 
+    logging.debug("Old heatpump_parameters: %s", config.heatpump_parameters)
     config.heatpump_parameters = new_heatpumps
+    logging.debug("New heatpump_parameters: %s", config.heatpump_parameters)
     return config
 
 
 def vary_params(config: Config) -> Config:
+    """Calls the `vary_parameter` function for each datapoint sequentially."""
+
     # for step in config.steps:
     #     filter over params where step == param.step
     for datapoint_index in range(config.general.number_datapoints):
         data = {}
 
-        for _, parameter in config.hydrogeological_parameters.items():
+        # This syntax merges the hydrogeological_parameters and the heatpump_parameters dicts so we don't have to write
+        # two separate for loops
+        for _, parameter in (config.hydrogeological_parameters | config.heatpump_parameters).items():
             parameter_data = vary_parameter(config, parameter, datapoint_index)
-            # XXX: Store this in the parameter?
-            # parameter.set_datapoint(datapoint_index, parameter_data)
-
-            data[parameter.name] = parameter_data
-
-        for _, parameter in config.heatpump_parameters.items():
-            parameter_data = vary_parameter(config, parameter, datapoint_index)
-            if parameter_data is None:
-                continue
             # XXX: Store this in the parameter?
             # parameter.set_datapoint(datapoint_index, parameter_data)
 
@@ -195,11 +199,17 @@ def vary_params(config: Config) -> Config:
 
     if config.general.shuffle_datapoints:
         config = shuffle_datapoints(config)
+        logging.debug("Shuffled datapoints")
 
     return config
 
 
 def shuffle_datapoints(config: Config) -> Config:
+    """Shuffles all `Parameter`s randomly in between the different `Datapoint`s. This is needed when e.g. two
+    parameters are generated as `Vary.CONST` with `ParameterValueMinMax`, as otherwise they would both have min
+    values in the first `Datapoint` and max values in the last one.
+    """
+
     parameters: dict[str, list[Data]] = {}
 
     parameter_names = list(config.datapoints[0].data)
@@ -208,6 +218,7 @@ def shuffle_datapoints(config: Config) -> Config:
             param_list = parameters.get(parameter, [])
             param_list.append(datapoint.data[parameter])
             parameters[parameter] = param_list
+
         # This np.array -> shuffle -> array.tolist is necessary as, for some
         # reason, pyright doesn't get that list[Data] is an ArrayLike...
         array = parameters[parameter]

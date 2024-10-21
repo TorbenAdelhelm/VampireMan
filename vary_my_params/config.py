@@ -462,11 +462,13 @@ def ensure_config_is_valid(config: Config) -> Config:
     if len(heatpumps) + len(heatpumps_gen) < 1:
         logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
 
+    logging.info("Config is valid")
     return config
 
 
 def load_config(arguments: argparse.Namespace) -> Config:
     run_config = Config()
+    logging.debug("Default config is %s", run_config)
 
     # Load config from file if provided
     config_file = arguments.config_file
