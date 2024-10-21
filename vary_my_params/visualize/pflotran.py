@@ -9,6 +9,8 @@ import matplotlib.ticker as ticker
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+from vary_my_params.prepare_simulation.pflotran.pflotran_write_permeability import plot_vary_field
+
 from ..config import Config, HeatPump
 
 TimeData = OrderedDict[str, dict[str, Any]]
@@ -56,6 +58,8 @@ def plot_simulation(config: Config):
 
         plot_y(list_to_plot, datapoint_path)
         plot_isolines(config, list_to_plot, datapoint_path)
+        # TODO: make this more general
+        plot_vary_field(datapoint_path, datapoint.data["permeability"])
 
         # print_heatpump_temp(config, list_to_plot)
 

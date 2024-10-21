@@ -8,7 +8,7 @@ from ...config import Config, HeatPump, ParameterValueXYZ
 from ...utils import get_answer
 from ...vary_params.vary_perlin import create_const_field
 from .pflotran_generate_mesh import write_mesh_and_border_files
-from .pflotran_write_permeability import plot_vary_field, save_vary_field
+from .pflotran_write_permeability import save_vary_field
 
 
 def render(config: Config):
@@ -55,6 +55,5 @@ def render(config: Config):
             datapoint_dir / "permeability_field.h5",
             config.general.number_cells,
             permeability.value,
-            "permeability",
+            permeability.name,
         )
-        plot_vary_field(permeability.value, datapoint_dir / f"{permeability.name}_field", permeability.name)

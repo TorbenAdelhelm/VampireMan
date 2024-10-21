@@ -1,8 +1,11 @@
 import logging
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 from h5py import File
+
+from ...config import Data
 
 
 def save_vary_field(filename, number_cells, cells, parameter_name: str = "permeability"):
@@ -19,18 +22,20 @@ def save_vary_field(filename, number_cells, cells, parameter_name: str = "permea
     logging.info(f"Created a {parameter_name}-field")
 
 
-def plot_vary_field(cells, filename, parameter_name):
+def plot_vary_field(datapoint_dir: Path, parameter: Data):
     fig, axes = plt.subplots(2, 2, figsize=(10, 6))
-    fig.suptitle(f"{parameter_name.title()} perlin field")
+    fig.suptitle(f"{parameter.name.title()} perlin field")
     axes = axes.ravel()
-    axes[0].imshow(cells[:, :, 0])
-    axes[2].imshow(cells[:, 0, :])
-    axes[3].imshow(cells[0, :, :])
+    if not isinstance(parameter.value, np.ndarray):
+        raise ValueError("Cannot visualize something that is not an np.ndarray")
+    axes[0].imshow(parameter.value[:, :, 0])
+    axes[2].imshow(parameter.value[:, 0, :])
+    axes[3].imshow(parameter.value[0, :, :])
     axes[0].set_title("yz")
     axes[2].set_title("xz")
     axes[3].set_title("xy")
     for i in range(0, 4):
         axes[i].axis("off")
     fig.tight_layout()
-    fig.savefig(f"{filename}.png")
+    fig.savefig(datapoint_dir / f"{parameter.name}_field.png")
     plt.close(fig)
