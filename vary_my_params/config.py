@@ -67,7 +67,8 @@ class TimeToSimulate(BaseModel):
     """Value component."""
 
     unit: str = "year"
-    """The default unit is `year`, so when the value is omitted in the config file, years is assumed."""
+    """The default unit is `year`, so when the value is omitted in the config file, years is assumed. Using SI units
+    here doesn't make much sense as we are unlikely to simulate anything other than years."""
 
     model_config = ConfigDict(extra="forbid")
 
