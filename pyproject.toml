@@ -16,6 +16,7 @@ noise = "^1.2.2"
 scipy = "^1.14.0"
 pydantic = "^2.8.2"
 pdoc3 = "^0.11.1"
+numpydantic = "^1.6.4"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -54,3 +55,8 @@ docstring-code-line-length = 120
 [tool.pyright]
 include = [ "./vary_my_params" ]
 exclude = [ "./vary_my_params/tests" ]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:ndarray.pyi stub file could not be generated",
+]

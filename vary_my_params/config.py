@@ -3,9 +3,9 @@ import datetime
 import enum
 import logging
 from pathlib import Path
-from typing import Any
 
 import numpy as np
+from numpydantic import NDArray
 from pydantic import BaseModel, ConfigDict, Field, FilePath, PositiveInt, field_validator, model_validator
 from ruamel.yaml import YAML
 
@@ -212,7 +212,7 @@ class Parameter(BaseModel):
 
 class Data(BaseModel):
     name: str
-    value: int | float | list[int] | list[float] | HeatPump | Any  # | np.ndarray
+    value: int | float | list[int] | list[float] | HeatPump | NDArray
 
     model_config = ConfigDict(extra="forbid")
 

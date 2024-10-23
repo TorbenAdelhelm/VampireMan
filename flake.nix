@@ -16,8 +16,15 @@
         config.allowUnfree = true;
       };
 
-      inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryEnv;
-      python3_env = mkPoetryEnv { projectDir = ./.; };
+      inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryEnv overrides;
+      python3_env = mkPoetryEnv {
+        projectDir = ./.;
+        overrides = overrides.withDefaults (
+          _: prev: {
+            numpydantic = prev.numpydantic.override { preferWheel = true; };
+          }
+        );
+      };
     in
     {
       packages.x86_64-linux = rec {
