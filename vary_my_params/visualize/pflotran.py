@@ -132,8 +132,21 @@ def plot_y(data: TimeData, path: Path):
 def plot_isolines(config: Config, data: TimeData, path: Path):
     rows = len(data)
     _, axes = plt.subplots(rows, 1, figsize=(20, 5 * rows))
-    # TODO read min/max from the data
-    levels = np.arange(10.6, 16.6, 0.25)
+
+    # XXX: What should be the default values?
+    level_min = float("inf")
+    level_max = -float("inf")
+    level_step = None
+
+    for _, time_data in data.items():
+        level_min = min(level_min, time_data["Temperature [C]"].min())
+        level_max = max(level_max, time_data["Temperature [C]"].max())
+    if level_min > level_max:
+        raise ValueError("level_min is larger than level_max")
+    # XXX: Why 24 here?
+    level_step = (level_max - level_min) / 24
+
+    levels = np.arange(level_min, level_max, level_step)
 
     for index, (time_step, time_data) in enumerate(data.items()):
         property_data = time_data.get("Temperature [C]")
