@@ -7,9 +7,12 @@ import os
 import pstats
 import sys
 import time
+from pathlib import Path
 from pstats import SortKey
 from types import ModuleType
 from typing import TYPE_CHECKING
+
+from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from .config import Config
@@ -92,26 +95,25 @@ def create_dataset_and_datapoint_dirs(config: "Config"):
             raise error
 
 
-def write_config_to_output_dir(config: "Config"):
-    config_target_path = config.general.output_directory / "config.json"
+def write_data_to_verified_json_file(config: "Config", target_path: Path, data: BaseModel):
+    # Check if there already is a target file
+    if os.path.isfile(target_path):
+        with open(target_path) as target_file:
+            target_file_content = target_file.read()
 
-    # Check if there already is a config file
-    if os.path.isfile(config_target_path):
-        with open(config_target_path) as config_file:
-            config_file_content = config_file.read()
-
-        # Calculate the hash from current config and the existing config.json file
-        hash_in_memory = hashlib.sha256(config.model_dump_json(indent=2).encode()).hexdigest()
-        hash_config_file = hashlib.sha256(config_file_content.encode()).hexdigest()
+        # Calculate the hash from the data object and the existing target file
+        hash_in_memory = hashlib.sha256(data.model_dump_json(indent=2).encode()).hexdigest()
+        hash_target_file = hashlib.sha256(target_file_content.encode()).hexdigest()
 
         # If there is, compare the contents to let the user abort
-        if hash_in_memory != hash_config_file:
-            logging.warning("Config file in output_directory has different contents!")
-            if not get_answer(
-                config, f"Different config file already in {config.general.output_directory}, overwrite?"
-            ):
+        if hash_in_memory != hash_target_file:
+            logging.warning("Target file '%s' has different contents than data structure!", target_path)
+            if not get_answer(config, f"Different target file already in {target_path}, overwrite?"):
                 config.pure = False
                 return
+        else:
+            logging.debug("File '%s' doesn't need to be written", target_path)
+            return
 
-    with open(config_target_path, "w") as config_file:
-        config_file.write(config.model_dump_json(indent=2))
+    with open(target_path, "w") as target_file:
+        target_file.write(data.model_dump_json(indent=2))
