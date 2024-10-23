@@ -11,11 +11,14 @@ from vary_my_params.config import (
     Vary,
 )
 from vary_my_params.pipeline import prepare_parameters, run_vary_params
+from vary_my_params.utils import create_dataset_and_datapoint_dirs
 
 
 def test_vary_copy():
     config = Config()
     config.general.interactive = False
+
+    create_dataset_and_datapoint_dirs(config)
 
     config.heatpump_parameters["hp1"] = Parameter(
         name="hp1",
@@ -51,6 +54,8 @@ def test_vary_space():
     config = Config()
     config.general.interactive = False
     config.general.number_datapoints = 2
+
+    create_dataset_and_datapoint_dirs(config)
 
     config.hydrogeological_parameters["param_scalar"] = Parameter(
         name="param_scalar",
@@ -89,6 +94,8 @@ def test_vary_heatpump():
     config.general.interactive = False
     config.general.number_datapoints = 2
 
+    create_dataset_and_datapoint_dirs(config)
+
     config.heatpump_parameters["hp1"] = Parameter(
         name="hp1",
         vary=Vary.SPACE,
@@ -115,6 +122,8 @@ def test_vary_const():
     config = Config()
     config.general.interactive = False
     config.general.number_datapoints = 3
+
+    create_dataset_and_datapoint_dirs(config)
 
     config.hydrogeological_parameters["parameter"] = Parameter(
         name="parameter",
