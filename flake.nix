@@ -193,7 +193,10 @@
 
           doCheck = true;
 
-          nativeBuildInputs = [ python3_env ];
+          nativeBuildInputs = [
+            python3_env
+            self.packages.x86_64-linux.default
+          ];
 
           checkPhase = ''
             pytest
