@@ -168,16 +168,19 @@ SUBSURFACE
     END
 
     RATE LIST
-      TIME_UNITS d
       DATA_UNITS m^3/s
-      0.    {{ value.injection_rate }}
+      TIME_UNITS {{ value.injection_rate.time_unit }}
+      {%- for time_step, time_value in value.injection_rate.values.items() %}
+      {{ time_step }}    {{ time_value }}
+      {%- endfor %}
     END
 
     TEMPERATURE LIST
-      TIME_UNITS year
       DATA_UNITS C
-      # TODO: Render a list here
-      0.    {{ value.injection_temp }}
+      TIME_UNITS {{ value.injection_temp.time_unit }}
+      {%- for time_step, time_value in value.injection_temp.values.items() %}
+      {{ time_step }}    {{ time_value }}
+      {%- endfor %}
     END
   END
   {% endfor %}
@@ -243,7 +246,6 @@ SUBSURFACE
 
   OUTPUT
     SNAPSHOT_FILE
-      #PERIODIC TIME 0.00001 y BETWEEN 0. y AND 0.00010 year
       TIMES y 0.1 1. 5.
       FORMAT HDF5 #VTK
       PRINT_COLUMN_IDS

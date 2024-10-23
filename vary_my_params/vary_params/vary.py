@@ -13,6 +13,7 @@ from ..config import (
     Parameter,
     ParameterValueMinMax,
     ParameterValuePerlin,
+    TimeBasedValue,
     Vary,
 )
 from .vary_perlin import create_perlin_field
@@ -228,5 +229,19 @@ def shuffle_datapoints(config: Config) -> Config:
     for parameter in parameter_names:
         for index in range(config.general.number_datapoints):
             config.datapoints[index].data[parameter] = parameters[parameter][index]
+
+    return config
+
+
+def handle_time_based_params(config: Config) -> Config:
+    """Convert specific parameters to time based entries."""
+
+    # Convert heatpumps to time based values
+    for _, heatpump in config.heatpump_parameters.items():
+        assert isinstance(heatpump.value, HeatPump)
+        if not isinstance(heatpump.value.injection_temp, TimeBasedValue):
+            heatpump.value.injection_temp = TimeBasedValue(values={0: heatpump.value.injection_temp})
+        if not isinstance(heatpump.value.injection_rate, TimeBasedValue):
+            heatpump.value.injection_rate = TimeBasedValue(values={0: heatpump.value.injection_rate})
 
     return config

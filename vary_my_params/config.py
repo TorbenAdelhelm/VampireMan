@@ -59,6 +59,18 @@ class TimeToSimulate(BaseModel):
         return f"{self.final_time} [{self.unit}]"
 
 
+class TimeBasedValue(BaseModel):
+    """This represents a time based value. This could be anything that can be varied in the `Vary.TIME` mode."""
+
+    time_unit: str = "year"
+    """The unit of each of the float values in the `values` dict."""
+
+    values: dict[float, float]
+    """Values that represent timesteps and their respective values. E.g., `{0: 10, 1: 15}` means, that at
+    timestep `0`, the value is `10` and at timestep `1` the value is `15`.
+        """
+
+
 class HeatPump(BaseModel):
     """Datastructure representing a single heat pump. A heat pump has a location, an injection temperature and an
     injection rate."""
@@ -68,11 +80,11 @@ class HeatPump(BaseModel):
     into coordinates matching the domain by multiplying it by the `GeneralConfig.cell_resolution`."""
 
     # TODO make this list[float]
-    injection_temp: float
+    injection_temp: TimeBasedValue | float
     """The injection temperature of the `HeatPump` in degree Celsius."""
 
     # TODO make this list[float]
-    injection_rate: float
+    injection_rate: TimeBasedValue | float
     """The injection rate of the `HeatPump` in m^3/s."""
 
     model_config = ConfigDict(extra="forbid")
