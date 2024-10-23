@@ -7,7 +7,7 @@ from .utils import (
     get_answer,
     get_workflow_module,
     profile_function,
-    write_config_to_output_dir,
+    write_data_to_verified_json_file,
 )
 from .vary_params.vary import calculate_hp_coordinates, generate_heatpumps, handle_time_based_params, vary_params
 
@@ -27,6 +27,9 @@ def run_vary_params(config: Config) -> Config:
     print("Following datapoints will be used")
     for datapoint in config.datapoints:
         print(datapoint)
+        write_data_to_verified_json_file(
+            config, config.general.output_directory / f"datapoint-{datapoint.index}" / "datapoint.json", datapoint
+        )
     return config
 
 
