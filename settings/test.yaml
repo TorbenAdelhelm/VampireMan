@@ -13,7 +13,14 @@ heatpump_parameters:
     vary: fixed
     value:
       location: [16, 32, 1]
-      injection_temp: 15.6
+      injection_temp:
+        time_unit: year
+        values:
+          0: 15
+          3.5: 10
+          4: 15
+          4.5: 10
+          5: 15
       injection_rate: 0.00024
   hp2:
     vary: spatially_vary_within_datapoint
@@ -26,14 +33,6 @@ heatpump_parameters:
     value:
       injection_temp_min: 13.6
       injection_temp_max: 15.6
-      injection_rate_min: 0.00002
-      injection_rate_max: 0.0001
-      number: 5
-  hps2:
-    vary: spatially_vary_within_datapoint
-    value:
-      injection_temp_min: 10.6
-      injection_temp_max: 12.6
       injection_rate_min: 0.00002
       injection_rate_max: 0.0001
       number: 5
