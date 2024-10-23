@@ -2,6 +2,7 @@ import os
 
 from vary_my_params.config import Config
 from vary_my_params.pipeline import prepare_parameters, run_render, run_vary_params
+from vary_my_params.utils import create_dataset_and_datapoint_dirs
 
 
 def test_render_borders_and_mesh(tmp_path):
@@ -10,6 +11,7 @@ def test_render_borders_and_mesh(tmp_path):
     config.general.output_directory = tmp_path / "render_test"
     config.general.number_cells = [32, 64, 2]
 
+    create_dataset_and_datapoint_dirs(config)
     run_render(config)
 
     for file in [
@@ -51,6 +53,7 @@ def test_render_files_not_empty(tmp_path):
     config.general.output_directory = tmp_path / "render_test"
     config.general.number_datapoints = 2
 
+    create_dataset_and_datapoint_dirs(config)
     config = prepare_parameters(config)
     config = run_vary_params(config)
     run_render(config)
