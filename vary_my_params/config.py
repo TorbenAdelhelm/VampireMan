@@ -341,6 +341,9 @@ class Config(BaseModel):
     steps: list[str] = Field(default_factory=lambda: ["global"])
     """This is actually unused atm..."""
 
+    pure: bool = True
+    """Internally used to detect if anything runs impure/non-deterministically."""
+
     hydrogeological_parameters: dict[str, Parameter] = Field(
         default_factory=lambda: {
             "permeability": Parameter(
@@ -429,6 +432,13 @@ class Config(BaseModel):
         if not isinstance(value, list) or len(value) == 0:
             raise ValueError("`steps` must be a non-empty list")
         return value
+
+    @model_validator(mode="before")
+    def prevent_pure_field_to_be_set(cls, data):
+        """This prevents setting the pure property."""
+        if data.get("pure") is not None:
+            raise ValueError("Not allowed to specify `pure` parameter.")
+        return data
 
     def override_with(self, other_config: "Config"):
         self.general = other_config.general
