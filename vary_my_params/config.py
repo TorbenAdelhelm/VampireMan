@@ -194,6 +194,12 @@ class Parameter(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
+    # XXX: Store this in the parameter?
+    # _datapoints: dict[int, Data]
+    #
+    # def set_datapoint(self, index: int, data: Data):
+    #     self._datapoints[index] = data
+
     def __str__(self) -> str:
         return (
             f"====== Parameter {self.name}\n"
