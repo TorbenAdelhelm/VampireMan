@@ -16,7 +16,10 @@ def render(config: Config):
 
     write_mesh_and_border_files(config, config.general.output_directory)
 
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(pathlib.Path(__file__).parent / "templates"))
+    LoggingUndefined = jinja2.make_logging_undefined(logger=logging.getLogger())
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(pathlib.Path(__file__).parent / "templates"), undefined=LoggingUndefined
+    )
     template = env.get_template("pflotran.in.j2")
 
     for index, datapoint in enumerate(config.datapoints):
