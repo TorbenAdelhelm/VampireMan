@@ -7,6 +7,7 @@ from vary_my_params.config import (
     Parameter,
     ParameterValueMinMax,
     ParameterValuePerlin,
+    TimeBasedValue,
     Vary,
 )
 from vary_my_params.pipeline import prepare_parameters, run_vary_params
@@ -147,3 +148,73 @@ def test_vary_const():
     assert data_0.value == -0.12
     assert data_1.value == 0.1
     assert data_2.value == 0.32
+
+
+def test_time_based_conversion():
+    config = Config()
+
+    config.heatpump_parameters = {
+        "hp1": Parameter(
+            name="hp1",
+            value=HeatPump(location=[1, 1, 1], injection_temp=10, injection_rate=0.01),
+        )
+    }
+
+    assert config.heatpump_parameters.get("hp1").value.injection_temp == 10
+    config = prepare_parameters(config)
+    assert config.heatpump_parameters.get("hp1").value.injection_temp.values.get(0) == 10
+
+
+def test_time_based_provided_values():
+    config = Config()
+
+    config.heatpump_parameters = {
+        "hp1": Parameter(
+            name="hp1",
+            value=HeatPump(
+                location=[1, 1, 1],
+                injection_temp=TimeBasedValue(
+                    values={
+                        0: 0,
+                        1: 1,
+                        2: 2,
+                        3: 3,
+                        4: 4,
+                    }
+                ),
+                injection_rate=0.01,
+            ),
+        )
+    }
+
+    config = prepare_parameters(config)
+    for i in range(2):
+        assert config.heatpump_parameters.get("hp1").value.injection_temp.values.get(i) == i
+
+
+def test_time_based_config():
+    config = Config(
+        **{
+            "general": {
+                "interactive": False,
+            },
+            "heatpump_parameters": {
+                "hp1": {
+                    "name": "hp1",
+                    "value": {
+                        "location": [1, 1, 1],
+                        "injection_temp": {
+                            "time_unit": "day",
+                            "values": {
+                                1: 1,
+                            },
+                        },
+                        "injection_rate": 0.001,
+                    },
+                }
+            },
+        }
+    )
+
+    config = prepare_parameters(config)
+    assert config.heatpump_parameters.get("hp1").value.injection_temp.values.get(1) == 1

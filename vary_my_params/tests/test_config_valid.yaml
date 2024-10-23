@@ -1,5 +1,19 @@
 general:
   interactive: false
+heatpump_parameters:
+  hp1:
+    vary: fixed
+    value:
+      location: [16, 32, 1]
+      injection_temp:
+        time_unit: year
+        values:
+          0: 15
+          3.5: 10
+          4: 15
+          4.5: 10
+          5: 15
+      injection_rate: 0.00024
 hydrogeological_parameters:
   grid:
     value: [64, 256, 1]
