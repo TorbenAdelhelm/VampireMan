@@ -178,16 +178,7 @@ class ParameterValueMinMax(BaseModel):
 
 class Parameter(BaseModel):
     name: str
-    value: (
-        float
-        | list[int]
-        | HeatPumps
-        | HeatPump
-        | ParameterValuePerlin
-        | ParameterValueMinMax
-        | FilePath
-        | ValueXYZ
-    )
+    value: float | list[int] | HeatPumps | HeatPump | ParameterValuePerlin | ParameterValueMinMax | FilePath | ValueXYZ
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
