@@ -161,7 +161,7 @@ SUBSURFACE
 
   {% for heatpump in heatpumps -%}
   {% for key, value in heatpump.items() -%}
-  FLOW_CONDITION {{ key }}_flow_condition !influx starting at day 72
+  FLOW_CONDITION {{ key }}_flow_condition
     TYPE
       RATE SCALED_VOLUMETRIC_RATE VOLUME
       TEMPERATURE DIRICHLET
