@@ -34,6 +34,8 @@ The program runs several stages, one after another, passing the outputs of the p
 Namely, the stages are (in this order):
 - load_config
     load the user provided values and parameters etc
+- prepare_parameters
+    generate heatpumps from the heatpumps parameters
 - vary_parameters
     varies the values loaded from the config step
 - prepare_simulation
