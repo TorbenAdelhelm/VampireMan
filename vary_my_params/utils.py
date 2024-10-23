@@ -1,5 +1,6 @@
 import cProfile
 import functools
+import hashlib
 import io
 import logging
 import os
@@ -89,3 +90,28 @@ def create_dataset_and_datapoint_dirs(config: "Config"):
         except OSError as error:
             logging.critical("Directory at %s could not be created, cannot proceed", datapoint_dir)
             raise error
+
+
+def write_config_to_output_dir(config: "Config"):
+    config_target_path = config.general.output_directory / "config.json"
+
+    # Check if there already is a config file
+    if os.path.isfile(config_target_path):
+        with open(config_target_path) as config_file:
+            config_file_content = config_file.read()
+
+        # Calculate the hash from current config and the existing config.json file
+        hash_in_memory = hashlib.sha256(config.model_dump_json(indent=2).encode()).hexdigest()
+        hash_config_file = hashlib.sha256(config_file_content.encode()).hexdigest()
+
+        # If there is, compare the contents to let the user abort
+        if hash_in_memory != hash_config_file:
+            logging.warning("Config file in output_directory has different contents!")
+            if not get_answer(
+                config, f"Different config file already in {config.general.output_directory}, overwrite?"
+            ):
+                config.pure = False
+                return
+
+    with open(config_target_path, "w") as config_file:
+        config_file.write(config.model_dump_json(indent=2))

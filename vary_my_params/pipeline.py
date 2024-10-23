@@ -53,6 +53,7 @@ def run(args: Namespace):
     config = ensure_config_is_valid(config)
 
     create_dataset_and_datapoint_dirs(config)
+    write_config_to_output_dir(config)
 
     # Where do we check this?
     logging.debug("Will run all stages")
