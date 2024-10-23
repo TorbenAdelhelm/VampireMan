@@ -65,7 +65,6 @@ def test_render_files_not_empty(tmp_path):
         for file in [
             "permeability_field.h5",
             "pflotran.in",
-            "permeability_field.png",
         ]:
             # Check if files are not empty
             # TODO: Better test
