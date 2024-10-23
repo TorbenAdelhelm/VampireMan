@@ -2,7 +2,13 @@ import logging
 from argparse import Namespace
 
 from .config import Config, ensure_config_is_valid, load_config
-from .utils import get_answer, get_workflow_module, profile_function
+from .utils import (
+    create_dataset_and_datapoint_dirs,
+    get_answer,
+    get_workflow_module,
+    profile_function,
+    write_config_to_output_dir,
+)
 from .vary_params.vary import calculate_hp_coordinates, generate_heatpumps, handle_time_based_params, vary_params
 
 
@@ -45,6 +51,8 @@ def run_visualization(config: Config):
 def run(args: Namespace):
     config = load_config(args)
     config = ensure_config_is_valid(config)
+
+    create_dataset_and_datapoint_dirs(config)
 
     # Where do we check this?
     logging.debug("Will run all stages")

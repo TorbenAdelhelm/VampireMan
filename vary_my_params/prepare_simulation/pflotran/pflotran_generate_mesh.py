@@ -1,5 +1,4 @@
 import logging
-import os
 from pathlib import Path
 
 from ...config import Config
@@ -18,9 +17,6 @@ def write_mesh_and_border_files(config: Config, output_dir: Path) -> None:
 
 
 def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: Path):
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
     with open(f"{output_dir}/{file_name}", "w") as file:
         file.writelines(output_strings)
 

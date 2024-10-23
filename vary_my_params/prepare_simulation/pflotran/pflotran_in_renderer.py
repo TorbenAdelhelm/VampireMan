@@ -1,11 +1,9 @@
 import logging
-import os
 import pathlib
 
 import jinja2
 
 from ...config import Config, HeatPump, ParameterValueXYZ
-from ...utils import get_answer
 from ...vary_params.vary_perlin import create_const_field
 from .pflotran_generate_mesh import write_mesh_and_border_files
 from .pflotran_write_permeability import save_vary_field
@@ -23,16 +21,6 @@ def render(config: Config):
 
     for index, datapoint in enumerate(config.datapoints):
         datapoint_dir = config.general.output_directory / f"datapoint-{index}"
-        try:
-            os.mkdir(datapoint_dir)
-        except FileExistsError:
-            logging.warning("The directory %s already exists, will override the contents", datapoint_dir)
-            if not get_answer(config, f"Should the directory {datapoint_dir} be overwritten?"):
-                continue
-        except OSError as error:
-            logging.critical("Directory at %s could not be created, cannot proceed", datapoint_dir)
-            raise error
-
         # Ensure hydraulic_head is x, y, z
         hydraulic_head = datapoint.data["hydraulic_head"]
         if isinstance(hydraulic_head.value, float):

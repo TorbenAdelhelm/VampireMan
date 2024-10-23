@@ -2,6 +2,7 @@ import cProfile
 import functools
 import io
 import logging
+import os
 import pstats
 import sys
 import time
@@ -78,3 +79,17 @@ def profile_function(function):
         return result
 
     return wrapper
+
+
+def create_dataset_and_datapoint_dirs(config: "Config"):
+    for index in range(config.general.number_datapoints):
+        datapoint_dir = config.general.output_directory / f"datapoint-{index}"
+        try:
+            os.makedirs(datapoint_dir)
+        except FileExistsError:
+            logging.warning("The directory %s already exists, will override the contents", datapoint_dir)
+            if not get_answer(config, f"Should the directory {datapoint_dir} be overwritten?"):
+                continue
+        except OSError as error:
+            logging.critical("Directory at %s could not be created, cannot proceed", datapoint_dir)
+            raise error
