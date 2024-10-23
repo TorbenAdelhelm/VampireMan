@@ -150,7 +150,7 @@ class ParameterValuePerlin(BaseModel):
         return self
 
 
-class ParameterValueXYZ(BaseModel):
+class ValueXYZ(BaseModel):
     """Datastructure to represent a vector of three float values."""
 
     x: float
@@ -186,7 +186,7 @@ class Parameter(BaseModel):
         | ParameterValuePerlin
         | ParameterValueMinMax
         | FilePath
-        | ParameterValueXYZ
+        | ValueXYZ
     )
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
@@ -212,7 +212,7 @@ class Parameter(BaseModel):
 
 class Data(BaseModel):
     name: str
-    value: int | float | list[int] | list[float] | HeatPump | NDArray
+    value: int | float | list[int] | list[float] | HeatPump | ValueXYZ | NDArray
 
     model_config = ConfigDict(extra="forbid")
 

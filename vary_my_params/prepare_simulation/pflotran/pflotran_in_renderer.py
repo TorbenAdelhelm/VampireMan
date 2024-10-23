@@ -3,7 +3,7 @@ import pathlib
 
 import jinja2
 
-from ...config import Config, HeatPump, ParameterValueXYZ
+from ...config import Config, HeatPump, ValueXYZ
 from ...vary_params.vary_perlin import create_const_field
 from .pflotran_generate_mesh import write_mesh_and_border_files
 from .pflotran_write_permeability import save_vary_field
@@ -24,7 +24,7 @@ def render(config: Config):
         # Ensure hydraulic_head is x, y, z
         hydraulic_head = datapoint.data["hydraulic_head"]
         if isinstance(hydraulic_head.value, float):
-            hydraulic_head.value = ParameterValueXYZ(x=0, y=hydraulic_head.value, z=0)
+            hydraulic_head.value = ValueXYZ(x=0, y=hydraulic_head.value, z=0)
 
         values = datapoint.data
         heatpumps = [{name: d.value} for name, d in datapoint.data.items() if isinstance(d.value, HeatPump)]
