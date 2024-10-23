@@ -31,16 +31,33 @@ class Distribution(enum.StrEnum):
 
 
 class Vary(enum.StrEnum):
+    """This represents the vary mode of `Parameter.vary`."""
+
     FIXED = "fixed"
+    """Don't vary the `Parameter` at all. Variation stage simply takes `Parameter.value` and copy it over to the
+    `Data` item in the `Datapoint`.
+    """
+
     CONST = "const_within_datapoint"
+    """The `Parameter` will be varied constantly within the `Datapoint`, so the `Parameter.value` won't change
+    within this `Datapoint`. The value will, however, be varied across the whole datasets, i.e.,
+    `Config.datapoints`.
+    """
+
     TIME = "timely_vary_within_datapoint"
+    # TODO This is currently unused
+
     SPACE = "spatially_vary_within_datapoint"
+    """`Parameter.value` will be varied spatially within the `Datapoint` and also across the dataset. E.g., this
+    could be the permeability that varies within the `Datapoint` with a perlin noise function.
+    """
 
 
 class Workflow(enum.StrEnum):
     """Enum behind `GeneralConfig.workflow`."""
 
     PFLOTRAN = "pflotran"
+    """The reference implementation and therefore the default workflow."""
 
 
 class TimeToSimulate(BaseModel):
