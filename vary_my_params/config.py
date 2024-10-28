@@ -397,17 +397,29 @@ class Config(BaseModel):
         """Check if one parameter is a file, then all must be"""
 
         # Get all parameters
-        permeability = self.hydrogeological_parameters.get("permeability", False)
-        hydraulic_head = self.hydrogeological_parameters.get("hydraulic_head", False)
-        temperature = self.hydrogeological_parameters.get("temperature", False)
+        permeability = self.hydrogeological_parameters.get("permeability")
+        hydraulic_head = self.hydrogeological_parameters.get("hydraulic_head")
+        temperature = self.hydrogeological_parameters.get("temperature")
 
         # Override with True where value is a Path to a file
-        if permeability:
-            permeability = isinstance(permeability, Path)
-        if hydraulic_head:
-            hydraulic_head = isinstance(hydraulic_head, Path)
-        if temperature:
-            temperature = isinstance(temperature, Path)
+        if permeability is not None and isinstance(permeability.value, Path):
+            if not permeability.vary == Vary.FIXED:
+                raise ValueError("When providing a Path, vary mode must be FIXED")
+            permeability = True
+        else:
+            permeability = False
+        if hydraulic_head is not None and isinstance(hydraulic_head.value, Path):
+            if not hydraulic_head.vary == Vary.FIXED:
+                raise ValueError("When providing a Path, vary mode must be FIXED")
+            hydraulic_head = True
+        else:
+            hydraulic_head = False
+        if temperature is not None and isinstance(temperature.value, Path):
+            if not temperature.vary == Vary.FIXED:
+                raise ValueError("When providing a Path, vary mode must be FIXED")
+            temperature = True
+        else:
+            temperature = False
 
         # If any of the parameters is True, all must be. Otherwise if none is True, its also fine
         if not (permeability == hydraulic_head == temperature):
