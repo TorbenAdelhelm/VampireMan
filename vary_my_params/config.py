@@ -472,10 +472,8 @@ class Config(BaseModel):
 
     def __str__(self) -> str:
         parameter_strings = []
-        for _, param in self.hydrogeological_parameters.items():
-            parameter_strings.append(str(param))
-        for _, param in self.heatpump_parameters.items():
-            parameter_strings.append(str(param))
+        for _, parameter in (self.hydrogeological_parameters | self.heatpump_parameters).items():
+            parameter_strings.append(str(parameter))
 
         return (
             f"=== This config will be used ===\n"
