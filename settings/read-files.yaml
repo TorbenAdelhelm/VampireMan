@@ -5,10 +5,7 @@ general:
 heatpump_parameters:
   hp1:
     vary: fixed
-    value:
-      location: [16, 32, 1]
-      injection_temp: 15
-      injection_rate: 0.00024
+    value: ./settings/inputs/hp1.json
 hydrogeological_parameters:
   permeability:
     vary: fixed

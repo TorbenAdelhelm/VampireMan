@@ -2,6 +2,7 @@ import cProfile
 import functools
 import hashlib
 import io
+import json
 import logging
 import os
 import pstats
@@ -126,29 +127,27 @@ def read_in_files(config: "Config"):
         if not isinstance(parameter.value, Path):
             continue
 
-        if parameter.value.suffix in [".H5", ".h5"]:
-            try:
+        try:
+            if parameter.value.suffix in [".H5", ".h5"]:
                 with File(parameter.value) as h5file:
+                    if parameter_name.title() not in h5file:
+                        raise KeyError("Could not find '%s' in the h5 file", parameter_name.title())
                     parameter.value = np.array(h5file[parameter_name.title()])
-            except KeyError as error:
-                logging.error("Could not find '%s' in the h5 file", parameter_name.title())
-                raise error
-            except (FileNotFoundError, PermissionError) as error:
-                raise OSError(
-                    f"Could not open value file '{parameter_name}' for parameter '{parameter.value}'"
-                ) from error
 
-        elif parameter.value.suffix in [".txt", ""]:
-            try:
+            elif parameter.value.suffix in [".json"]:
+                with open(parameter.value) as value_file:
+                    parameter.value = json.load(value_file)
+
+            elif parameter.value.suffix in [".txt", ""]:
                 with open(parameter.value) as value_file:
                     parameter.value = value_file.read()
-            except (FileNotFoundError, PermissionError) as error:
-                raise OSError(
-                    f"Could not open value file '{parameter_name}' for parameter '{parameter.value}'"
-                ) from error
-        else:
-            msg = f"Don't know what to do with the extension '{parameter.value.suffix}'"
-            logging.error(msg)
-            raise ValueError(msg)
+
+            else:
+                msg = f"Don't know what to do with the extension '{parameter.value.suffix}'"
+                logging.error(msg)
+                raise ValueError(msg)
+
+        except (FileNotFoundError, PermissionError) as error:
+            raise OSError(f"Could not open value file '{parameter_name}' for parameter '{parameter.value}'") from error
 
     return config
