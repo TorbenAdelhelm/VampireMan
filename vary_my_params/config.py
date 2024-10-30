@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 from numpydantic import NDArray, Shape
-from pydantic import BaseModel, ConfigDict, Field, FilePath, PositiveInt, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator, model_validator
 from ruamel.yaml import YAML
 
 from .utils import profile_function
@@ -186,7 +186,7 @@ class Parameter(BaseModel):
         | HeatPump
         | ParameterValuePerlin
         | ParameterValueMinMax
-        | FilePath
+        | Path  # Could use pydantic.FilePath here, but then tests fail as cwd does not match
         | ValueXYZ
         | NDArray[Shape["*, ..."], (np.float64,)]  # pyright: ignore
     )
@@ -209,14 +209,6 @@ class Parameter(BaseModel):
             return Path(str(value))
 
         return value
-
-    @model_validator(mode="after")
-    def check_path_valid(self):
-        """Check that all `Path`s are existing."""
-        if isinstance(self.value, Path) and not self.value.exists():
-            raise ValueError(f"Path {self.value} does not exist")
-
-        return self
 
     def __str__(self) -> str:
         return (
