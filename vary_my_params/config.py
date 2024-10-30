@@ -355,7 +355,7 @@ class Config(BaseModel):
     general: GeneralConfig = Field(default_factory=lambda: GeneralConfig())
     """The `GeneralConfig`."""
 
-    pure: bool = True
+    pure: bool = Field(True, exclude=True)
     """Internally used to detect if anything runs impure/non-deterministically."""
 
     hydrogeological_parameters: dict[str, Parameter] = Field(
