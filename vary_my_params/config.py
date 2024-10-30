@@ -220,10 +220,10 @@ class Parameter(BaseModel):
     def __str__(self) -> str:
         return (
             f"====== Parameter {self.name}\n"
-            f"       type(): {type(self.value)}\n"
-            f"       Value: {self.value}\n"
             f"       Distribution: {self.distribution}\n"
             f"       Vary: {self.vary}\n"
+            f"       type(): {type(self.value)}\n"
+            f"       Value: {self.value}\n"
         )
 
 
