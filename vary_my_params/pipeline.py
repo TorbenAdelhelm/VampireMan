@@ -55,6 +55,7 @@ def run_visualization(config: Config):
 
 def run(args: Namespace):
     config = load_config(args)
+    config = prepare_parameters(config)
     config = ensure_config_is_valid(config)
 
     create_dataset_and_datapoint_dirs(config)
@@ -66,7 +67,6 @@ def run(args: Namespace):
     print("This is the config that is going to be used:")
     print(config)
 
-    config = prepare_parameters(config)
     config = run_vary_params(config)
 
     run_render(config)
