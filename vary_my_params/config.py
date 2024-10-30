@@ -2,6 +2,7 @@
 import argparse
 import datetime
 import enum
+import inspect
 import logging
 from pathlib import Path
 
@@ -159,6 +160,12 @@ class ValueXYZ(BaseModel):
     z: float
 
     model_config = ConfigDict(extra="forbid")
+
+    def __str__(self) -> str:
+        # This "hack" is needed as there is some problem when serializing otherwise
+        if inspect.stack()[1].function == "model_dump_json":
+            return {"x": self.x, "y": self.y, "z": self.z}
+        return super().__str__()
 
 
 class ParameterValueMinMax(BaseModel):
