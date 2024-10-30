@@ -99,6 +99,9 @@ def create_dataset_and_datapoint_dirs(config: "Config"):
 
 
 def write_data_to_verified_json_file(config: "Config", target_path: Path, data: BaseModel):
+    """Write a `BaseModel` to a file and warn the user if there is already a file present with different contents than
+    the data that is represented in `data`. The data will be written in json format."""
+
     # Check if there already is a target file
     if os.path.isfile(target_path):
         with open(target_path) as target_file:
