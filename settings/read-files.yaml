@@ -1,0 +1,21 @@
+# This setting has one heatpump and reads in files for the hydrogeological_parameters
+general:
+  output_directory: ./datasets_out/read-files
+  mpirun: false
+heatpump_parameters:
+  hp1:
+    vary: fixed
+    value:
+      location: [16, 32, 1]
+      injection_temp: 15
+      injection_rate: 0.00024
+hydrogeological_parameters:
+  permeability:
+    vary: fixed
+    value: ./settings/inputs/permeability_field.h5
+  hydraulic_head:
+    vary: fixed
+    value: ./settings/inputs/hydraulic_head.txt
+  temperature:
+    vary: fixed
+    value: ./settings/inputs/temperature
