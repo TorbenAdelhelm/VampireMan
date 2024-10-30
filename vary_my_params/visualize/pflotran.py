@@ -50,6 +50,9 @@ def pflotran_time_to_year(time_step: str) -> float:
 
 
 def plot_simulation(config: Config):
+    if len(config.datapoints) == 0:
+        logging.error("There are no datapoints that could be plotted. Did you skip the previous stages?")
+
     for datapoint in config.datapoints:
         datapoint_path = config.general.output_directory / f"datapoint-{datapoint.index}"
 
