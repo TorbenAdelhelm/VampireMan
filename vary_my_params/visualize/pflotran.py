@@ -59,7 +59,7 @@ def plot_simulation(config: Config):
         plot_y(list_to_plot, datapoint_path)
         plot_isolines(config, list_to_plot, datapoint_path)
         # TODO: make this more general
-        plot_vary_field(datapoint_path, datapoint.data["permeability"])
+        plot_vary_field(config, datapoint_path, datapoint.data["permeability"])
 
         # print_heatpump_temp(config, list_to_plot)
 

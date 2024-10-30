@@ -12,6 +12,8 @@ from pstats import SortKey
 from types import ModuleType
 from typing import TYPE_CHECKING
 
+import numpy as np
+from h5py import File
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
@@ -117,3 +119,36 @@ def write_data_to_verified_json_file(config: "Config", target_path: Path, data: 
 
     with open(target_path, "w") as target_file:
         target_file.write(data.model_dump_json(indent=2))
+
+
+def read_in_files(config: "Config"):
+    for parameter_name, parameter in (config.hydrogeological_parameters | config.heatpump_parameters).items():
+        if not isinstance(parameter.value, Path):
+            continue
+
+        if parameter.value.suffix in [".H5", ".h5"]:
+            try:
+                with File(parameter.value) as h5file:
+                    parameter.value = np.array(h5file[parameter_name.title()])
+            except KeyError as error:
+                logging.error("Could not find '%s' in the h5 file", parameter_name.title())
+                raise error
+            except (FileNotFoundError, PermissionError) as error:
+                raise OSError(
+                    f"Could not open value file '{parameter_name}' for parameter '{parameter.value}'"
+                ) from error
+
+        elif parameter.value.suffix in [".txt", ""]:
+            try:
+                with open(parameter.value) as value_file:
+                    parameter.value = value_file.read()
+            except (FileNotFoundError, PermissionError) as error:
+                raise OSError(
+                    f"Could not open value file '{parameter_name}' for parameter '{parameter.value}'"
+                ) from error
+        else:
+            msg = f"Don't know what to do with the extension '{parameter.value.suffix}'"
+            logging.error(msg)
+            raise ValueError(msg)
+
+    return config

@@ -1,3 +1,4 @@
+# ruff: noqa: F722
 import argparse
 import datetime
 import enum
@@ -5,7 +6,7 @@ import logging
 from pathlib import Path
 
 import numpy as np
-from numpydantic import NDArray
+from numpydantic import NDArray, Shape
 from pydantic import BaseModel, ConfigDict, Field, FilePath, PositiveInt, field_validator, model_validator
 from ruamel.yaml import YAML
 
@@ -178,18 +179,45 @@ class ParameterValueMinMax(BaseModel):
 
 class Parameter(BaseModel):
     name: str
-    value: float | list[int] | HeatPumps | HeatPump | ParameterValuePerlin | ParameterValueMinMax | FilePath | ValueXYZ
+    value: (
+        float
+        | list[int]
+        | HeatPumps
+        | HeatPump
+        | ParameterValuePerlin
+        | ParameterValueMinMax
+        | FilePath
+        | ValueXYZ
+        | NDArray[Shape["*, ..."], (np.float64,)]  # pyright: ignore
+    )
     # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
     # XXX: Store this in the parameter?
     # _datapoints: dict[int, Data]
     #
     # def set_datapoint(self, index: int, data: Data):
     #     self._datapoints[index] = data
+
+    @field_validator("value")
+    @classmethod
+    def make_path(cls, value):
+        """If NDArray is of type path, make it a Path"""
+        if isinstance(value, np.ndarray) and value.ndim == 0:
+            return Path(str(value))
+
+        return value
+
+    @model_validator(mode="after")
+    def check_path_valid(self):
+        """Check that all `Path`s are existing."""
+        if isinstance(self.value, Path) and not self.value.exists():
+            raise ValueError(f"Path {self.value} does not exist")
+
+        return self
 
     def __str__(self) -> str:
         return (

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from h5py import File
 
-from ...config import Data
+from ...config import Config, Data
 
 
 def save_vary_field(filename, number_cells, cells, parameter_name: str = "permeability"):
@@ -22,12 +22,17 @@ def save_vary_field(filename, number_cells, cells, parameter_name: str = "permea
     logging.info(f"Created a {parameter_name}-field")
 
 
-def plot_vary_field(datapoint_dir: Path, parameter: Data):
+def plot_vary_field(config: Config, datapoint_dir: Path, parameter: Data):
     fig, axes = plt.subplots(2, 2, figsize=(10, 6))
     fig.suptitle(f"{parameter.name.title()} perlin field")
     axes = axes.ravel()
     if not isinstance(parameter.value, np.ndarray):
         raise ValueError("Cannot visualize something that is not an np.ndarray")
+
+    if parameter.value.ndim != 3:
+        # Reshape the data to match the 3D space of the domain
+        parameter.value = parameter.value.reshape(config.general.number_cells, order="F")
+
     axes[0].imshow(parameter.value[:, :, 0])
     axes[2].imshow(parameter.value[:, 0, :])
     axes[3].imshow(parameter.value[0, :, :])
