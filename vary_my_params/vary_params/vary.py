@@ -180,8 +180,6 @@ def generate_heatpumps(config: Config) -> Config:
 def vary_params(config: Config) -> Config:
     """Calls the `vary_parameter` function for each datapoint sequentially."""
 
-    # for step in config.steps:
-    #     filter over params where step == param.step
     for datapoint_index in range(config.general.number_datapoints):
         data = {}
 

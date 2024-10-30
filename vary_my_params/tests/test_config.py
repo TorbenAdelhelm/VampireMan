@@ -34,15 +34,10 @@ def test_config_dont_allow_extras():
 def test_config_catch_wrong_values():
     # Check if wrong values get caught
     with pytest.raises(ValidationError):
-        config = Config(**{"steps": 5})
+        config = Config(**{"pure": 5})
 
     with pytest.raises(ValidationError):
-        config = Config(**{"steps": ["test", {}]})
-
-    with pytest.raises(ValidationError):
-        config = Config(**{"steps": []})
-    config = Config(**{"steps": ["one", "two"]})
-    assert len(config.steps) == 2
+        config = Config(**{"general": {"number_cells": ["test", {}]}})
 
 
 def test_config_invalid_config():

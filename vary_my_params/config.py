@@ -190,7 +190,6 @@ class Parameter(BaseModel):
         | ValueXYZ
         | NDArray[Shape["*, ..."], (np.float64,)]  # pyright: ignore
     )
-    # steps: list[str]
     distribution: Distribution = Distribution.UNIFORM
     vary: Vary = Vary.FIXED
 
@@ -357,9 +356,6 @@ class Config(BaseModel):
     general: GeneralConfig = Field(default_factory=lambda: GeneralConfig())
     """The `GeneralConfig`."""
 
-    steps: list[str] = Field(default_factory=lambda: ["global"])
-    """This is actually unused atm..."""
-
     pure: bool = True
     """Internally used to detect if anything runs impure/non-deterministically."""
 
@@ -457,13 +453,6 @@ class Config(BaseModel):
 
         return self
 
-    @field_validator("steps")
-    def non_empty_list(cls, value):
-        """Ensure `steps` is not empty."""
-        if not isinstance(value, list) or len(value) == 0:
-            raise ValueError("`steps` must be a non-empty list")
-        return value
-
     @model_validator(mode="before")
     def prevent_pure_field_to_be_set(cls, data):
         """This prevents setting the pure property."""
@@ -473,7 +462,6 @@ class Config(BaseModel):
 
     def override_with(self, other_config: "Config"):
         self.general = other_config.general
-        self.steps = other_config.steps or self.steps
         self.hydrogeological_parameters |= other_config.hydrogeological_parameters
         self.heatpump_parameters |= other_config.heatpump_parameters
         self.datapoints = other_config.datapoints
@@ -507,9 +495,6 @@ class Config(BaseModel):
             f"=== This config will be used ===\n"
             f"\n"
             f"{self.general}\n"
-            f"=== Steps (in this order)\n"
-            f"    {"\n".join(self.steps)}\n"
-            f"\n"
             f"=== Parameters\n\n"
             f"{"\n".join(parameter_strings)}"
             f"\n"
