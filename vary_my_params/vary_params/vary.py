@@ -131,6 +131,21 @@ def generate_heatpumps(config: Config) -> Config:
     `HeatPump.injection_rate` values are simply taken from a random number between the respective min and max values.
     """
 
+    def handle_heatpump_values(value: TimeBasedValue | ParameterValueMinMax):
+        """Normalize the given value to a `TimeBasedValue` with values that lay between the given min/max values."""
+        if isinstance(value, ParameterValueMinMax):
+            value = TimeBasedValue(values={0: ParameterValueMinMax(min=value.min, max=value.max)})
+
+        result = TimeBasedValue(time_unit=value.time_unit, values={})
+
+        for index, val in value.values.items():
+            if isinstance(val, ParameterValueMinMax):
+                result.values[index] = val.max - (rand.random() * (val.max - val.min))
+            else:
+                result.values[index] = val
+
+        return result
+
     rand = config.get_rng()
     new_heatpumps: dict[str, Parameter] = {}
     for _, hps in config.heatpump_parameters.items():
@@ -141,27 +156,25 @@ def generate_heatpumps(config: Config) -> Config:
         if not isinstance(hps.value, HeatPumps):
             raise ValueError("There was a non HeatPumps item in heatpump_parameters")
 
-        # TODO: calculate relevant parameters
         for index in range(hps.value.number):  # type:ignore
-            injection_temp_min = hps.value.injection_temp_min
-            injection_temp_max = hps.value.injection_temp_max
-            injection_rate_min = hps.value.injection_rate_min
-            injection_rate_max = hps.value.injection_rate_max
+            name = f"{hps.name}_{index}"
+            if (config.heatpump_parameters.get(name) is not None) and (new_heatpumps.get(name) is not None):
+                msg = f"There is a naming clash for generated heatpump {name}"
+                logging.error(msg)
+                raise ValueError(msg)
 
+            # XXX: This is actually always random
             location = np.ceil(rand.random(3) * config.general.number_cells).tolist()
-            injection_temp = injection_temp_max - (rand.random() * (injection_temp_max - injection_temp_min))
-            injection_rate = injection_rate_max - (rand.random() * (injection_rate_max - injection_rate_min))
+
+            injection_temp = handle_heatpump_values(hps.value.injection_temp)
+            injection_rate = handle_heatpump_values(hps.value.injection_rate)
+
             logging.debug(
                 "Generating heatpump with location %s, injection_temp %s, injection_rate %s",
                 location,
                 injection_temp,
                 injection_rate,
             )
-            name = f"{hps.name}_{index}"
-            if (config.heatpump_parameters.get(name) is not None) and (new_heatpumps.get(name) is not None):
-                msg = f"There is a naming clash for generated heatpump {name}"
-                logging.error(msg)
-                raise ValueError(msg)
             new_heatpumps[name] = Parameter(
                 name=name,
                 vary=hps.vary,

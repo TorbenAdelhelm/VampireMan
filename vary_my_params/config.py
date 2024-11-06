@@ -101,7 +101,7 @@ class TimeBasedValue(BaseModel):
     time_unit: str = "year"
     """The unit of each of the float values in the `values` dict."""
 
-    values: dict[float, float]
+    values: dict[float, ParameterValueMinMax | float]
     """Values that represent timesteps and their respective values. E.g., `{0: 10, 1: 15}` means, that at
     timestep `0`, the value is `10` and at timestep `1` the value is `15`.
         """
@@ -138,10 +138,8 @@ class HeatPumps(BaseModel):
     number: PositiveInt
     """How many `HeatPump`s to generate."""
 
-    injection_temp_min: float
-    injection_temp_max: float
-    injection_rate_min: float
-    injection_rate_max: float
+    injection_temp: TimeBasedValue | ParameterValueMinMax
+    injection_rate: TimeBasedValue | ParameterValueMinMax
 
     model_config = ConfigDict(extra="forbid")
 
