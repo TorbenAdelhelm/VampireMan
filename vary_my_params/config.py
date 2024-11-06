@@ -16,7 +16,7 @@ from .utils import profile_function
 yaml = YAML(typ="safe")
 
 
-def value_is_3d(value: list[int]):
+def value_is_3d(value: list[float]):
     """Ensure value is given in three dimensional space."""
     if len(value) == 2:
         value.append(1)
