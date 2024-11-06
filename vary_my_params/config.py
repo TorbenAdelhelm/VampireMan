@@ -488,7 +488,7 @@ class Config(BaseModel):
             with open(config_file_path, encoding="utf-8") as config_file:
                 yaml_values = yaml.load(config_file)
         except OSError as err:
-            logging.error("Could not find config file '%s', %s", config_file_path, err)
+            logging.error("Could not open config file '%s', %s", config_file_path, err)
             raise err
         logging.debug("Loaded config from %s", config_file_path)
         logging.debug("Yaml: %s", yaml_values)
