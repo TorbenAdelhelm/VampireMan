@@ -243,3 +243,29 @@ def handle_time_based_params(config: Config) -> Config:
             heatpump.value.injection_rate = TimeBasedValue(values={0: heatpump.value.injection_rate})
 
     return config
+
+
+def calculate_frequencies(config: Config) -> Config:
+    """For every `Parameter` that has a value of `ParameterValuePerlin` type, calculate the frequency value if
+    `ParameterValueMinMax` is given."""
+
+    # Convert heatpumps to time based values
+    for _, parameter in (config.hydrogeological_parameters | config.heatpump_parameters).items():
+        if not isinstance(parameter.value, ParameterValuePerlin):
+            continue
+
+        if not isinstance(parameter.value.frequency, ParameterValueMinMax):
+            continue
+
+        rand = config.get_rng()
+
+        min = parameter.value.frequency.min
+        max = parameter.value.frequency.max
+
+        val1 = max - (rand.random() * (max - min))
+        val2 = max - (rand.random() * (max - min))
+        val3 = max - (rand.random() * (max - min))
+
+        parameter.value.frequency = [val1, val2, val3]
+
+    return config

@@ -10,12 +10,19 @@ from .utils import (
     read_in_files,
     write_data_to_verified_json_file,
 )
-from .vary_params.vary import calculate_hp_coordinates, generate_heatpumps, handle_time_based_params, vary_params
+from .vary_params.vary import (
+    calculate_frequencies,
+    calculate_hp_coordinates,
+    generate_heatpumps,
+    handle_time_based_params,
+    vary_params,
+)
 
 
 @profile_function
 def prepare_parameters(config: Config) -> Config:
     config = read_in_files(config)
+    config = calculate_frequencies(config)
     config = generate_heatpumps(config)
     config = calculate_hp_coordinates(config)
     config = handle_time_based_params(config)

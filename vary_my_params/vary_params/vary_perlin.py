@@ -62,6 +62,8 @@ def create_perlin_field(config: Config, parameter: Parameter):
         raise ValueError()
 
     freq_factor = parameter.value.frequency
+    if not isinstance(freq_factor, list):
+        raise ValueError()
 
     vary_min = parameter.value.min
     vary_max = parameter.value.max

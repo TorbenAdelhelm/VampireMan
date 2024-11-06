@@ -79,6 +79,22 @@ class TimeToSimulate(BaseModel):
         return f"{self.final_time} [{self.unit}]"
 
 
+class ParameterValueMinMax(BaseModel):
+    """Datastructure to represent a `min` and a `max` value for `Parameter.value`."""
+
+    min: float
+    max: float
+
+    model_config = ConfigDict(extra="forbid")
+
+    @model_validator(mode="after")
+    def ensure_max_ge_min(self):
+        """Ensure the `min` value is smaller or equal to the `max` value."""
+        if self.max < self.min:
+            raise ValueError("`max` value must be greater or equal to `min`")
+        return self
+
+
 class TimeBasedValue(BaseModel):
     """This represents a time based value. This could be anything that can be varied in the `Vary.TIME` mode."""
 
@@ -133,16 +149,26 @@ class HeatPumps(BaseModel):
 class ParameterValuePerlin(BaseModel):
     """Datastructure to represent a perlin noise value for `Parameter.value`."""
 
-    frequency: list[float]
+    frequency: ParameterValueMinMax | list[float]
     """The larger these values are, the more fine grained the perlin field will
-    be (i.e., the smaller the "dots" are and how many of them)."""
+    be (i.e., the smaller the "dots" are and how many of them).
+
+    Can either be a fixed three dimensional list of floats, in which case the value will simply be taken as is,
+    or `ParameterValueMinMax`, in which case the min and max values describe a range in which three floats are
+    being generated.
+    """
 
     max: float
     min: float
 
     model_config = ConfigDict(extra="forbid")
 
-    _validated_3d = field_validator("frequency")(value_is_3d)
+    @model_validator(mode="after")
+    def ensure_3d_if_list(self):
+        """If frequency is a list, check if it is 3d"""
+        if isinstance(self.frequency, list):
+            value_is_3d(self.frequency)
+        return self
 
     @model_validator(mode="after")
     def ensure_max_ge_min(self):
@@ -166,22 +192,6 @@ class ValueXYZ(BaseModel):
         if inspect.stack()[1].function == "model_dump_json":
             return {"x": self.x, "y": self.y, "z": self.z}  # pyright: ignore
         return super().__str__()
-
-
-class ParameterValueMinMax(BaseModel):
-    """Datastructure to represent a `min` and a `max` value for `Parameter.value`."""
-
-    min: float
-    max: float
-
-    model_config = ConfigDict(extra="forbid")
-
-    @model_validator(mode="after")
-    def ensure_max_ge_min(self):
-        """Ensure the `min` value is smaller or equal to the `max` value."""
-        if self.max < self.min:
-            raise ValueError("`max` value must be greater or equal to `min`")
-        return self
 
 
 class Parameter(BaseModel):
