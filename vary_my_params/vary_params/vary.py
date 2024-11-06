@@ -61,6 +61,7 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
                     f"Parameter {parameter.name} is vary.space and has a float value, "
                     f"it should be set to vary.fixed or vary.const with a min/max value instead; {parameter}"
                 )
+            # This should be inside the CONST block, yet it seems to make more sense to users to find it here
             elif isinstance(parameter.value, HeatPump):
                 data = vary_heatpump(config, parameter)
             elif isinstance(parameter.value, ParameterValueMinMax):
