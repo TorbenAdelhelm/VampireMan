@@ -5,7 +5,7 @@ After describing which parameters should be varied in which manner, the program 
 
 Currently, only the `pflotran` workflow is implemented.
 
-The minimum required python version is 3.10.
+The minimum required python version is 3.11.
 
 ## Quickstart
 
@@ -18,10 +18,17 @@ When the program has exited successfully, `cd datasets_out/xyz` into the directo
 
 ### Ubuntu
 
-1. Install at least python 3.10 (e.g., `apt install python3`)
+1. Install at least python 3.11 (e.g., `apt install python3`)
 1. Install poetry (e.g., `pip install poetry`)
+1. Install the dependencies from the project root (i.e., `poetry install`)
 1. Enter a poetry shell (e.g., `poetry shell`)
 1. Install pflotan 5.0.0
+
+### Installing Nix on Uni Stuttgart IPVS HPC
+
+1. Clone the repository
+1. Run `bash setup.sh` in the project root
+1. Log out and in again
 
 ### Nix
 
