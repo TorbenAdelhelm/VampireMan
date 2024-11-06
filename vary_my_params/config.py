@@ -164,7 +164,7 @@ class ValueXYZ(BaseModel):
     def __str__(self) -> str:
         # This "hack" is needed as there is some problem when serializing otherwise
         if inspect.stack()[1].function == "model_dump_json":
-            return {"x": self.x, "y": self.y, "z": self.z}
+            return {"x": self.x, "y": self.y, "z": self.z}  # pyright: ignore
         return super().__str__()
 
 
@@ -526,7 +526,7 @@ def ensure_config_is_valid(config: Config) -> Config:
 
 
 def load_config(arguments: argparse.Namespace) -> Config:
-    run_config = Config()
+    run_config = Config()  # pyright: ignore
     logging.debug("Default config is %s", run_config)
 
     # Load config from file if provided
