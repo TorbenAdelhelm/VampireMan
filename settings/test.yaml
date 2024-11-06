@@ -22,19 +22,22 @@ heatpump_parameters:
           4.5: 10
           5: 15
       injection_rate: 0.00024
-  hp2:
-    vary: spatially_vary_within_datapoint
-    value:
-      location: [16, 64, 1]
-      injection_temp: 15.6
-      injection_rate: 0.00024
   hps:
     vary: spatially_vary_within_datapoint
     value:
-      injection_temp_min: 13.6
-      injection_temp_max: 15.6
-      injection_rate_min: 0.00002
-      injection_rate_max: 0.0001
+      injection_temp:
+        time_unit: year
+        values:
+          0:
+            min: 13.6
+            max: 15.5
+          1: 8
+          2:
+            min: 13.6
+            max: 15.6
+      injection_rate:
+        min: 0.00002
+        max: 0.0002
       number: 5
 hydrogeological_parameters:
   permeability:
