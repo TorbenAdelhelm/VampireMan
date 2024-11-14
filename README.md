@@ -55,3 +55,30 @@ Namely, the stages are (in this order):
 - run_simulation
 - collect_results
 - visualize_results
+
+## Settings
+
+There are several example settings in [the settings directory](./settings).
+Those settings represent test cases and are also semantically validated when running pytest.
+
+All grids are unstructured and have three dimensions with a cell resolution of 5 meters in each dimension.
+Two dimensional grids are implicitly converted to three dimensions by adding a `z` coordinate with the value of 1.
+
+Further, all cases have the similarities:
+- random seed is always set to `0`
+- output directory is set to `./datasets_out/<casename>`.
+- workflow is `pflotran`
+- profiling is disabled
+- simulation time is 27.5 years
+- interactive is set to false
+
+| case                                           | grid         | datapoint(s) | heat pump(s)   | permeability | hydraulic head | temperature | description                                                                               |
+|------------------------------------------------|--------------|--------------|----------------|--------------|----------------|-------------|-------------------------------------------------------------------------------------------|
+| [0](./settings/case0_default.yaml)             | (32,128,1) | 1            | 1 fix          | fix          | fix            | fix         | Takes over all default values from the program.                                           |
+| [1](./settings/case1_vary-pressure-const.yaml) | (32,128,1) | 2            | 1 fix          | const        | const          | fix         | Demonstrates CONST vary method.                                                           |
+| [2](./settings/case2_vary-hp-positions.yaml)   | (64,256,1) | 2            | 1 fix, 2 space | fix          | fix            | fix         | Demonstrates the SPACE vary method for heat pumps.                                        |
+| [3](./settings/case3_allin1.yaml)              | (32,128,1) | 3            | 2 space        | space        | fix            | fix         | Demonstrates the SPACE vary method for heat pumps and hydrogeological parameters.         |
+| [4](./settings/case4_extend-plumes.yaml)       | (16,128,1) | 3            | 1 fix          | space        | const          | fix         | Longer domain and long heat plumes while having the permeability varied spatially.        |
+| [5](./settings/case5_3d.yaml)                  | (16,64,16) | 1            | 1 fix          | fix          | fix            | fix         | case0 in a 3D domain with z > 1                                                           |
+| [6](./settings/case6_vertical_aniso.yaml)      | (16,64,16) | 1            | 1 fix          | fix          | fix            | fix         | case5 with a vertical anisotropy ratio of 10.                                             |
+| [9](./settings/case9_seasonal-changes.yaml)    | (32,128,1) | 1            | 2 fix          | fix          | fix            | fix         | Demonstrates time based changes in the heat pump injection values (temperature and rate).
