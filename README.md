@@ -61,8 +61,8 @@ Namely, the stages are (in this order):
 There are several example settings in [the settings directory](./settings).
 Those settings represent test cases and are also semantically validated when running pytest.
 
-All grids are unstructured and have three dimensions with a cell resolution of 5 meters in each dimension.
-Two dimensional grids are implicitly converted to three dimensions by adding a `z` coordinate with the value of 1.
+In these examples, all grids are cartesian and have three dimensions with a cell resolution of 5 meters in each dimension.
+Two dimensional grids are implicitly converted to three dimensions by adding a `z` coordinate with the value of 1, meaning a height of 1 cell.
 
 Further, all cases have the similarities:
 - random seed is always set to `0`
