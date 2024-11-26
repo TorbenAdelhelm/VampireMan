@@ -2,6 +2,7 @@
 general:
   output_directory: ./datasets_out/case1_vary-hydraulic_head-const
   number_datapoints: 2
+  # TODO remove
   mpirun: false
   mute_simulation_output: true
 hydrogeological_parameters:

@@ -4,6 +4,7 @@ general:
   output_directory: ./datasets_out/case2_vary-hp-positions
   random_seed: null
   number_cells: [64, 256, 1]
+  # TODO remove
   mpirun: false
   mute_simulation_output: true
 heatpump_parameters:
