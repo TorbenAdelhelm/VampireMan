@@ -46,9 +46,6 @@ class Vary(enum.StrEnum):
     `Config.datapoints`.
     """
 
-    TIME = "timely_vary_within_datapoint"
-    # TODO This is currently unused
-
     SPACE = "spatially_vary_within_datapoint"
     """`Parameter.value` will be varied spatially within the `Datapoint` and also across the dataset. E.g., this
     could be the permeability that varies within the `Datapoint` with a perlin noise function.
