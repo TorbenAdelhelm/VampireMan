@@ -1,8 +1,14 @@
 # This setting is larger than the default case and has several heat pumps.
+#
+# Diff from case0:
+# grid: 2D larger -> (64, 256, 1)
+# datapoint(s): 2
+# heat pump(s): 1 fix, 2 space
+
 general:
   number_datapoints: 2
   output_directory: ./datasets_out/case2_vary-hp-positions
-  random_seed: null
+  # random_seed: null
   number_cells: [64, 256, 1]
   # TODO remove
   mpirun: false

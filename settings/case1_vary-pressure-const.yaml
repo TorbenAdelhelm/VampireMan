@@ -1,4 +1,10 @@
-# In addition to case0, there is one more datapoint and a const varying hydraulic_head.
+# In addition to case0, there are now two datapoints, the hydraulic_head and the permeability are varied using the CONST method.
+#
+# Diff from case0:
+# datapoint(s): 2
+# permeability: const
+# hydraulic head: const
+
 general:
   output_directory: ./datasets_out/case1_vary-hydraulic_head-const
   number_datapoints: 2
@@ -11,3 +17,9 @@ hydrogeological_parameters:
     value:
       max: -0.0015
       min: -0.0035
+  permeability:
+    vary: const_within_datapoint
+    distribution: logarithmic
+    value:
+      max: 5.09683995922528e-09
+      min: 1.0193679918450561e-11

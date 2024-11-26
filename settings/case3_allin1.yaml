@@ -1,4 +1,11 @@
-# This setting has multiple hps and a varying permission field.
+# This setting has multiple hps and a varying permeability field.
+#
+# Diff from case1:
+# datapoint(s): 3
+# heat pump(s): 1 fix, 1 space
+# permeability: space
+# hydraulic head: fix
+
 general:
   output_directory: ./datasets_out/case3_allin1
   number_datapoints: 3
@@ -24,5 +31,5 @@ hydrogeological_parameters:
     distribution: logarithmic
     value:
       frequency: [18, 18, 18]
-      max: 5.09683995922528e-09   #testcases #old:6.65e-09
-      min: 1.0193679918450561e-11 #testcases #old:1.36e-12
+      max: 5.09683995922528e-09
+      min: 1.0193679918450561e-11
