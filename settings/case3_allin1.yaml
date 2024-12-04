@@ -16,7 +16,7 @@ heatpump_parameters:
   hp1:
     vary: spatially_vary_within_datapoint
     value:
-      location: [16, 32, 1]
+      location: [32, 512, 1]
       injection_temp: 15.6
       injection_rate: 0.00024
   hp2:

@@ -55,8 +55,8 @@ def test_prepare_heatpump_generation():
     }
     config = prepare_parameters(config)
     assert len(config.heatpump_parameters) == 10
-    assert config.heatpump_parameters.get("hps_0").value.location == [102.5, 172.5, 2.5]
-    assert config.heatpump_parameters.get("hps_9").value.location == [52.5, 97.5, 2.5]
+    assert config.heatpump_parameters.get("hps_0").value.location == [102.5, 347.5, 2.5]
+    assert config.heatpump_parameters.get("hps_9").value.location == [52.5, 192.5, 2.5]
     assert config.heatpump_parameters.get("hps_9").value.injection_temp.values[0] == 14.814702918850823
     assert config.heatpump_parameters.get("hps_9").value.injection_rate.values[1] == 0
 

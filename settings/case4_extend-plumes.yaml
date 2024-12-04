@@ -2,7 +2,7 @@
 general:
   number_datapoints: 3
   output_directory: ./datasets_out/case4_extend-plumes
-  number_cells: [16, 128, 1]
+  number_cells: [32, 1280, 1]
   # TODO remove
   mpirun: false
   mute_simulation_output: true

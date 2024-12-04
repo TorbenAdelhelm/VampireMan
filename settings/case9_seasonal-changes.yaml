@@ -4,6 +4,7 @@ general:
   number_datapoints: 1
   mpirun: false
   mute_simulation_output: true
+  number_cells: [32, 512, 1]
 heatpump_parameters:
   hp1:
     vary: fixed

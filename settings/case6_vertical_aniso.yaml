@@ -2,14 +2,14 @@
 general:
   output_directory: ./datasets_out/case6_vertical_aniso
   number_datapoints: 1
-  number_cells: [16, 64, 16]
+  number_cells: [32, 256, 32]
   # TODO remove
   mpirun: false
   mute_simulation_output: true
 heatpump_parameters:
   hp1:
     value:
-      location: [8, 16, 8]
+      location: [16, 32, 16]
       injection_temp: 15.6
       injection_rate: 0.00002
 hydrogeological_parameters:

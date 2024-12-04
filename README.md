@@ -71,14 +71,15 @@ Further, all cases have the similarities:
 - profiling is disabled
 - simulation time is 27.5 years
 - interactive is set to false
+- groundwater temperature is always fix to 10.6 degrees celsius
 
-| case                                           | grid         | datapoint(s) | heat pump(s)   | permeability | hydraulic head | temperature | description                                                                               |
-|------------------------------------------------|--------------|--------------|----------------|--------------|----------------|-------------|-------------------------------------------------------------------------------------------|
-| [0](./settings/case0_default.yaml)             | (32,128,1) | 1            | 1 fix          | fix          | fix            | fix         | Takes over all default values from the program.                                           |
-| [1](./settings/case1_vary-pressure-const.yaml) | (32,128,1) | 2            | 1 fix          | const        | const          | fix         | Demonstrates CONST vary method.                                                           |
-| [2](./settings/case2_vary-hp-positions.yaml)   | (64,256,1) | 2            | 1 fix, 2 space | fix          | fix            | fix         | Demonstrates the SPACE vary method for heat pumps.                                        |
-| [3](./settings/case3_allin1.yaml)              | (32,128,1) | 3            | 2 space        | space        | fix            | fix         | Demonstrates the SPACE vary method for heat pumps and hydrogeological parameters.         |
-| [4](./settings/case4_extend-plumes.yaml)       | (16,128,1) | 3            | 1 fix          | space        | const          | fix         | Longer domain and long heat plumes while having the permeability varied spatially.        |
-| [5](./settings/case5_3d.yaml)                  | (16,64,16) | 1            | 1 fix          | fix          | fix            | fix         | case0 in a 3D domain with z > 1                                                           |
-| [6](./settings/case6_vertical_aniso.yaml)      | (16,64,16) | 1            | 1 fix          | fix          | fix            | fix         | case5 with a vertical anisotropy ratio of 10.                                             |
-| [9](./settings/case9_seasonal-changes.yaml)    | (32,128,1) | 1            | 2 fix          | fix          | fix            | fix         | Demonstrates time based changes in the heat pump injection values (temperature and rate).
+| case                                           | grid        | datapoint(s) | heat pump(s)   | permeability | hydraulic head | additional specialties                                         |
+|------------------------------------------------|-------------|--------------|----------------|--------------|----------------|----------------------------------------------------------------|
+| [0](./settings/case0_default.yaml)             | (32,256,1)  | 1            | 1 fix          | fix          | fix            |                                                                |
+| [1](./settings/case1_vary-pressure-const.yaml) | (32,256,1)  | 2            | 1 fix          | const        | const          |                                                                |
+| [2](./settings/case2_vary-hp-positions.yaml)   | (32,512,1)  | 2            | 1 fix, 2 space | fix          | fix            |                                                                |
+| [3](./settings/case3_allin1.yaml)              | (32,512,1)  | 3            | 2 space        | space        | fix            |                                                                |
+| [4](./settings/case4_extend-plumes.yaml)       | (32,1280,1) | 3            | 1 fix          | space        | const          |                                                                |
+| [5](./settings/case5_3d.yaml)                  | (32,256,32) | 1            | 1 fix          | fix          | fix            |                                                                |
+| [6](./settings/case6_vertical_aniso.yaml)      | (32,256,32) | 1            | 1 fix          | space        | fix            | vertical anisotropy ratio of 10                                |
+| [9](./settings/case9_seasonal-changes.yaml)    | (32,512,1)  | 1            | 2 fix          | fix          | fix            | time based changes in heat pump injection temperature and rate |
