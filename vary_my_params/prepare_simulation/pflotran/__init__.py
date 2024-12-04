@@ -1,1 +1,1 @@
-from .pflotran_in_renderer import render as render
+from .pflotran_in_renderer import render as render_stage

@@ -4,13 +4,13 @@ from .run_simulation import pflotran as pflotran_run
 from .visualize import pflotran as pflotran_visualize
 
 
-def render(config: State):
-    return pflotran_render.render(config)
+def render_stage(config: State):
+    return pflotran_render.render_stage(config)
 
 
-def run_simulation(config: State):
-    return pflotran_run.run_simulation(config)
+def simulation_stage(config: State):
+    return pflotran_run.simulation_stage(config)
 
 
-def plot_simulation(config: State):
-    return pflotran_visualize.plot_simulation(config)
+def visualization_stage(config: State):
+    return pflotran_visualize.visualization_stage(config)

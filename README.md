@@ -44,6 +44,8 @@ Depending on your environment, choose one of the following.
 
 The program sequentially runs several stages passing the outputs of the previous stage onto the next one.
 
+<!-- TODO fix this -->
+
 Namely, the stages are (in this order):
 - load_config
     load the user provided values and parameters etc
@@ -52,7 +54,7 @@ Namely, the stages are (in this order):
 - vary_parameters
     varies the values loaded from the config step
 - prepare_simulation
-- run_simulation
+- simulation stage
 - collect_results
 - visualize_results
 

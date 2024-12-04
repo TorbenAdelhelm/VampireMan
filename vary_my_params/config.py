@@ -506,7 +506,7 @@ class State(BaseModel):
 
 
 @profile_function
-def ensure_state_is_valid(state: State) -> State:
+def validation_stage(state: State) -> State:
     # TODO make this more extensive
 
     hydraulic_head = state.hydrogeological_parameters.get("hydraulic_head")
@@ -530,7 +530,7 @@ def ensure_state_is_valid(state: State) -> State:
     return state
 
 
-def load_state(arguments: argparse.Namespace) -> State:
+def loading_stage(arguments: argparse.Namespace) -> State:
     run_state = State()  # pyright: ignore
     logging.debug("Default state is %s", run_state)
 

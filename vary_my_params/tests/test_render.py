@@ -1,7 +1,7 @@
 import os
 
 from vary_my_params.config import State
-from vary_my_params.pipeline import prepare_parameters, run_render, run_vary_params
+from vary_my_params.pipeline import prepare_parameters, render_stage, variation_stage
 from vary_my_params.utils import create_dataset_and_datapoint_dirs
 
 
@@ -12,7 +12,7 @@ def test_render_borders_and_mesh(tmp_path):
     state.general.number_cells = [32, 64, 2]
 
     create_dataset_and_datapoint_dirs(state)
-    run_render(state)
+    render_stage(state)
 
     for file in [
         "east.ex",
@@ -55,8 +55,8 @@ def test_render_files_not_empty(tmp_path):
 
     create_dataset_and_datapoint_dirs(state)
     state = prepare_parameters(state)
-    state = run_vary_params(state)
-    run_render(state)
+    state = variation_stage(state)
+    render_stage(state)
 
     for dir in [
         "datapoint-0",

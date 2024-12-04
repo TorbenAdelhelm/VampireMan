@@ -6,7 +6,7 @@ from ..config import State
 from ..utils import get_answer
 
 
-def run_simulation(state: State):
+def simulation_stage(state: State):
     """Runs the pflotran simulation. The function changes the cwd into each of the datapoints directories. Then,
     in the respective datapoint dir, it runs the pflotran simulation either with mpirun or directly depending on
     `vary_my_params.config.GeneralConfig.mpirun`.

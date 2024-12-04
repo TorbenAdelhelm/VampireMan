@@ -10,7 +10,7 @@ from vary_my_params.config import (
     TimeBasedValue,
     Vary,
 )
-from vary_my_params.pipeline import prepare_parameters, run_vary_params
+from vary_my_params.pipeline import prepare_parameters, variation_stage
 from vary_my_params.utils import create_dataset_and_datapoint_dirs
 
 
@@ -31,7 +31,7 @@ def test_vary_copy():
 
     assert len(state.datapoints) == 0
     state = prepare_parameters(state)
-    state = run_vary_params(state)
+    state = variation_stage(state)
     assert len(state.datapoints) == 1
 
     temp_data = state.datapoints[0].data.get("temperature")
@@ -72,7 +72,7 @@ def test_vary_space():
     param_scalar = state.hydrogeological_parameters.get("param_scalar")
 
     assert len(state.datapoints) == 0
-    state = run_vary_params(state)
+    state = variation_stage(state)
     assert len(state.datapoints) == 2
 
     data_scalar_0 = state.datapoints[0].data.get("param_scalar")
@@ -106,7 +106,7 @@ def test_vary_heatpump():
 
     assert len(state.datapoints) == 0
     state = prepare_parameters(state)
-    state = run_vary_params(state)
+    state = variation_stage(state)
     assert len(state.datapoints) == 2
 
     hp_data_0 = state.datapoints[0].data.get("hp1")
@@ -139,7 +139,7 @@ def test_vary_const():
     param = state.hydrogeological_parameters.get("parameter")
 
     assert len(state.datapoints) == 0
-    state = run_vary_params(state)
+    state = variation_stage(state)
     assert len(state.datapoints) == 3
 
     data_0 = state.datapoints[0].data.get("parameter")

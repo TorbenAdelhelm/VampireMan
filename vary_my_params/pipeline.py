@@ -1,7 +1,7 @@
 import logging
 from argparse import Namespace
 
-from .config import State, ensure_state_is_valid, load_state
+from .config import State, validation_stage, loading_stage
 from .utils import (
     create_dataset_and_datapoint_dirs,
     get_answer,
@@ -20,7 +20,7 @@ from .vary_params.vary import (
 
 
 @profile_function
-def prepare_parameters(state: State) -> State:
+def preparation_stage(state: State) -> State:
     state = read_in_files(state)
     state = calculate_frequencies(state)
     state = generate_heatpumps(state)
@@ -30,8 +30,8 @@ def prepare_parameters(state: State) -> State:
 
 
 @profile_function
-def run_vary_params(state: State) -> State:
-    get_answer(state, "Do you want to run the stage parameter variation?", True)
+def variation_stage(state: State) -> State:
+    get_answer(state, "Do you want to run the variation stage?", True)
     state = vary_params(state)
     print("Following datapoints will be used")
     for datapoint in state.datapoints:
@@ -43,27 +43,27 @@ def run_vary_params(state: State) -> State:
 
 
 @profile_function
-def run_render(state: State):
-    get_answer(state, "Do you want to run the stage prepare_simulation?", True)
-    get_workflow_module(state.general.workflow).render(state)
+def render_stage(state: State):
+    get_answer(state, "Do you want to run the render stage?", True)
+    get_workflow_module(state.general.workflow).render_stage(state)
 
 
 @profile_function
-def run_simulation(state: State):
-    get_answer(state, "Do you want to run the stage run_simulation?", True)
-    get_workflow_module(state.general.workflow).run_simulation(state)
+def simulation_stage(state: State):
+    get_answer(state, "Do you want to run the simulation stage?", True)
+    get_workflow_module(state.general.workflow).simulation_stage(state)
 
 
 @profile_function
-def run_visualization(state: State):
-    get_answer(state, "Do you want to run the stage run_visualization?", True)
-    get_workflow_module(state.general.workflow).plot_simulation(state)
+def visualization_stage(state: State):
+    get_answer(state, "Do you want to run the visualization stage?", True)
+    get_workflow_module(state.general.workflow).visualization_stage(state)
 
 
 def run(args: Namespace):
-    state = load_state(args)
-    state = prepare_parameters(state)
-    state = ensure_state_is_valid(state)
+    state = loading_stage(args)
+    state = preparation_stage(state)
+    state = validation_stage(state)
 
     create_dataset_and_datapoint_dirs(state)
     write_data_to_verified_json_file(state, state.general.output_directory / "state.json", state)
@@ -74,8 +74,8 @@ def run(args: Namespace):
     print("This is the state that is going to be used:")
     print(state)
 
-    state = run_vary_params(state)
+    state = variation_stage(state)
 
-    run_render(state)
-    run_simulation(state)
-    run_visualization(state)
+    render_stage(state)
+    simulation_stage(state)
+    visualization_stage(state)

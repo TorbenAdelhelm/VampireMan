@@ -49,7 +49,7 @@ def pflotran_time_to_year(time_step: str) -> float:
 #         plt.savefig(pic_file_name)
 
 
-def plot_simulation(state: State):
+def visualization_stage(state: State):
     if len(state.datapoints) == 0:
         logging.error("There are no datapoints that could be plotted. Did you skip the previous stages?")
 
