@@ -1,7 +1,7 @@
 import pytest
 
 from vary_my_params.config import HeatPump, HeatPumps, Parameter, ParameterValueMinMax, State, TimeBasedValue, Vary
-from vary_my_params.pipeline import prepare_parameters
+from vary_my_params.pipeline import preparation_stage
 
 
 def test_prepare_heatpump():
@@ -15,7 +15,7 @@ def test_prepare_heatpump():
         )
     }
 
-    state = prepare_parameters(state)
+    state = preparation_stage(state)
 
     assert state.heatpump_parameters.get("hp1").value.location == [15.5, 31.5, 0.5]
 
@@ -28,7 +28,7 @@ def test_prepare_heatpump():
         )
     }
 
-    state = prepare_parameters(state)
+    state = preparation_stage(state)
 
     assert state.heatpump_parameters.get("hp1").value.location == [77.5, 157.5, 2.5]
 
@@ -53,7 +53,7 @@ def test_prepare_heatpump_generation():
             ),
         )
     }
-    state = prepare_parameters(state)
+    state = preparation_stage(state)
     assert len(state.heatpump_parameters) == 10
     assert state.heatpump_parameters.get("hps_0").value.location == [102.5, 347.5, 2.5]
     assert state.heatpump_parameters.get("hps_9").value.location == [52.5, 192.5, 2.5]
@@ -81,4 +81,4 @@ def test_prepare_heatpump_name_clash():
     }
 
     with pytest.raises(ValueError):
-        prepare_parameters(state)
+        preparation_stage(state)

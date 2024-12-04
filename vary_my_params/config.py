@@ -1,5 +1,4 @@
 # ruff: noqa: F722
-import argparse
 import datetime
 import enum
 import inspect
@@ -10,8 +9,6 @@ import numpy as np
 from numpydantic import NDArray, Shape
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator, model_validator
 from ruamel.yaml import YAML
-
-from .utils import profile_function
 
 yaml = YAML(typ="safe")
 
@@ -503,51 +500,3 @@ class State(BaseModel):
             f"{"\n".join(parameter_strings)}"
             f"\n"
         )
-
-
-@profile_function
-def validation_stage(state: State) -> State:
-    # TODO make this more extensive
-    # XXX this could also be done by pydantic...
-
-    hydraulic_head = state.hydrogeological_parameters.get("hydraulic_head")
-    permeability = state.hydrogeological_parameters.get("permeability")
-    temperature = state.hydrogeological_parameters.get("temperature")
-
-    if permeability is None:
-        raise ValueError("`permeability` must not be None")
-    if hydraulic_head is None:
-        raise ValueError("`hydraulic_head` must not be None")
-    if temperature is None:
-        raise ValueError("`temperature` must not be None")
-
-    # Simulation without heatpumps doesn't make much sense
-    heatpumps = [{name: d.name} for name, d in state.heatpump_parameters.items() if isinstance(d.value, HeatPump)]
-    heatpumps_gen = [{name: d.name} for name, d in state.heatpump_parameters.items() if isinstance(d.value, HeatPumps)]
-    if len(heatpumps) + len(heatpumps_gen) < 1:
-        logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
-
-    logging.info("State is valid")
-    return state
-
-
-def loading_stage(arguments: argparse.Namespace) -> State:
-    run_state = State()  # pyright: ignore
-    logging.debug("Default state is %s", run_state)
-
-    # Load settings from file if provided
-    settings_file = arguments.settings_file
-    if settings_file is not None:
-        user_settings = State.from_yaml(settings_file)
-        run_state.override_with(user_settings)
-
-    # Also consider arguments from command line
-    if arguments.non_interactive:
-        run_state.general.interactive = False
-
-    if run_state.general.interactive:
-        logging.info("Running non-interactively")
-
-    logging.debug("Resulting state of load_state: %s", run_state)
-
-    return run_state

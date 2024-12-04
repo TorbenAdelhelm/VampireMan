@@ -1,45 +1,18 @@
 import logging
 from argparse import Namespace
 
-from .config import State, validation_stage, loading_stage
+from .config import State
+from .loading_stage import loading_stage
+from .preparation_stage import preparation_stage
 from .utils import (
     create_dataset_and_datapoint_dirs,
     get_answer,
     get_workflow_module,
     profile_function,
-    read_in_files,
     write_data_to_verified_json_file,
 )
-from .vary_params.vary import (
-    calculate_frequencies,
-    calculate_hp_coordinates,
-    generate_heatpumps,
-    handle_time_based_params,
-    vary_params,
-)
-
-
-@profile_function
-def preparation_stage(state: State) -> State:
-    state = read_in_files(state)
-    state = calculate_frequencies(state)
-    state = generate_heatpumps(state)
-    state = calculate_hp_coordinates(state)
-    state = handle_time_based_params(state)
-    return state
-
-
-@profile_function
-def variation_stage(state: State) -> State:
-    get_answer(state, "Do you want to run the variation stage?", True)
-    state = vary_params(state)
-    print("Following datapoints will be used")
-    for datapoint in state.datapoints:
-        print(datapoint)
-        write_data_to_verified_json_file(
-            state, state.general.output_directory / f"datapoint-{datapoint.index}" / "datapoint.json", datapoint
-        )
-    return state
+from .validation_stage import validation_stage
+from .variation_stage import variation_stage
 
 
 @profile_function

@@ -9,9 +9,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from vary_my_params.prepare_simulation.pflotran.pflotran_write_permeability import plot_vary_field
-
-from ..config import HeatPump, State
+from ..config import Data, HeatPump, State
 
 TimeData = OrderedDict[str, dict[str, Any]]
 
@@ -185,3 +183,27 @@ def plot_isolines(state: State, data: TimeData, path: Path):
 def aligned_colorbar(*args, **kwargs):
     cax = make_axes_locatable(plt.gca()).append_axes("right", size=0.3, pad=0.05)
     plt.colorbar(*args, cax=cax, **kwargs)
+
+
+def plot_vary_field(state: State, datapoint_dir: Path, parameter: Data):
+    fig, axes = plt.subplots(2, 2, figsize=(10, 6))
+    fig.suptitle(f"{parameter.name.title()} perlin field")
+    axes = axes.ravel()
+    if not isinstance(parameter.value, np.ndarray):
+        raise ValueError("Cannot visualize something that is not an np.ndarray")
+
+    if parameter.value.ndim != 3:
+        # Reshape the data to match the 3D space of the domain
+        parameter.value = parameter.value.reshape(state.general.number_cells, order="F")
+
+    axes[0].imshow(parameter.value[:, :, 0])
+    axes[2].imshow(parameter.value[:, 0, :])
+    axes[3].imshow(parameter.value[0, :, :])
+    axes[0].set_title("yz")
+    axes[2].set_title("xz")
+    axes[3].set_title("xy")
+    for i in range(0, 4):
+        axes[i].axis("off")
+    fig.tight_layout()
+    fig.savefig(datapoint_dir / f"{parameter.name}_field.png")
+    plt.close(fig)

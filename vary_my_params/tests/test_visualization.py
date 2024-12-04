@@ -1,7 +1,13 @@
 import os
 
 from vary_my_params.config import State
-from vary_my_params.pipeline import preparation_stage, render_stage, simulation_stage, vary_stage, visualization_stage
+from vary_my_params.pipeline import (
+    preparation_stage,
+    render_stage,
+    simulation_stage,
+    variation_stage,
+    visualization_stage,
+)
 from vary_my_params.utils import create_dataset_and_datapoint_dirs
 
 
@@ -14,7 +20,7 @@ def test_vis_files_not_empty(tmp_path):
 
     create_dataset_and_datapoint_dirs(state)
     state = preparation_stage(state)
-    state = vary_stage(state)
+    state = variation_stage(state)
     render_stage(state)
     simulation_stage(state)
     visualization_stage(state)

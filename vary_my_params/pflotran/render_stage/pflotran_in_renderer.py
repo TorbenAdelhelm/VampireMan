@@ -4,12 +4,12 @@ import pathlib
 import jinja2
 
 from ...config import HeatPump, State, ValueXYZ
-from ...vary_params.vary_perlin import create_const_field
+from ...variation_stage.vary_perlin import create_const_field
 from .pflotran_generate_mesh import write_mesh_and_border_files
 from .pflotran_write_permeability import save_vary_field
 
 
-def render(state: State):
+def render_stage(state: State):
     """Render all files needed for pflotran to run. This means, `write_mesh_and_border_files`, rendering the
     pflotran.in file and rendering the permeability field with `save_vary_field`.
     """

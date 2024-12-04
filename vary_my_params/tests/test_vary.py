@@ -10,7 +10,7 @@ from vary_my_params.config import (
     TimeBasedValue,
     Vary,
 )
-from vary_my_params.pipeline import prepare_parameters, variation_stage
+from vary_my_params.pipeline import preparation_stage, variation_stage
 from vary_my_params.utils import create_dataset_and_datapoint_dirs
 
 
@@ -30,7 +30,7 @@ def test_vary_copy():
     hp_param = state.heatpump_parameters.get("hp1")
 
     assert len(state.datapoints) == 0
-    state = prepare_parameters(state)
+    state = preparation_stage(state)
     state = variation_stage(state)
     assert len(state.datapoints) == 1
 
@@ -105,7 +105,7 @@ def test_vary_heatpump():
     hp_param = state.heatpump_parameters.get("hp1")
 
     assert len(state.datapoints) == 0
-    state = prepare_parameters(state)
+    state = preparation_stage(state)
     state = variation_stage(state)
     assert len(state.datapoints) == 2
 
@@ -170,7 +170,7 @@ def test_time_based_conversion():
     }
 
     assert state.heatpump_parameters.get("hp1").value.injection_temp == 10
-    state = prepare_parameters(state)
+    state = preparation_stage(state)
     assert state.heatpump_parameters.get("hp1").value.injection_temp.values.get(0) == 10
 
 
@@ -196,7 +196,7 @@ def test_time_based_provided_values():
         )
     }
 
-    state = prepare_parameters(state)
+    state = preparation_stage(state)
     for i in range(2):
         assert state.heatpump_parameters.get("hp1").value.injection_temp.values.get(i) == i
 
@@ -225,5 +225,5 @@ def test_time_based_state():
         }
     )
 
-    state = prepare_parameters(state)
+    state = preparation_stage(state)
     assert state.heatpump_parameters.get("hp1").value.injection_temp.values.get(1) == 1

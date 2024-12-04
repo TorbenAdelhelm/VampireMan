@@ -57,6 +57,7 @@ include = [ "./vary_my_params" ]
 exclude = [ "./vary_my_params/tests" ]
 
 [tool.pytest.ini_options]
+testpaths = "vary_my_params"
 filterwarnings = [
     "ignore:ndarray.pyi stub file could not be generated",
 ]
