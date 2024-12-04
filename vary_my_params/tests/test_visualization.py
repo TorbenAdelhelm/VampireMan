@@ -1,6 +1,6 @@
 import os
 
-from vary_my_params.config import State
+from vary_my_params.data_structures import State
 from vary_my_params.pipeline import (
     preparation_stage,
     render_stage,

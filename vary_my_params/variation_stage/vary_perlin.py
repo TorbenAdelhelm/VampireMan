@@ -4,7 +4,7 @@ import noise
 import numpy as np
 from numpy.typing import NDArray
 
-from ..config import Distribution, Parameter, ParameterValueMinMax, ParameterValuePerlin, State
+from ..data_structures import Distribution, Parameter, ParameterValueMinMax, ParameterValuePerlin, State
 
 
 def make_perlin_grid(

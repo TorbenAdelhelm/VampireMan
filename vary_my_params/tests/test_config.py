@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from vary_my_params.config import State
+from vary_my_params.data_structures import State
 
 
 def test_state_override():

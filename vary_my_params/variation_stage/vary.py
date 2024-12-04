@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from ..config import (
+from ..data_structures import (
     Data,
     Datapoint,
     Distribution,

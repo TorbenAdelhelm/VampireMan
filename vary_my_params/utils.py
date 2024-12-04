@@ -18,7 +18,7 @@ from h5py import File
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from .config import State
+    from .data_structures import State
 
 
 def get_answer(state: "State", question: str, exit_if_no: bool = False) -> bool:

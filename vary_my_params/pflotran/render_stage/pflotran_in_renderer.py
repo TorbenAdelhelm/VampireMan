@@ -3,7 +3,7 @@ import pathlib
 
 import jinja2
 
-from ...config import HeatPump, State, ValueXYZ
+from ...data_structures import HeatPump, State, ValueXYZ
 from ...variation_stage.vary_perlin import create_const_field
 from .pflotran_generate_mesh import write_mesh_and_border_files
 from .pflotran_write_permeability import save_vary_field

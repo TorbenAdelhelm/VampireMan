@@ -1,7 +1,7 @@
 import logging
 from argparse import Namespace
 
-from .config import State
+from .data_structures import State
 from .loading_stage import loading_stage
 from .preparation_stage import preparation_stage
 from .utils import (

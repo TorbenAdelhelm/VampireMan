@@ -1,6 +1,14 @@
 import pytest
 
-from vary_my_params.config import HeatPump, HeatPumps, Parameter, ParameterValueMinMax, State, TimeBasedValue, Vary
+from vary_my_params.data_structures import (
+    HeatPump,
+    HeatPumps,
+    Parameter,
+    ParameterValueMinMax,
+    State,
+    TimeBasedValue,
+    Vary,
+)
 from vary_my_params.pipeline import preparation_stage
 
 

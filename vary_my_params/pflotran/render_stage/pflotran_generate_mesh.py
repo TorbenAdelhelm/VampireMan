@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from ...config import State
+from ...data_structures import State
 
 
 def write_mesh_and_border_files(state: State, output_dir: Path) -> None:

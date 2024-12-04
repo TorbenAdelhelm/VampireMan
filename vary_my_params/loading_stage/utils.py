@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from ..config import State
+from ..data_structures import State
 
 
 def loading_stage(arguments: argparse.Namespace) -> State:

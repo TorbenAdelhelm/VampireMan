@@ -1,6 +1,6 @@
 import os
 
-from vary_my_params.config import State
+from vary_my_params.data_structures import State
 from vary_my_params.pipeline import preparation_stage, render_stage, variation_stage
 from vary_my_params.utils import create_dataset_and_datapoint_dirs
 

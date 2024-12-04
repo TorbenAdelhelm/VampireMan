@@ -1,4 +1,4 @@
-from ..config import State
+from ..data_structures import State
 from ..utils import profile_function, read_in_files
 from ..variation_stage.vary import (
     calculate_frequencies,

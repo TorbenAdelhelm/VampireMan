@@ -1,6 +1,6 @@
 import logging
 
-from ..config import HeatPump, HeatPumps, State
+from ..data_structures import HeatPump, HeatPumps, State
 from ..utils import profile_function
 
 

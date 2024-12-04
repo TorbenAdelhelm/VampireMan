@@ -1,6 +1,6 @@
 import numpy as np
 
-from vary_my_params.config import (
+from vary_my_params.data_structures import (
     Distribution,
     HeatPump,
     Parameter,
