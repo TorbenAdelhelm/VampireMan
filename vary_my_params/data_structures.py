@@ -1,3 +1,5 @@
+"""This file holds all data structures that are used throughout the software."""
+
 # ruff: noqa: F722
 import datetime
 import enum
