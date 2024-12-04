@@ -1,5 +1,5 @@
 # Vary My Params
-
+<!-- TODO add references to YAML, HDF5, JSON -->
 This tool allows a user to describe how parameters for a data set should be varied.
 After describing which parameters should be varied in which manner, i.e. permeability should be a constant field, with values varying between 1 and 10, the program proceeds actually varying these parameters and also renders all files necessary to run the simulations afterwards.
 Then, the tool starts a simulation based on the rendered input files and finally visualizes the results.
