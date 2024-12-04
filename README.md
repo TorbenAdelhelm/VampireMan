@@ -6,7 +6,7 @@ Then, the tool starts a simulation based on the rendered input files and finally
 
 Currently, only the preparation for the simulation software `pflotran` workflow is implemented.
 
-The minimum required python version is 3.11.
+The minimum required Python version is 3.11.
 
 ## Quickstart
 
@@ -22,7 +22,7 @@ Depending on your environment, choose one of the following.
 
 ### Ubuntu
 
-1. Install at least python 3.11 (e.g., `apt install python3`)
+1. Install at least Python 3.11 (e.g., `apt install python3`)
 1. Install poetry (e.g., `pip install poetry`)
 1. Clone this repository and `cd` into it
 1. Install the dependencies from the project root (i.e., `poetry install`)
