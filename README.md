@@ -34,6 +34,7 @@ Depending on your environment, choose one of the following.
 1. Clone the repository
 1. Run `bash setup.sh` in the project root
 1. Log out and in again to apply the changes to the `PATH` environment variable
+1. Enter `nix develop` to load the Nix environment
 
 ### Nix
 
