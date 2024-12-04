@@ -43,7 +43,7 @@ class Vary(enum.StrEnum):
     CONST = "const_within_datapoint"
     """The `Parameter` will be varied constantly within the `Datapoint`, so the `Parameter.value` won't change
     within this `Datapoint`. The value will, however, be varied across the whole datasets, i.e.,
-    `Config.datapoints`.
+    `State.datapoints`.
     """
 
     SPACE = "spatially_vary_within_datapoint"
@@ -66,7 +66,7 @@ class TimeToSimulate(BaseModel):
     """Value component."""
 
     unit: str = "year"
-    """The default unit is `year`, so when the value is omitted in the config file, years is assumed. Using SI units
+    """The default unit is `year`, so when the value is omitted in the settings file, years is assumed. Using SI units
     here doesn't make much sense as we are unlikely to simulate anything other than years."""
 
     model_config = ConfigDict(extra="forbid")
@@ -129,7 +129,7 @@ class HeatPumps(BaseModel):
     """Datastructure representing a set of heat pumps. During the `vary_my_params.pipeline.prepare_parameters` stage,
     the individual `HeatPump`s will be generated from this.
 
-    Using `Config.get_rng`, values between min and max are chosen for each of the generated `HeatPump`s.
+    Using `State.get_rng`, values between min and max are chosen for each of the generated `HeatPump`s.
     """
 
     number: PositiveInt
@@ -289,13 +289,13 @@ class GeneralConfig(BaseModel):
     # This forces every run to be reproducible by default
     random_seed: None | int = 0
     """This random seed will be passed to the numpy random number generator. By default the value is 0, meaning that a
-    given set of input parameters (read from a config file) always produces the same outputs. If the used simulation
+    given set of input parameters (read from a settings file) always produces the same outputs. If the used simulation
     tool is deterministic, then the same inputs yield the same simulation results.
 
     Setting this to another fixed value will yield (still deterministic) different results.
 
-    Setting this value to `None`, or rather `null` in a yaml config file, will always use a random value for the random
-    seed, making it nondeterministic.
+    Setting this value to `None`, or rather `null` in a yaml settings file, will always use a random value for the
+    random seed, making it nondeterministic.
     """
 
     number_datapoints: PositiveInt = 1
@@ -326,7 +326,7 @@ class GeneralConfig(BaseModel):
 
     # XXX: distance to border in percent?
 
-    # This makes pydantic fail if there is extra data in the yaml config file that cannot be parsed
+    # This makes pydantic fail if there is extra data in the yaml settings file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
 
     _validated_3d = field_validator("number_cells", "cell_resolution")(value_is_3d)
@@ -355,7 +355,7 @@ class GeneralConfig(BaseModel):
         )
 
 
-class Config(BaseModel):
+class State(BaseModel):
     # Need to use field here, as otherwise it would be the same dict across several objects
     general: GeneralConfig = Field(default_factory=lambda: GeneralConfig())
     """The `GeneralConfig`."""
@@ -402,7 +402,7 @@ class Config(BaseModel):
     _rng: np.random.Generator = np.random.default_rng(seed=0)
     """The execution wide random number generator."""
 
-    # This makes pydantic fail if there is extra data in the yaml config file that cannot be parsed
+    # This makes pydantic fail if there is extra data in the yaml settings file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
 
     @model_validator(mode="before")
@@ -464,11 +464,11 @@ class Config(BaseModel):
             raise ValueError("Not allowed to specify `pure` parameter.")
         return data
 
-    def override_with(self, other_config: "Config"):
-        self.general = other_config.general
-        self.hydrogeological_parameters |= other_config.hydrogeological_parameters
-        self.heatpump_parameters |= other_config.heatpump_parameters
-        self.datapoints = other_config.datapoints
+    def override_with(self, other_state: "State"):
+        self.general = other_state.general
+        self.hydrogeological_parameters |= other_state.hydrogeological_parameters
+        self.heatpump_parameters |= other_state.heatpump_parameters
+        self.datapoints = other_state.datapoints
 
     def get_rng(self) -> np.random.Generator:
         """Returns the execution-wide same instance of the random number generator instantiated with
@@ -477,18 +477,18 @@ class Config(BaseModel):
         return self._rng
 
     @staticmethod
-    def from_yaml(config_file_path: str) -> "Config":
-        logging.debug("Trying to load config from %s", config_file_path)
+    def from_yaml(settings_file_path: str) -> "State":
+        logging.debug("Trying to load config from %s", settings_file_path)
         try:
-            with open(config_file_path, encoding="utf-8") as config_file:
-                yaml_values = yaml.load(config_file)
+            with open(settings_file_path, encoding="utf-8") as state_file:
+                yaml_values = yaml.load(state_file)
         except OSError as err:
-            logging.error("Could not open config file '%s', %s", config_file_path, err)
+            logging.error("Could not open settings file '%s', %s", settings_file_path, err)
             raise err
-        logging.debug("Loaded config from %s", config_file_path)
+        logging.debug("Loaded state from %s", settings_file_path)
         logging.debug("Yaml: %s", yaml_values)
 
-        return Config(**yaml_values)
+        return State(**yaml_values)
 
     def __str__(self) -> str:
         parameter_strings = []
@@ -496,7 +496,7 @@ class Config(BaseModel):
             parameter_strings.append(str(parameter))
 
         return (
-            f"=== This config will be used ===\n"
+            f"=== This state will be used ===\n"
             f"\n"
             f"{self.general}\n"
             f"=== Parameters\n\n"
@@ -506,12 +506,12 @@ class Config(BaseModel):
 
 
 @profile_function
-def ensure_config_is_valid(config: Config) -> Config:
+def ensure_state_is_valid(state: State) -> State:
     # TODO make this more extensive
 
-    hydraulic_head = config.hydrogeological_parameters.get("hydraulic_head")
-    permeability = config.hydrogeological_parameters.get("permeability")
-    temperature = config.hydrogeological_parameters.get("temperature")
+    hydraulic_head = state.hydrogeological_parameters.get("hydraulic_head")
+    permeability = state.hydrogeological_parameters.get("permeability")
+    temperature = state.hydrogeological_parameters.get("temperature")
 
     if permeability is None:
         raise ValueError("`permeability` must not be None")
@@ -521,32 +521,32 @@ def ensure_config_is_valid(config: Config) -> Config:
         raise ValueError("`temperature` must not be None")
 
     # Simulation without heatpumps doesn't make much sense
-    heatpumps = [{name: d.name} for name, d in config.heatpump_parameters.items() if isinstance(d.value, HeatPump)]
-    heatpumps_gen = [{name: d.name} for name, d in config.heatpump_parameters.items() if isinstance(d.value, HeatPumps)]
+    heatpumps = [{name: d.name} for name, d in state.heatpump_parameters.items() if isinstance(d.value, HeatPump)]
+    heatpumps_gen = [{name: d.name} for name, d in state.heatpump_parameters.items() if isinstance(d.value, HeatPumps)]
     if len(heatpumps) + len(heatpumps_gen) < 1:
         logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
 
-    logging.info("Config is valid")
-    return config
+    logging.info("State is valid")
+    return state
 
 
-def load_config(arguments: argparse.Namespace) -> Config:
-    run_config = Config()  # pyright: ignore
-    logging.debug("Default config is %s", run_config)
+def load_state(arguments: argparse.Namespace) -> State:
+    run_state = State()  # pyright: ignore
+    logging.debug("Default state is %s", run_state)
 
-    # Load config from file if provided
-    config_file = arguments.config_file
-    if config_file is not None:
-        user_config = Config.from_yaml(config_file)
-        run_config.override_with(user_config)
+    # Load settings from file if provided
+    settings_file = arguments.settings_file
+    if settings_file is not None:
+        user_settings = State.from_yaml(settings_file)
+        run_state.override_with(user_settings)
 
     # Also consider arguments from command line
     if arguments.non_interactive:
-        run_config.general.interactive = False
+        run_state.general.interactive = False
 
-    if run_config.general.interactive:
+    if run_state.general.interactive:
         logging.info("Running non-interactively")
 
-    logging.debug("Resulting config of load_config: %s", run_config)
+    logging.debug("Resulting state of load_state: %s", run_state)
 
-    return run_config
+    return run_state

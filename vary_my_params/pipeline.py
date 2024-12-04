@@ -1,7 +1,7 @@
 import logging
 from argparse import Namespace
 
-from .config import Config, ensure_config_is_valid, load_config
+from .config import State, ensure_state_is_valid, load_state
 from .utils import (
     create_dataset_and_datapoint_dirs,
     get_answer,
@@ -20,62 +20,62 @@ from .vary_params.vary import (
 
 
 @profile_function
-def prepare_parameters(config: Config) -> Config:
-    config = read_in_files(config)
-    config = calculate_frequencies(config)
-    config = generate_heatpumps(config)
-    config = calculate_hp_coordinates(config)
-    config = handle_time_based_params(config)
-    return config
+def prepare_parameters(state: State) -> State:
+    state = read_in_files(state)
+    state = calculate_frequencies(state)
+    state = generate_heatpumps(state)
+    state = calculate_hp_coordinates(state)
+    state = handle_time_based_params(state)
+    return state
 
 
 @profile_function
-def run_vary_params(config: Config) -> Config:
-    get_answer(config, "Do you want to run the stage parameter variation?", True)
-    config = vary_params(config)
+def run_vary_params(state: State) -> State:
+    get_answer(state, "Do you want to run the stage parameter variation?", True)
+    state = vary_params(state)
     print("Following datapoints will be used")
-    for datapoint in config.datapoints:
+    for datapoint in state.datapoints:
         print(datapoint)
         write_data_to_verified_json_file(
-            config, config.general.output_directory / f"datapoint-{datapoint.index}" / "datapoint.json", datapoint
+            state, state.general.output_directory / f"datapoint-{datapoint.index}" / "datapoint.json", datapoint
         )
-    return config
+    return state
 
 
 @profile_function
-def run_render(config: Config):
-    get_answer(config, "Do you want to run the stage prepare_simulation?", True)
-    get_workflow_module(config.general.workflow).render(config)
+def run_render(state: State):
+    get_answer(state, "Do you want to run the stage prepare_simulation?", True)
+    get_workflow_module(state.general.workflow).render(state)
 
 
 @profile_function
-def run_simulation(config: Config):
-    get_answer(config, "Do you want to run the stage run_simulation?", True)
-    get_workflow_module(config.general.workflow).run_simulation(config)
+def run_simulation(state: State):
+    get_answer(state, "Do you want to run the stage run_simulation?", True)
+    get_workflow_module(state.general.workflow).run_simulation(state)
 
 
 @profile_function
-def run_visualization(config: Config):
-    get_answer(config, "Do you want to run the stage run_visualization?", True)
-    get_workflow_module(config.general.workflow).plot_simulation(config)
+def run_visualization(state: State):
+    get_answer(state, "Do you want to run the stage run_visualization?", True)
+    get_workflow_module(state.general.workflow).plot_simulation(state)
 
 
 def run(args: Namespace):
-    config = load_config(args)
-    config = prepare_parameters(config)
-    config = ensure_config_is_valid(config)
+    state = load_state(args)
+    state = prepare_parameters(state)
+    state = ensure_state_is_valid(state)
 
-    create_dataset_and_datapoint_dirs(config)
-    write_data_to_verified_json_file(config, config.general.output_directory / "config.json", config)
+    create_dataset_and_datapoint_dirs(state)
+    write_data_to_verified_json_file(state, state.general.output_directory / "state.json", state)
 
     # Where do we check this?
     logging.debug("Will run all stages")
 
-    print("This is the config that is going to be used:")
-    print(config)
+    print("This is the state that is going to be used:")
+    print(state)
 
-    config = run_vary_params(config)
+    state = run_vary_params(state)
 
-    run_render(config)
-    run_simulation(config)
-    run_visualization(config)
+    run_render(state)
+    run_simulation(state)
+    run_visualization(state)

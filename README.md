@@ -11,7 +11,7 @@ The minimum required python version is 3.11.
 ## Quickstart
 
 After installing the dependencies, you can run the most basic default case by executing `python -m vary_my_params`.
-This command interactively guides you through the preparation stages of the pipeline and renders all files needed to execute a pflotran simulation to the directory specified by `output_directory` in the configs `general` section (which is by default the date in UTC ISO 8601 format `./datasets_out/2024-08-17T10:06:15+00:00`).
+This command interactively guides you through the preparation stages of the pipeline and renders all files needed to execute a pflotran simulation to the directory specified by `output_directory` in the states `general` section (which is by default the date in UTC ISO 8601 format `./datasets_out/2024-08-17T10:06:15+00:00`).
 
 When the program has exited successfully, `cd datasets_out/<name of the output directory>` into the directory and look at the results.
 

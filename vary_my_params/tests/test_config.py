@@ -3,17 +3,17 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from vary_my_params.config import Config
+from vary_my_params.config import State
 
 
-def test_config_override():
-    # Check if the basics of the config work
-    config = Config()
-    assert config.general.interactive is True
+def test_state_override():
+    # Check if the basics of the State work
+    state = State()
+    assert state.general.interactive is True
 
     # Check if overrides work
-    config.override_with(
-        Config(
+    state.override_with(
+        State(
             **{
                 "general": {
                     "interactive": False,
@@ -22,27 +22,27 @@ def test_config_override():
             }
         )
     )
-    assert config.general.interactive is False
+    assert state.general.interactive is False
 
 
-def test_config_dont_allow_extras():
+def test_state_dont_allow_extras():
     # Check if additional keys get detected
     with pytest.raises(ValidationError):
-        Config(**{"additional": "key"})
+        State(**{"additional": "key"})
 
 
-def test_config_catch_wrong_values():
+def test_state_catch_wrong_values():
     # Check if wrong values get caught
     with pytest.raises(ValidationError):
-        Config(**{"pure": 5})
+        State(**{"pure": 5})
 
     with pytest.raises(ValidationError):
-        Config(**{"general": {"number_cells": ["test", {}]}})
+        State(**{"general": {"number_cells": ["test", {}]}})
 
 
-def test_config_invalid_config():
+def test_state_invalid_state():
     with pytest.raises(ValidationError):
-        Config(
+        State(
             **{
                 "general": {
                     "workflow": "new-thing",
@@ -51,44 +51,44 @@ def test_config_invalid_config():
         )
 
 
-def test_config_read_correct_yaml():
+def test_state_read_correct_yaml():
     # Check if reading yaml files works correctly
-    Config.from_yaml("vary_my_params/tests/test_config_valid.yaml")
+    State.from_yaml("vary_my_params/tests/test_settings_valid.yaml")
 
 
-def test_config_default_cases():
+def test_state_default_cases():
     pathlist = Path("./settings/").glob("*.yaml")
     # raise ValueError(os.getcwd())
     for setting in pathlist:
         try:
-            Config.from_yaml(setting)
+            State.from_yaml(setting)
         except ValidationError as err:
             raise ValueError(f"{err}\n\n{setting} not correct") from err
 
 
-def test_config_read_incorrect_yaml():
+def test_state_read_incorrect_yaml():
     with pytest.raises(ValueError):
-        Config.from_yaml("vary_my_params/tests/test_config_invalid.yaml")
+        State.from_yaml("vary_my_params/tests/test_settings_invalid.yaml")
 
 
-def test_config_read_nonexistent_yaml():
+def test_state_read_nonexistent_yaml():
     with pytest.raises(OSError):
-        Config.from_yaml("/nonexistent/test.yaml")
+        State.from_yaml("/nonexistent/test.yaml")
 
 
-def test_config_rng():
-    config = Config()
+def test_state_rng():
+    state = State()
 
     # These value should always be the same, due to the fixed seed
-    assert config.get_rng().random() == 0.6369616873214543
-    assert config.get_rng().random(3).tolist() == [0.2697867137638703, 0.04097352393619469, 0.016527635528529094]
+    assert state.get_rng().random() == 0.6369616873214543
+    assert state.get_rng().random(3).tolist() == [0.2697867137638703, 0.04097352393619469, 0.016527635528529094]
 
 
 def test_3d_param():
-    config = Config(**{"general": {"number_cells": [3, 2]}})
-    assert config.general.number_cells == [3, 2, 1]
+    state = State(**{"general": {"number_cells": [3, 2]}})
+    assert state.general.number_cells == [3, 2, 1]
 
     with pytest.raises(ValidationError):
-        config = Config(**{"general": {"number_cells": [3]}})
+        state = State(**{"general": {"number_cells": [3]}})
     with pytest.raises(ValidationError):
-        config = Config(**{"general": {"number_cells": [1, 2, 3, 4]}})
+        state = State(**{"general": {"number_cells": [1, 2, 3, 4]}})

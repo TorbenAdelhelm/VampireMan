@@ -18,15 +18,15 @@ from h5py import File
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from .config import Config
+    from .config import State
 
 
-def get_answer(config: "Config", question: str, exit_if_no: bool = False) -> bool:
+def get_answer(state: "State", question: str, exit_if_no: bool = False) -> bool:
     """Ask a yes/no question on the command line and return True if the answer is yes and False if the answer is
     no. When CTRL+C is detected, the function will terminate the whole program returning an exit code of 0.
     """
 
-    if not config.general.interactive:
+    if not state.general.interactive:
         return True
     try:
         match input(f"{question} Y/n "):
@@ -57,9 +57,9 @@ def get_workflow_module(workflow: str) -> ModuleType:
 def profile_function(function):
     @functools.wraps(function)
     def wrapper(*args):
-        config: Config = args[0]
+        state: State = args[0]
 
-        if config.general.profiling:
+        if state.general.profiling:
             profile = cProfile.Profile()
 
             start_time = time.perf_counter()
@@ -88,9 +88,9 @@ def profile_function(function):
     return wrapper
 
 
-def create_dataset_and_datapoint_dirs(config: "Config"):
-    for index in range(config.general.number_datapoints):
-        datapoint_dir = config.general.output_directory / f"datapoint-{index}"
+def create_dataset_and_datapoint_dirs(state: "State"):
+    for index in range(state.general.number_datapoints):
+        datapoint_dir = state.general.output_directory / f"datapoint-{index}"
         try:
             os.makedirs(datapoint_dir, exist_ok=True)
         except OSError as error:
@@ -98,7 +98,7 @@ def create_dataset_and_datapoint_dirs(config: "Config"):
             raise error
 
 
-def write_data_to_verified_json_file(config: "Config", target_path: Path, data: BaseModel):
+def write_data_to_verified_json_file(state: "State", target_path: Path, data: BaseModel):
     """Write a `pydantic.main.BaseModel` to a file and ask the user how to proceed, if there is already a file present
     with different contents than the data that is represented in `data`. The data will be written in json format."""
 
@@ -114,8 +114,8 @@ def write_data_to_verified_json_file(config: "Config", target_path: Path, data: 
         # If there is, compare the contents to let the user abort
         if hash_in_memory != hash_target_file:
             logging.warning("Target file '%s' has different contents than data structure!", target_path)
-            if not get_answer(config, f"Different target file already in {target_path}, overwrite?"):
-                config.pure = False
+            if not get_answer(state, f"Different target file already in {target_path}, overwrite?"):
+                state.pure = False
                 return
         else:
             logging.debug("File '%s' doesn't need to be written", target_path)
@@ -125,8 +125,8 @@ def write_data_to_verified_json_file(config: "Config", target_path: Path, data: 
         target_file.write(data.model_dump_json(indent=2))
 
 
-def read_in_files(config: "Config"):
-    for parameter_name, parameter in (config.hydrogeological_parameters | config.heatpump_parameters).items():
+def read_in_files(state: "State"):
+    for parameter_name, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
         if not isinstance(parameter.value, Path):
             continue
 
@@ -153,4 +153,4 @@ def read_in_files(config: "Config"):
         except (FileNotFoundError, PermissionError) as error:
             raise OSError(f"Could not open value file '{parameter_name}' for parameter '{parameter.value}'") from error
 
-    return config
+    return state

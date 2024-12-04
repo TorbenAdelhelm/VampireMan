@@ -1,13 +1,13 @@
 import pytest
 
-from vary_my_params.config import Config, HeatPump, HeatPumps, Parameter, ParameterValueMinMax, TimeBasedValue, Vary
+from vary_my_params.config import HeatPump, HeatPumps, Parameter, ParameterValueMinMax, State, TimeBasedValue, Vary
 from vary_my_params.pipeline import prepare_parameters
 
 
 def test_prepare_heatpump():
-    config = Config()
-    config.general.cell_resolution = [1, 1, 1]
-    config.heatpump_parameters = {
+    state = State()
+    state.general.cell_resolution = [1, 1, 1]
+    state.heatpump_parameters = {
         "hp1": Parameter(
             name="hp1",
             vary=Vary.FIXED,
@@ -15,12 +15,12 @@ def test_prepare_heatpump():
         )
     }
 
-    config = prepare_parameters(config)
+    state = prepare_parameters(state)
 
-    assert config.heatpump_parameters.get("hp1").value.location == [15.5, 31.5, 0.5]
+    assert state.heatpump_parameters.get("hp1").value.location == [15.5, 31.5, 0.5]
 
-    config = Config()
-    config.heatpump_parameters = {
+    state = State()
+    state.heatpump_parameters = {
         "hp1": Parameter(
             name="hp1",
             vary=Vary.FIXED,
@@ -28,14 +28,14 @@ def test_prepare_heatpump():
         )
     }
 
-    config = prepare_parameters(config)
+    state = prepare_parameters(state)
 
-    assert config.heatpump_parameters.get("hp1").value.location == [77.5, 157.5, 2.5]
+    assert state.heatpump_parameters.get("hp1").value.location == [77.5, 157.5, 2.5]
 
 
 def test_prepare_heatpump_generation():
-    config = Config()
-    config.heatpump_parameters = {
+    state = State()
+    state.heatpump_parameters = {
         "hps": Parameter(
             name="hps",
             vary=Vary.FIXED,
@@ -53,17 +53,17 @@ def test_prepare_heatpump_generation():
             ),
         )
     }
-    config = prepare_parameters(config)
-    assert len(config.heatpump_parameters) == 10
-    assert config.heatpump_parameters.get("hps_0").value.location == [102.5, 347.5, 2.5]
-    assert config.heatpump_parameters.get("hps_9").value.location == [52.5, 192.5, 2.5]
-    assert config.heatpump_parameters.get("hps_9").value.injection_temp.values[0] == 14.814702918850823
-    assert config.heatpump_parameters.get("hps_9").value.injection_rate.values[1] == 0
+    state = prepare_parameters(state)
+    assert len(state.heatpump_parameters) == 10
+    assert state.heatpump_parameters.get("hps_0").value.location == [102.5, 347.5, 2.5]
+    assert state.heatpump_parameters.get("hps_9").value.location == [52.5, 192.5, 2.5]
+    assert state.heatpump_parameters.get("hps_9").value.injection_temp.values[0] == 14.814702918850823
+    assert state.heatpump_parameters.get("hps_9").value.injection_rate.values[1] == 0
 
 
 def test_prepare_heatpump_name_clash():
-    config = Config()
-    config.heatpump_parameters = {
+    state = State()
+    state.heatpump_parameters = {
         "hp_0": Parameter(
             name="hp_0",
             vary=Vary.FIXED,
@@ -81,4 +81,4 @@ def test_prepare_heatpump_name_clash():
     }
 
     with pytest.raises(ValueError):
-        prepare_parameters(config)
+        prepare_parameters(state)

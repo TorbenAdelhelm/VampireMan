@@ -4,17 +4,17 @@ import noise
 import numpy as np
 from numpy.typing import NDArray
 
-from ..config import Config, Distribution, Parameter, ParameterValueMinMax, ParameterValuePerlin
+from ..config import Distribution, Parameter, ParameterValueMinMax, ParameterValuePerlin, State
 
 
 def make_perlin_grid(
     aimed_min: float,
     aimed_max: float,
-    config: Config,
+    state: State,
     offset: NDArray[np.float64],
     freq: list[float],
 ) -> NDArray[np.floating[Any]]:
-    grid_dimensions: list[int] = config.general.number_cells
+    grid_dimensions: list[int] = state.general.number_cells
 
     # adapted by Manuel Hirche
 
@@ -55,8 +55,8 @@ def make_perlin_grid(
     return values
 
 
-def create_perlin_field(config: Config, parameter: Parameter):
-    base_offset = config.get_rng().random(3) * 4242
+def create_perlin_field(state: State, parameter: Parameter):
+    base_offset = state.get_rng().random(3) * 4242
 
     if not isinstance(parameter.value, ParameterValuePerlin):
         raise ValueError()
@@ -75,7 +75,7 @@ def create_perlin_field(config: Config, parameter: Parameter):
     cells = make_perlin_grid(
         vary_min,
         vary_max,
-        config,
+        state,
         base_offset,
         freq_factor,
     )
@@ -84,25 +84,25 @@ def create_perlin_field(config: Config, parameter: Parameter):
         cells = 10**cells
 
     if parameter.name == "hydraulic_head":
-        cells = calc_pressure_from_gradient_field(cells, config, parameter)
+        cells = calc_pressure_from_gradient_field(cells, state, parameter)
 
     return cells
 
 
-def create_const_field(config: Config, value: float):
+def create_const_field(state: State, value: float):
     # TODO think about pressure
-    return np.full(config.general.number_cells, value)
+    return np.full(state.general.number_cells, value)
 
 
 def calc_pressure_from_gradient_field(
-    gradient_field: NDArray[np.float64], config: Config, parameter: Parameter
+    gradient_field: NDArray[np.float64], state: State, parameter: Parameter
 ) -> NDArray[np.float64]:
     # XXX: is this function correctly implemented?
 
     value = parameter.value
     assert isinstance(value, ParameterValueMinMax)
 
-    # scale pressure field to min and max values from config
+    # scale pressure field to min and max values from state
     current_min = np.min(gradient_field)
     current_max = np.max(gradient_field)
 
@@ -112,7 +112,7 @@ def calc_pressure_from_gradient_field(
     gradient_field = (gradient_field - current_min) / (current_max - current_min) * (new_max - new_min) + new_min
 
     reference = 101325  # Standard atmosphere pressure in Pa
-    resolution = config.general.cell_resolution
+    resolution = state.general.cell_resolution
 
     pressure_field = np.zeros_like(gradient_field)
     pressure_field[:, 0] = reference

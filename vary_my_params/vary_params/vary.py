@@ -4,7 +4,6 @@ from copy import deepcopy
 import numpy as np
 
 from ..config import (
-    Config,
     Data,
     Datapoint,
     Distribution,
@@ -13,6 +12,7 @@ from ..config import (
     Parameter,
     ParameterValueMinMax,
     ParameterValuePerlin,
+    State,
     TimeBasedValue,
     Vary,
 )
@@ -24,15 +24,15 @@ def copy_parameter(parameter: Parameter) -> Data:
     return Data(name=parameter.name, value=deepcopy(parameter.value))
 
 
-def vary_heatpump(config: Config, parameter: Parameter) -> Data:
-    resolution = np.array(config.general.cell_resolution)
-    number_cells = np.array(config.general.number_cells)
+def vary_heatpump(state: State, parameter: Parameter) -> Data:
+    resolution = np.array(state.general.cell_resolution)
+    number_cells = np.array(state.general.number_cells)
 
     hp = deepcopy(parameter.value)
     assert isinstance(hp, HeatPump)
 
     # This is needed as we need to calculate the heatpump coordinates for pflotran.in
-    result_location = (number_cells - 1) * config.get_rng().random(3) * resolution + (resolution * 0.5)
+    result_location = (number_cells - 1) * state.get_rng().random(3) * resolution + (resolution * 0.5)
 
     return Data(
         name=parameter.name,
@@ -42,7 +42,7 @@ def vary_heatpump(config: Config, parameter: Parameter) -> Data:
     )
 
 
-def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
+def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
     """This function does the variation of `Parameter`s. It does so by implementing a large match-case that in turn
     invokes other functions that then work on the `Parameter.value` based on the `Parameter.vary` type.
     """
@@ -54,7 +54,7 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
             if isinstance(parameter.value, ParameterValuePerlin):
                 data = Data(
                     name=parameter.name,
-                    value=create_perlin_field(config, parameter),
+                    value=create_perlin_field(state, parameter),
                 )
             elif isinstance(parameter.value, float):
                 raise ValueError(
@@ -63,7 +63,7 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
                 )
             # This should be inside the CONST block, yet it seems to make more sense to users to find it here
             elif isinstance(parameter.value, HeatPump):
-                data = vary_heatpump(config, parameter)
+                data = vary_heatpump(state, parameter)
             elif isinstance(parameter.value, ParameterValueMinMax):
                 raise ValueError(
                     f"Parameter {parameter.name} is vary.space and has min/max values, "
@@ -84,7 +84,7 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
                     min = np.log10(min)
 
                 distance = max - min
-                step_width = distance / (config.general.number_datapoints - 1)
+                step_width = distance / (state.general.number_datapoints - 1)
                 value = min + step_width * index
 
                 if parameter.distribution == Distribution.LOG:
@@ -107,12 +107,12 @@ def vary_parameter(config: Config, parameter: Parameter, index: int) -> Data:
     return data
 
 
-def calculate_hp_coordinates(config: Config) -> Config:
+def calculate_hp_coordinates(state: State) -> State:
     """Calculate the coordinates of each heatpump by multiplying with the cell_resolution"""
 
-    for _, hp_data in config.heatpump_parameters.items():
+    for _, hp_data in state.heatpump_parameters.items():
         assert not isinstance(hp_data.value, HeatPumps)
-        resolution = np.array(config.general.cell_resolution)
+        resolution = np.array(state.general.cell_resolution)
 
         hp = hp_data.value
         assert isinstance(hp, HeatPump)
@@ -122,12 +122,12 @@ def calculate_hp_coordinates(config: Config) -> Config:
 
         hp.location = result_location.tolist()
 
-    return config
+    return state
 
 
-def generate_heatpumps(config: Config) -> Config:
+def generate_heatpumps(state: State) -> State:
     """Generate `HeatPump`s from the given `HeatPumps` parameter. This function will remove all `HeatPumps` from
-    `Config.heatpump_parameters` and add `HeatPumps.number` `HeatPump`s to the dict. The `HeatPump.injection_temp` and
+    `State.heatpump_parameters` and add `HeatPumps.number` `HeatPump`s to the dict. The `HeatPump.injection_temp` and
     `HeatPump.injection_rate` values are simply taken from a random number between the respective min and max values.
     """
 
@@ -146,9 +146,9 @@ def generate_heatpumps(config: Config) -> Config:
 
         return result
 
-    rand = config.get_rng()
+    rand = state.get_rng()
     new_heatpumps: dict[str, Parameter] = {}
-    for _, hps in config.heatpump_parameters.items():
+    for _, hps in state.heatpump_parameters.items():
         if isinstance(hps.value, HeatPump):
             new_heatpumps[hps.name] = hps
             continue
@@ -158,13 +158,13 @@ def generate_heatpumps(config: Config) -> Config:
 
         for index in range(hps.value.number):  # type:ignore
             name = f"{hps.name}_{index}"
-            if (config.heatpump_parameters.get(name) is not None) and (new_heatpumps.get(name) is not None):
+            if (state.heatpump_parameters.get(name) is not None) and (new_heatpumps.get(name) is not None):
                 msg = f"There is a naming clash for generated heatpump {name}"
                 logging.error(msg)
                 raise ValueError(msg)
 
             # XXX: This is actually always random
-            location = np.ceil(rand.random(3) * config.general.number_cells).tolist()
+            location = np.ceil(rand.random(3) * state.general.number_cells).tolist()
 
             injection_temp = handle_heatpump_values(hps.value.injection_temp)
             injection_rate = handle_heatpump_values(hps.value.injection_rate)
@@ -185,38 +185,38 @@ def generate_heatpumps(config: Config) -> Config:
         if isinstance(value, HeatPumps):
             raise ValueError(f"There should be no HeatPumps in the new_heatpumps dict, but {name} is.")
 
-    logging.debug("Old heatpump_parameters: %s", config.heatpump_parameters)
-    config.heatpump_parameters = new_heatpumps
-    logging.debug("New heatpump_parameters: %s", config.heatpump_parameters)
-    return config
+    logging.debug("Old heatpump_parameters: %s", state.heatpump_parameters)
+    state.heatpump_parameters = new_heatpumps
+    logging.debug("New heatpump_parameters: %s", state.heatpump_parameters)
+    return state
 
 
-def vary_params(config: Config) -> Config:
+def vary_params(state: State) -> State:
     """Calls the `vary_parameter` function for each datapoint sequentially."""
 
-    for datapoint_index in range(config.general.number_datapoints):
+    for datapoint_index in range(state.general.number_datapoints):
         data = {}
 
         # This syntax merges the hydrogeological_parameters and the heatpump_parameters dicts so we don't have to write
         # two separate for loops
-        for _, parameter in (config.hydrogeological_parameters | config.heatpump_parameters).items():
-            parameter_data = vary_parameter(config, parameter, datapoint_index)
+        for _, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
+            parameter_data = vary_parameter(state, parameter, datapoint_index)
             # XXX: Store this in the parameter?
             # parameter.set_datapoint(datapoint_index, parameter_data)
 
             data[parameter.name] = parameter_data
 
         # TODO split into data_fixed etc
-        config.datapoints.append(Datapoint(index=datapoint_index, data=data))
+        state.datapoints.append(Datapoint(index=datapoint_index, data=data))
 
-    if config.general.shuffle_datapoints:
-        config = shuffle_datapoints(config)
+    if state.general.shuffle_datapoints:
+        state = shuffle_datapoints(state)
         logging.debug("Shuffled datapoints")
 
-    return config
+    return state
 
 
-def shuffle_datapoints(config: Config) -> Config:
+def shuffle_datapoints(state: State) -> State:
     """Shuffles all `Parameter`s randomly in between the different `Datapoint`s. This is needed when e.g. two
     parameters are generated as `Vary.CONST` with `ParameterValueMinMax`, as otherwise they would both have min
     values in the first `Datapoint` and max values in the last one.
@@ -224,9 +224,9 @@ def shuffle_datapoints(config: Config) -> Config:
 
     parameters: dict[str, list[Data]] = {}
 
-    parameter_names = list(config.datapoints[0].data)
+    parameter_names = list(state.datapoints[0].data)
     for parameter in parameter_names:
-        for datapoint in config.datapoints:
+        for datapoint in state.datapoints:
             param_list = parameters.get(parameter, [])
             param_list.append(datapoint.data[parameter])
             parameters[parameter] = param_list
@@ -235,43 +235,43 @@ def shuffle_datapoints(config: Config) -> Config:
         # reason, pyright doesn't get that list[Data] is an ArrayLike...
         array = parameters[parameter]
         array = np.array(array)
-        config.get_rng().shuffle(array)
+        state.get_rng().shuffle(array)
         parameters[parameter] = array.tolist()
 
     for parameter in parameter_names:
-        for index in range(config.general.number_datapoints):
-            config.datapoints[index].data[parameter] = parameters[parameter][index]
+        for index in range(state.general.number_datapoints):
+            state.datapoints[index].data[parameter] = parameters[parameter][index]
 
-    return config
+    return state
 
 
-def handle_time_based_params(config: Config) -> Config:
+def handle_time_based_params(state: State) -> State:
     """Convert specific parameters to time based entries."""
 
     # Convert heatpumps to time based values
-    for _, heatpump in config.heatpump_parameters.items():
+    for _, heatpump in state.heatpump_parameters.items():
         assert isinstance(heatpump.value, HeatPump)
         if not isinstance(heatpump.value.injection_temp, TimeBasedValue):
             heatpump.value.injection_temp = TimeBasedValue(values={0: heatpump.value.injection_temp})
         if not isinstance(heatpump.value.injection_rate, TimeBasedValue):
             heatpump.value.injection_rate = TimeBasedValue(values={0: heatpump.value.injection_rate})
 
-    return config
+    return state
 
 
-def calculate_frequencies(config: Config) -> Config:
+def calculate_frequencies(state: State) -> State:
     """For every `Parameter` that has a value of `ParameterValuePerlin` type, calculate the frequency value if
     `ParameterValueMinMax` is given."""
 
     # Convert heatpumps to time based values
-    for _, parameter in (config.hydrogeological_parameters | config.heatpump_parameters).items():
+    for _, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
         if not isinstance(parameter.value, ParameterValuePerlin):
             continue
 
         if not isinstance(parameter.value.frequency, ParameterValueMinMax):
             continue
 
-        rand = config.get_rng()
+        rand = state.get_rng()
 
         min = parameter.value.frequency.min
         max = parameter.value.frequency.max
@@ -282,4 +282,4 @@ def calculate_frequencies(config: Config) -> Config:
 
         parameter.value.frequency = [val1, val2, val3]
 
-    return config
+    return state

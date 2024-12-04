@@ -11,7 +11,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from vary_my_params.prepare_simulation.pflotran.pflotran_write_permeability import plot_vary_field
 
-from ..config import Config, HeatPump
+from ..config import HeatPump, State
 
 TimeData = OrderedDict[str, dict[str, Any]]
 
@@ -49,32 +49,32 @@ def pflotran_time_to_year(time_step: str) -> float:
 #         plt.savefig(pic_file_name)
 
 
-def plot_simulation(config: Config):
-    if len(config.datapoints) == 0:
+def plot_simulation(state: State):
+    if len(state.datapoints) == 0:
         logging.error("There are no datapoints that could be plotted. Did you skip the previous stages?")
 
-    for datapoint in config.datapoints:
-        datapoint_path = config.general.output_directory / f"datapoint-{datapoint.index}"
+    for datapoint in state.datapoints:
+        datapoint_path = state.general.output_directory / f"datapoint-{datapoint.index}"
 
         with h5py.File(datapoint_path / "pflotran.h5") as file:
-            list_to_plot = make_plottable(config, file)
+            list_to_plot = make_plottable(state, file)
 
         plot_y(list_to_plot, datapoint_path)
-        plot_isolines(config, list_to_plot, datapoint_path)
+        plot_isolines(state, list_to_plot, datapoint_path)
         # TODO: make this more general
-        plot_vary_field(config, datapoint_path, datapoint.data["permeability"])
+        plot_vary_field(state, datapoint_path, datapoint.data["permeability"])
 
-        # print_heatpump_temp(config, list_to_plot)
+        # print_heatpump_temp(state, list_to_plot)
 
 
-def print_heatpump_temp(config: Config, data: TimeData):
+def print_heatpump_temp(state: State, data: TimeData):
     # XXX is this needed?
     key, value = data.popitem()
     data[key] = value
     temp_data = value["Temperature [C]"]
     years = pflotran_time_to_year(key)
 
-    for index, datapoint in enumerate(config.datapoints):
+    for index, datapoint in enumerate(state.datapoints):
         heatpumps = [{name: d.value} for name, d in datapoint.data.items() if isinstance(d.value, HeatPump)]
         for name, heatpump in heatpumps:
             assert isinstance(heatpump, HeatPump)
@@ -86,8 +86,8 @@ def print_heatpump_temp(config: Config, data: TimeData):
                 logging.error("Could not get HP temp: %s", err)
 
 
-def make_plottable(config: Config, hdf5_file: h5py.File) -> TimeData:
-    dimensions = config.general.number_cells
+def make_plottable(state: State, hdf5_file: h5py.File) -> TimeData:
+    dimensions = state.general.number_cells
 
     datapoints_to_plot: TimeData = OrderedDict()
 
@@ -132,7 +132,7 @@ def plot_y(data: TimeData, path: Path):
     plt.savefig(pic_file_name)
 
 
-def plot_isolines(config: Config, data: TimeData, path: Path):
+def plot_isolines(state: State, data: TimeData, path: Path):
     rows = len(data)
     _, axes = plt.subplots(rows, 1, figsize=(20, 5 * rows))
 
@@ -157,8 +157,8 @@ def plot_isolines(config: Config, data: TimeData, path: Path):
 
         plt.sca(axes[index])
 
-        x_ticks = ticker.FuncFormatter(lambda x, pos: f"{x*config.general.cell_resolution[0]:g}")
-        y_ticks = ticker.FuncFormatter(lambda y, pos: f"{y*config.general.cell_resolution[1]:g}")
+        x_ticks = ticker.FuncFormatter(lambda x, pos: f"{x*state.general.cell_resolution[0]:g}")
+        y_ticks = ticker.FuncFormatter(lambda y, pos: f"{y*state.general.cell_resolution[1]:g}")
         axes[index].xaxis.set_major_formatter(x_ticks)
         axes[index].yaxis.set_major_formatter(y_ticks)
 
