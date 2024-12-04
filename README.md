@@ -82,4 +82,5 @@ Further, all cases have the similarities:
 | [4](./settings/case4_extend-plumes.yaml)       | (32,1280,1) | 3            | 1 fix          | space        | const          |                                                                |
 | [5](./settings/case5_3d.yaml)                  | (32,256,32) | 1            | 1 fix          | fix          | fix            |                                                                |
 | [6](./settings/case6_vertical_aniso.yaml)      | (32,256,32) | 1            | 1 fix          | space        | fix            | vertical anisotropy ratio of 10                                |
+| [7](./settings/case7_read-from-files.yaml)     | (32,256,1)  | 1            | 1 fix          | fix          | fix            | heat pump, permeability and hydraulic head are read from file  |
 | [9](./settings/case9_seasonal-changes.yaml)    | (32,512,1)  | 1            | 2 fix          | fix          | fix            | time based changes in heat pump injection temperature and rate |
