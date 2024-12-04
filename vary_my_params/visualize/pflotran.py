@@ -53,6 +53,7 @@ def visualization_stage(state: State):
     if len(state.datapoints) == 0:
         logging.error("There are no datapoints that could be plotted. Did you skip the previous stages?")
 
+    # XXX: Could probably run in separate threads, but need to handle case of num_datapoints > num_processors
     for datapoint in state.datapoints:
         datapoint_path = state.general.output_directory / f"datapoint-{datapoint.index}"
 

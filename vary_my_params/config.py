@@ -508,6 +508,7 @@ class State(BaseModel):
 @profile_function
 def validation_stage(state: State) -> State:
     # TODO make this more extensive
+    # XXX this could also be done by pydantic...
 
     hydraulic_head = state.hydrogeological_parameters.get("hydraulic_head")
     permeability = state.hydrogeological_parameters.get("permeability")
