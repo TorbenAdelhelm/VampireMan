@@ -36,7 +36,7 @@ def render_stage(state: State):
         permeability = datapoint.data["permeability"]
 
         # Is the permeability already a 3d field? If not, create one
-        if isinstance(permeability.value, float):
+        if isinstance(permeability.value, float | NDArray):
             permeability.value = create_const_field(state, permeability.value)
 
         save_vary_field(

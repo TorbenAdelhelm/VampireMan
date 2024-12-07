@@ -89,7 +89,7 @@ def create_perlin_field(state: State, parameter: Parameter):
     return cells
 
 
-def create_const_field(state: State, value: float):
+def create_const_field(state: State, value: float | NDArray):
     # TODO think about pressure
     return np.full(state.general.number_cells, value)
 
