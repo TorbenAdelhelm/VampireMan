@@ -2,11 +2,13 @@ import logging
 import pathlib
 
 import jinja2
+import numpy as np
+from h5py import File
+from numpydantic import NDArray
 
 from ...data_structures import HeatPump, State, ValueXYZ
 from ...variation_stage.vary_perlin import create_const_field
 from .pflotran_generate_mesh import write_mesh_and_border_files
-from .pflotran_write_permeability import save_vary_field
 
 
 def render_stage(state: State):
@@ -53,3 +55,17 @@ def render_stage(state: State):
         with open(f"{datapoint_dir}/pflotran.in", "w") as file:
             file.write(template.render(values))
             logging.debug("Rendered pflotran-%s.in", index)
+
+
+def save_vary_field(filename, number_cells, cells, parameter_name: str = "permeability"):
+    n = number_cells[0] * number_cells[1] * number_cells[2]
+    # create integer array for cell ids
+    iarray = np.arange(n, dtype="i4")
+    iarray[:] += 1  # convert to 1-based
+    cells_array_flatten = cells.reshape(n, order="F")
+
+    with File(filename, mode="w") as h5file:
+        h5file.create_dataset("Cell Ids", data=iarray)
+        h5file.create_dataset(parameter_name.title(), data=cells_array_flatten)
+
+    logging.info(f"Created a {parameter_name}-field")
