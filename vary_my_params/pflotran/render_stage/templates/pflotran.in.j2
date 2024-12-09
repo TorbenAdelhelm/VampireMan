@@ -1,5 +1,3 @@
-#Description: flow in a 3D area plus one heatpump - super super simplified for approach 2 try 1
-
 SIMULATION
   SIMULATION_TYPE SUBSURFACE
   PROCESS_MODELS
@@ -48,51 +46,6 @@ SUBSURFACE
     FILENAME permeability_field.h5
   END
 
-#=========================== material properties ==============================
-
-  MATERIAL_PROPERTY gravel
-    ID 1
-    POROSITY 0.25d0                     #[-]        # TODO sensitivity analysis
-    ROCK_DENSITY 2.8d3                  #[kg/m^3]        # literature
-    SPECIFIC_HEAT 2.0d3                 #[J/(kg*K)]      # literature
-    THERMAL_CONDUCTIVITY_DRY 0.65       #[W/(K*m)] #TODO # literature
-    THERMAL_CONDUCTIVITY_WET 1.0        #[W/(K*m)] #TODO # literature
-    LONGITUDINAL_DISPERSIVITY 1.0       #[m]             # sensitivity analysis
-    TRANSVERSE_DISPERSIVITY_H 0.1       #[m]             # sensitivity analysis
-    PERMEABILITY                        #[m^2] 
-      DATASET perm
-      {%- if vertical_anisotropy_ratio %}
-      {#- what about PERM_ISO here? https://www.pflotran.org/documentation/user_guide/cards/subsurface/material_property_card.html #}
-      VERTICAL_ANISOTROPY_RATIO {{ vertical_anisotropy_ratio.value }}
-      {%- endif %}
-    /
-    CHARACTERISTIC_CURVES cc1
-  END
-
-  {% for heatpump in heatpumps -%}
-  {% set outer_loop = loop -%}
-  {% for key, value in heatpump.items() -%}
-  MATERIAL_PROPERTY {{ key }}_material
-    ID {{ outer_loop.index + 5 + 1 }} {#- The + 5 part is for visually separating the heatpumps from the gravel material, the + 1 is for starting at 2 as gravel already has id 1 #}
-    POROSITY 0.25d0                     #[-]        # TODO sensitivity analysis
-    ROCK_DENSITY 2.8d3                  #[kg/m^3]        # literature
-    SPECIFIC_HEAT 2.0d3                 #[J/(kg*K)]      # literature
-    THERMAL_CONDUCTIVITY_DRY 0.65       #[W/(K*m)] #TODO # literature
-    THERMAL_CONDUCTIVITY_WET 1.0        #[W/(K*m)] #TODO # literature
-    LONGITUDINAL_DISPERSIVITY 1.0       #[m]             # sensitivity analysis
-    TRANSVERSE_DISPERSIVITY_H 0.1       #[m]             # sensitivity analysis
-    PERMEABILITY                        #[m^2] #TESTCASE
-      DATASET perm
-      {%- if vertical_anisotropy_ratio %}
-      VERTICAL_ANISOTROPY_RATIO {{ vertical_anisotropy_ratio.value }}
-      {%- endif %}
-    /
-    CHARACTERISTIC_CURVES cc1
-  END
-
-  {% endfor %}
-  {%- endfor %}
-
 #=========================== characteristic curves ============================
 
   CHARACTERISTIC_CURVES cc1
@@ -105,6 +58,27 @@ SUBSURFACE
       M 0.5d0
       LIQUID_RESIDUAL_SATURATION 0.1d0
     /
+  END
+
+#=========================== material properties ==============================
+
+  MATERIAL_PROPERTY gravel
+    ID 1
+    POROSITY 0.25d0                     #[-]             # TODO sensitivity analysis
+    ROCK_DENSITY 2.8d3                  #[kg/m^3]        # literature
+    SPECIFIC_HEAT 2.0d3                 #[J/(kg*K)]      # literature
+    THERMAL_CONDUCTIVITY_DRY 0.65       #[W/(K*m)] #TODO # literature
+    THERMAL_CONDUCTIVITY_WET 1.0        #[W/(K*m)] #TODO # literature
+    LONGITUDINAL_DISPERSIVITY 1.0       #[m]             # sensitivity analysis
+    TRANSVERSE_DISPERSIVITY_H 0.1       #[m]             # sensitivity analysis
+    PERMEABILITY                        #[m^2]
+      DATASET perm
+      {%- if vertical_anisotropy_ratio %}
+      {#- what about PERM_ISO here? https://www.pflotran.org/documentation/user_guide/cards/subsurface/material_property_card.html #}
+      VERTICAL_ANISOTROPY_RATIO {{ vertical_anisotropy_ratio.value }}
+      {%- endif %}
+    /
+    CHARACTERISTIC_CURVES cc1
   END
 
 #=========================== discretization ===================================
@@ -139,14 +113,6 @@ SUBSURFACE
     FILE ../east.ex
   END
 
-  {% for heatpump in heatpumps -%}
-  {% for key, value in heatpump.items() -%}
-  REGION {{ key }}_region
-    COORDINATE {{ value.location[0] }} {{ value.location[1] }} {{ value.location[2] }}
-  END
-  {% endfor %}
-  {%- endfor %}
-
 #=========================== flow conditions ==================================
 
   FLOW_CONDITION initial
@@ -161,34 +127,6 @@ SUBSURFACE
     LIQUID_PRESSURE 101325.d0
     TEMPERATURE {{ temperature.value }} C
   /
-
-  {% for heatpump in heatpumps -%}
-  {% for key, value in heatpump.items() -%}
-  FLOW_CONDITION {{ key }}_flow_condition
-    TYPE
-      RATE SCALED_VOLUMETRIC_RATE VOLUME
-      TEMPERATURE DIRICHLET
-    END
-
-      # DATA_UNITS l/s
-    RATE LIST
-      DATA_UNITS m^3/s
-      TIME_UNITS {{ value.injection_rate.time_unit }}
-      {%- for time_step, time_value in value.injection_rate.values.items() %}
-      {{ time_step }}    {{ time_value }}
-      {%- endfor %}
-    END
-
-    TEMPERATURE LIST
-      DATA_UNITS C
-      TIME_UNITS {{ value.injection_temp.time_unit }}
-      {%- for time_step, time_value in value.injection_temp.values.items() %}
-      {{ time_step }}    {{ time_value }}
-      {%- endfor %}
-    END
-  END
-  {% endfor %}
-  {%- endfor %}
 
 #=========================== condition couplers ===============================
 
@@ -220,15 +158,6 @@ SUBSURFACE
     REGION east
   /
 
-  {% for heatpump in heatpumps -%}
-  {% for key, value in heatpump.items() -%}
-  SOURCE_SINK {{ key }}_sink
-    FLOW_CONDITION {{ key }}_flow_condition
-    REGION {{ key }}_region
-  END
-  {% endfor %}
-  {%- endfor %}
-
 #=========================== stratigraphy couplers ============================
 
   STRATA
@@ -236,15 +165,71 @@ SUBSURFACE
     MATERIAL gravel
   END
 
-# same but different material for hps to get a map with the hp locations alias Material_ID
+#=========================== heat pumps =======================================
+
   {% for heatpump in heatpumps -%}
+  {% set outer_loop = loop -%}
   {% for key, value in heatpump.items() -%}
+
+  MATERIAL_PROPERTY {{ key }}_material
+    ID {{ outer_loop.index + 5 + 1 }} {#- The + 5 part is for visually separating the heatpumps from the gravel material, the + 1 is for starting at 2 as gravel already has id 1 #}
+    POROSITY 0.25d0                     #[-]             # TODO sensitivity analysis
+    ROCK_DENSITY 2.8d3                  #[kg/m^3]        # literature
+    SPECIFIC_HEAT 2.0d3                 #[J/(kg*K)]      # literature
+    THERMAL_CONDUCTIVITY_DRY 0.65       #[W/(K*m)] #TODO # literature
+    THERMAL_CONDUCTIVITY_WET 1.0        #[W/(K*m)] #TODO # literature
+    LONGITUDINAL_DISPERSIVITY 1.0       #[m]             # sensitivity analysis
+    TRANSVERSE_DISPERSIVITY_H 0.1       #[m]             # sensitivity analysis
+    PERMEABILITY                        #[m^2]           # TESTCASE
+      DATASET perm
+      {%- if vertical_anisotropy_ratio %}
+      VERTICAL_ANISOTROPY_RATIO {{ vertical_anisotropy_ratio.value }}
+      {%- endif %}
+    /
+    CHARACTERISTIC_CURVES cc1
+  END
+
+  FLOW_CONDITION {{ key }}_flow_condition
+    TYPE
+      RATE SCALED_VOLUMETRIC_RATE VOLUME
+      TEMPERATURE DIRICHLET
+    END
+
+      # DATA_UNITS l/s
+    RATE LIST
+      DATA_UNITS m^3/s
+      TIME_UNITS {{ value.injection_rate.time_unit }}
+      {%- for time_step, time_value in value.injection_rate.values.items() %}
+      {{ time_step }}    {{ time_value }}
+      {%- endfor %}
+    END
+
+    TEMPERATURE LIST
+      DATA_UNITS C
+      TIME_UNITS {{ value.injection_temp.time_unit }}
+      {%- for time_step, time_value in value.injection_temp.values.items() %}
+      {{ time_step }}    {{ time_value }}
+      {%- endfor %}
+    END
+  END
+
+  REGION {{ key }}_region
+    COORDINATE {{ value.location[0] }} {{ value.location[1] }} {{ value.location[2] }}
+  END
+
+  SOURCE_SINK {{ key }}_sink
+    FLOW_CONDITION {{ key }}_flow_condition
+    REGION {{ key }}_region
+  END
+
   STRATA
     REGION {{ key }}_region
     MATERIAL {{ key }}_material
   END
+
   {% endfor %}
   {%- endfor %}
+
 
 #=========================== output options ===================================
 
