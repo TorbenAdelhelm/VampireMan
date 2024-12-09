@@ -122,7 +122,8 @@ SUBSURFACE
     /
     DATUM 200.d0 0.d0 85.d0
     GRADIENT
-      LIQUID_PRESSURE {{ hydraulic_head.value.x }} {{ hydraulic_head.value.y }} {{ hydraulic_head.value.z }}
+      {% set hh = hydraulic_head.value %}
+      LIQUID_PRESSURE {{ hh.x }} {{  hh.y }} {{ hh.z }}
     /
     LIQUID_PRESSURE 101325.d0
     TEMPERATURE {{ temperature.value }} C
