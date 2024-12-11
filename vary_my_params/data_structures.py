@@ -18,7 +18,10 @@ yaml = YAML(typ="safe")
 def value_is_3d(value: list[float]):
     """Ensure value is given in three dimensional space."""
     if len(value) == 2:
-        value.append(1)
+        if isinstance(value, NDArray):
+            value = np.append(value, 1)
+        else:
+            value.append(1)
 
     if len(value) != 3:
         raise ValueError("Value must be given in three dimensional space")
@@ -259,7 +262,9 @@ class Datapoint(BaseModel):
 class GeneralConfig(BaseModel):
     """The `GeneralConfig` doesn't change during execution of the program."""
 
-    number_cells: NDArray = Field(default_factory=lambda: np.array([32, 256, 1]))
+    number_cells: NDArray[Shape["3 number_cells"], int] | NDArray[Shape["2 number_cells"], int] = Field(
+        default_factory=lambda: np.array([32, 256, 1])
+    )
     """Specifies the number of cells for the simulation."""
 
     cell_resolution: float = 5.0

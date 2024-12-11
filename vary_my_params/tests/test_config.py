@@ -37,7 +37,7 @@ def test_state_catch_wrong_values():
         State(**{"pure": 5})
 
     with pytest.raises(ValidationError):
-        State(**{"general": {"number_cells": ["test", {}]}})
+        print(State(**{"general": {"number_cells": ["test", {}]}}))
 
 
 def test_state_invalid_state():
@@ -86,7 +86,9 @@ def test_state_rng():
 
 def test_3d_param():
     state = State(**{"general": {"number_cells": [3, 2]}})
-    assert state.general.number_cells == [3, 2, 1]
+    assert state.general.number_cells[0] == 3
+    assert state.general.number_cells[1] == 2
+    assert state.general.number_cells[2] == 1
 
     with pytest.raises(ValidationError):
         state = State(**{"general": {"number_cells": [3]}})
