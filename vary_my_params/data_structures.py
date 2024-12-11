@@ -72,7 +72,7 @@ class TimeToSimulate(BaseModel):
 
     def __str__(self) -> str:
         """Returns time including unit, e.g., `27.5 [year]`."""
-        return f"{self.final_time} [{self.unit}]"
+        return f"{self.final_time} {self.unit}"
 
 
 class ParameterValueMinMax(BaseModel):
