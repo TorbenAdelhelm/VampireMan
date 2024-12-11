@@ -36,8 +36,8 @@ def render_stage(state: State):
         permeability = datapoint.data["permeability"]
 
         # Is the permeability already a 3d field? If not, create one
-        if isinstance(permeability.value, float | NDArray):
-            permeability.value = create_const_field(state, permeability.value)
+        if isinstance(permeability.value, float | NDArray):  # pyright: ignore[reportArgumentType]
+            permeability.value = create_const_field(state, permeability.value)  # pyright: ignore[reportArgumentType]
 
         save_vary_field(
             datapoint_dir / "permeability_field.h5",
