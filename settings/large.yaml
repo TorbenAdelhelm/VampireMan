@@ -1,0 +1,39 @@
+general:
+  output_directory: ./datasets_out/large
+  mpirun: false
+  profiling: true
+  number_cells: [320,2560,32]
+heatpump_parameters:
+  hps:
+    vary: spatially_vary_within_datapoint
+    value:
+      injection_temp:
+        time_unit: year
+        values:
+          0:
+            min: 13.6
+            max: 15.5
+          1: 8
+          2:
+            min: 13.6
+            max: 15.6
+      injection_rate:
+        min: 0.00002
+        max: 0.0002
+      number: 50
+hydrogeological_parameters:
+  permeability:
+    vary: spatially_vary_within_datapoint
+    distribution: logarithmic
+    value:
+      frequency:
+        min: 18
+        max: 19
+      max: 5.09683995922528e-09
+      min: 1.0193679918450561e-11
+  hydraulic_head:
+    vary: fixed
+    value:
+      x: -0.0008
+      y: -0.003
+      z: 0
