@@ -259,7 +259,7 @@ class Datapoint(BaseModel):
 class GeneralConfig(BaseModel):
     """The `GeneralConfig` doesn't change during execution of the program."""
 
-    number_cells: list[int] = Field(default_factory=lambda: [32, 256, 1])
+    number_cells: NDArray = Field(default_factory=lambda: np.array([32, 256, 1]))
     """Specifies the number of cells for the simulation."""
 
     cell_resolution: list[float] = Field(default_factory=lambda: [5.0, 5.0, 5.0])
