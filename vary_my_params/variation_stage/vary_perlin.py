@@ -117,11 +117,7 @@ def calc_pressure_from_gradient_field(
     pressure_field = np.zeros_like(gradient_field)
     pressure_field[:, 0] = reference
     for i in range(1, pressure_field.shape[1]):
-        pressure_field[:, i] = pressure_field[:, i - 1] + gradient_field[:, i] * resolution[1] * 1000
+        pressure_field[:, i] = pressure_field[:, i - 1] + gradient_field[:, i] * resolution * 1000
     pressure_field = pressure_field[::-1]
-
-    # for i in range(1, pressure_field.shape[0]):
-    #     pressure_field[i,:] = (pressure_field[i-1,:] + gradient_field[i,:] * resolution[0] + pressure_field[i,:])/2
-    # pressure_field = gradient_field * resolution[1] + reference
 
     return pressure_field

@@ -14,7 +14,7 @@ from vary_my_params.pipeline import preparation_stage
 
 def test_prepare_heatpump():
     state = State()
-    state.general.cell_resolution = [1, 1, 1]
+    state.general.cell_resolution = 1.0
     state.heatpump_parameters = {
         "hp1": Parameter(
             name="hp1",

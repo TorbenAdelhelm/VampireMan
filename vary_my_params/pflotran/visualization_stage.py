@@ -156,8 +156,8 @@ def plot_isolines(state: State, data: TimeData, path: Path):
 
         plt.sca(axes[index])
 
-        x_ticks = ticker.FuncFormatter(lambda x, pos: f"{x*state.general.cell_resolution[0]:g}")
-        y_ticks = ticker.FuncFormatter(lambda y, pos: f"{y*state.general.cell_resolution[1]:g}")
+        x_ticks = ticker.FuncFormatter(lambda x, pos: f"{x*state.general.cell_resolution:g}")
+        y_ticks = ticker.FuncFormatter(lambda y, pos: f"{y*state.general.cell_resolution:g}")
         axes[index].xaxis.set_major_formatter(x_ticks)
         axes[index].yaxis.set_major_formatter(y_ticks)
 
@@ -169,7 +169,6 @@ def plot_isolines(state: State, data: TimeData, path: Path):
         plt.contourf(plot_data, levels=levels, cmap="RdBu_r")
 
         plt.title(f"{pflotran_time_to_year(time_step)} years")
-        # XXX this is not meters, it is cells. Should be number_cells * cell_resolution
         plt.xlabel("y [m]")
         plt.ylabel("x [m]")
         aligned_colorbar(label="Temperature [°C]")

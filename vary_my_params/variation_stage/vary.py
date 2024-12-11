@@ -25,7 +25,7 @@ def copy_parameter(parameter: Parameter) -> Data:
 
 
 def vary_heatpump(state: State, parameter: Parameter) -> Data:
-    resolution = np.array(state.general.cell_resolution)
+    resolution = state.general.cell_resolution
     number_cells = np.array(state.general.number_cells)
 
     hp = deepcopy(parameter.value)
@@ -112,7 +112,7 @@ def calculate_hp_coordinates(state: State) -> State:
 
     for _, hp_data in state.heatpump_parameters.items():
         assert not isinstance(hp_data.value, HeatPumps)
-        resolution = np.array(state.general.cell_resolution)
+        resolution = state.general.cell_resolution
 
         hp = hp_data.value
         assert isinstance(hp, HeatPump)

@@ -23,17 +23,10 @@ def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: P
 
 def render_mesh(state: State) -> list[str]:
     xGrid, yGrid, zGrid = state.general.number_cells
-    cellXWidth, cellYWidth, cellZWidth = state.general.cell_resolution
+    resolution = state.general.cell_resolution
 
-    volume = cellXWidth * cellYWidth * cellZWidth
-    if cellXWidth == cellYWidth == cellZWidth:
-        faceArea = cellXWidth**2
-    else:
-        logging.error(
-            "The grid is not cubic - look at create_grid_unstructured.py OR "
-            + "2D case and settings.yaml depth for z is not adapted"
-        )
-        raise ValueError("Grid is not cubic")
+    volume = resolution**3
+    faceArea = resolution**2
 
     # CELLS <number of cells>
     # <cell id> <x> <y> <z> <volume>
@@ -49,32 +42,32 @@ def render_mesh(state: State) -> list[str]:
     cellID_1 = 1
 
     for k in range(zGrid):
-        zloc = (k + 0.5) * cellZWidth
+        zloc = (k + 0.5) * resolution
 
         for j in range(yGrid):
-            yloc = (j + 0.5) * cellYWidth
+            yloc = (j + 0.5) * resolution
 
             for i in range(xGrid):
-                xloc = (i + 0.5) * cellXWidth
+                xloc = (i + 0.5) * resolution
 
                 output_string_cells.append(f"\n{cellID_1} {xloc} {yloc} {zloc} {volume}")
                 cellID_1 += 1
 
                 gridCellID_1 = i + 1 + j * xGrid + k * xGrid * yGrid
                 if i < xGrid - 1:
-                    xloc_local = (i + 1) * cellXWidth
+                    xloc_local = (i + 1) * resolution
                     cellID_2 = gridCellID_1 + 1
                     output_string_connections.append(
                         f"\n{gridCellID_1} {cellID_2} {xloc_local} {yloc} {zloc} {faceArea}"
                     )
                 if j < yGrid - 1:
-                    yloc_local = (j + 1) * cellYWidth
+                    yloc_local = (j + 1) * resolution
                     cellID_2 = gridCellID_1 + xGrid
                     output_string_connections.append(
                         f"\n{gridCellID_1} {cellID_2} {xloc} {yloc_local} {zloc} {faceArea}"
                     )
                 if k < zGrid - 1:
-                    zloc_local = (k + 1) * cellZWidth
+                    zloc_local = (k + 1) * resolution
                     cellID_2 = gridCellID_1 + xGrid * yGrid
                     output_string_connections.append(
                         f"\n{gridCellID_1} {cellID_2} {xloc} {yloc} {zloc_local} {faceArea}"
@@ -85,16 +78,9 @@ def render_mesh(state: State) -> list[str]:
 
 def render_borders(state: State):
     xGrid, yGrid, zGrid = state.general.number_cells
-    cellXWidth, cellYWidth, cellZWidth = state.general.cell_resolution
+    resolution = state.general.cell_resolution
 
-    if cellXWidth == cellYWidth == cellZWidth:
-        faceArea = cellXWidth**2
-    else:
-        logging.error(
-            "The grid is not cubic - look at create_grid_unstructured.py OR "
-            + "2D case and settings.yaml depth for z is not adapted"
-        )
-        raise ValueError("Grid is not cubic")
+    faceArea = resolution**2
 
     output_string_east = ["CONNECTIONS " + str(yGrid * zGrid)]
     output_string_west = ["CONNECTIONS " + str(yGrid * zGrid)]
@@ -104,21 +90,21 @@ def render_borders(state: State):
 
     yloc_south = 0
     xloc_west = 0
-    yloc_north = yGrid * cellYWidth
-    xloc_east = xGrid * cellXWidth
+    yloc_north = yGrid * resolution
+    xloc_east = xGrid * resolution
 
     for k in range(zGrid):
-        zloc = (k + 0.5) * cellZWidth
+        zloc = (k + 0.5) * resolution
 
         for i in range(xGrid):
-            xloc = (i + 0.5) * cellXWidth
+            xloc = (i + 0.5) * resolution
             cellID_north = (xGrid * (yGrid - 1)) + i + 1 + k * xGrid * yGrid
             cellID_south = i + 1 + k * xGrid * yGrid
             output_string_north.append(f"\n{cellID_north} {xloc} {yloc_north} {zloc} {faceArea}")
             output_string_south.append(f"\n{cellID_south} {xloc} {yloc_south} {zloc} {faceArea}")
 
         for j in range(yGrid):
-            yloc = (j + 0.5) * cellYWidth
+            yloc = (j + 0.5) * resolution
             cellID_east = (j + 1) * xGrid + k * xGrid * yGrid
             cellID_west = j * xGrid + 1 + k * xGrid * yGrid
             output_string_east.append(f"\n{cellID_east} {xloc_east} {yloc} {zloc} {faceArea}")

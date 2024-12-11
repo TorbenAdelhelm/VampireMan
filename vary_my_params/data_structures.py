@@ -262,7 +262,7 @@ class GeneralConfig(BaseModel):
     number_cells: NDArray = Field(default_factory=lambda: np.array([32, 256, 1]))
     """Specifies the number of cells for the simulation."""
 
-    cell_resolution: list[float] = Field(default_factory=lambda: [5.0, 5.0, 5.0])
+    cell_resolution: float = 5.0
     """Resolution of each of the cells. Cells must be cubic currently."""
 
     shuffle_datapoints: bool = False
@@ -328,16 +328,7 @@ class GeneralConfig(BaseModel):
     # This makes pydantic fail if there is extra data in the yaml settings file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
 
-    _validated_3d = field_validator("number_cells", "cell_resolution")(value_is_3d)
-
-    @field_validator("cell_resolution")
-    @classmethod
-    def cell_resolution_is_cubic(cls, param: list[int]):
-        """Ensure cell_resolution is cubic."""
-        if not (param[0] == param[1] == param[2]):
-            raise ValueError("Cells must be cubic")
-
-        return param
+    _validated_3d = field_validator("number_cells")(value_is_3d)
 
     def __str__(self) -> str:
         return (
