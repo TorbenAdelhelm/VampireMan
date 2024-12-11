@@ -9,7 +9,7 @@ END
 
 SUBSURFACE
 
-#=========================== times ============================================
+#=== times ===
 
   TIME
     FINAL_TIME {{ time_to_simulate }}
@@ -18,11 +18,7 @@ SUBSURFACE
 
   REFERENCE_PRESSURE 101325. #[Pa]
 
-#=========================== solver options ===================================
-
-  #NEWTON_SOLVER FLOW
-  #  ITOL_UPDATE 1.d0     ! Convergences with max change in pressure is 1 Pa.
-  #END
+#=== solver options ===
 
   NUMERICAL_METHODS FLOW
     NEWTON_SOLVER
@@ -35,10 +31,10 @@ SUBSURFACE
     /
   END
 
-#=========================== fluid properties =================================
+#=== fluid properties ===
 
   FLUID_PROPERTY
-    DIFFUSION_COEFFICIENT 1.d-9 #[m^2/s]                  # literature
+    DIFFUSION_COEFFICIENT 1.d-9 #[m^2/s]
   END
 
   DATASET perm
@@ -46,7 +42,7 @@ SUBSURFACE
     FILENAME permeability_field.h5
   END
 
-#=========================== characteristic curves ============================
+#=== characteristic curves ===
 
   CHARACTERISTIC_CURVES cc1
     SATURATION_FUNCTION VAN_GENUCHTEN
@@ -60,35 +56,34 @@ SUBSURFACE
     /
   END
 
-#=========================== material properties ==============================
+#=== material properties ===
 
   MATERIAL_PROPERTY gravel
     ID 1
-    POROSITY 0.25d0                     #[-]             # TODO sensitivity analysis
-    ROCK_DENSITY 2.8d3                  #[kg/m^3]        # literature
-    SPECIFIC_HEAT 2.0d3                 #[J/(kg*K)]      # literature
-    THERMAL_CONDUCTIVITY_DRY 0.65       #[W/(K*m)] #TODO # literature
-    THERMAL_CONDUCTIVITY_WET 1.0        #[W/(K*m)] #TODO # literature
-    LONGITUDINAL_DISPERSIVITY 1.0       #[m]             # sensitivity analysis
-    TRANSVERSE_DISPERSIVITY_H 0.1       #[m]             # sensitivity analysis
-    PERMEABILITY                        #[m^2]
+    POROSITY 0.25d0                #[-]
+    ROCK_DENSITY 2.8d3             #[kg/m^3]
+    SPECIFIC_HEAT 2.0d3            #[J/(kg*K)]
+    THERMAL_CONDUCTIVITY_DRY 0.65  #[W/(K*m)]
+    THERMAL_CONDUCTIVITY_WET 1.0   #[W/(K*m)]
+    LONGITUDINAL_DISPERSIVITY 1.0  #[m]
+    TRANSVERSE_DISPERSIVITY_H 0.1  #[m]
+    PERMEABILITY                   #[m^2]
       DATASET perm
       {%- if vertical_anisotropy_ratio %}
-      {#- what about PERM_ISO here? https://www.pflotran.org/documentation/user_guide/cards/subsurface/material_property_card.html #}
       VERTICAL_ANISOTROPY_RATIO {{ vertical_anisotropy_ratio.value }}
       {%- endif %}
     /
     CHARACTERISTIC_CURVES cc1
   END
 
-#=========================== discretization ===================================
+#=== discretization ===
 
   GRID
     TYPE UNSTRUCTURED_EXPLICIT ../mesh.uge
     MAX_CELLS_SHARING_A_VERTEX 8
   END
 
-#=========================== regions ==========================================
+#=== regions ===
 
   REGION all
     COORDINATES
@@ -113,14 +108,14 @@ SUBSURFACE
     FILE ../east.ex
   END
 
-#=========================== flow conditions ==================================
+#=== flow conditions ===
 
   FLOW_CONDITION initial
     TYPE
       LIQUID_PRESSURE HYDROSTATIC
       TEMPERATURE DIRICHLET
     /
-    DATUM 200.d0 0.d0 85.d0
+    DATUM 200 0 85 {#- TODO adjust? #}
     GRADIENT
       {% set hh = hydraulic_head.value %}
       LIQUID_PRESSURE {{ hh.x }} {{  hh.y }} {{ hh.z }}
@@ -129,15 +124,13 @@ SUBSURFACE
     TEMPERATURE {{ temperature.value }} C
   /
 
-#=========================== condition couplers ===============================
+#=== condition couplers ===
 
-# initial condition
   INITIAL_CONDITION
     FLOW_CONDITION initial
     REGION all
   /
 
-# boundary conditions
   BOUNDARY_CONDITION
     FLOW_CONDITION initial
     REGION north
@@ -148,7 +141,6 @@ SUBSURFACE
     REGION south
   /
 
-  # boundary conditions
   BOUNDARY_CONDITION
     FLOW_CONDITION initial
     REGION west
@@ -159,29 +151,29 @@ SUBSURFACE
     REGION east
   /
 
-#=========================== stratigraphy couplers ============================
+#=== stratigraphy couplers ===
 
   STRATA
     REGION all
     MATERIAL gravel
   END
 
-#=========================== heat pumps =======================================
+#=== heat pumps ===
 
   {% for heatpump in heatpumps -%}
   {% set outer_loop = loop -%}
   {% for key, value in heatpump.items() -%}
 
   MATERIAL_PROPERTY {{ key }}_material
-    ID {{ outer_loop.index + 5 + 1 }} {#- The + 5 part is for visually separating the heatpumps from the gravel material, the + 1 is for starting at 2 as gravel already has id 1 #}
-    POROSITY 0.25d0                     #[-]             # TODO sensitivity analysis
-    ROCK_DENSITY 2.8d3                  #[kg/m^3]        # literature
-    SPECIFIC_HEAT 2.0d3                 #[J/(kg*K)]      # literature
-    THERMAL_CONDUCTIVITY_DRY 0.65       #[W/(K*m)] #TODO # literature
-    THERMAL_CONDUCTIVITY_WET 1.0        #[W/(K*m)] #TODO # literature
-    LONGITUDINAL_DISPERSIVITY 1.0       #[m]             # sensitivity analysis
-    TRANSVERSE_DISPERSIVITY_H 0.1       #[m]             # sensitivity analysis
-    PERMEABILITY                        #[m^2]           # TESTCASE
+    ID {{ outer_loop.index + 5 + 1 }} {#- visually separate from gravel #}
+    POROSITY 0.25d0                #[-]
+    ROCK_DENSITY 2.8d3             #[kg/m^3]
+    SPECIFIC_HEAT 2.0d3            #[J/(kg*K)]
+    THERMAL_CONDUCTIVITY_DRY 0.65  #[W/(K*m)]
+    THERMAL_CONDUCTIVITY_WET 1.0   #[W/(K*m)]
+    LONGITUDINAL_DISPERSIVITY 1.0  #[m]
+    TRANSVERSE_DISPERSIVITY_H 0.1  #[m]
+    PERMEABILITY                   #[m^2]
       DATASET perm
       {%- if vertical_anisotropy_ratio %}
       VERTICAL_ANISOTROPY_RATIO {{ vertical_anisotropy_ratio.value }}
@@ -196,7 +188,6 @@ SUBSURFACE
       TEMPERATURE DIRICHLET
     END
 
-      # DATA_UNITS l/s
     RATE LIST
       DATA_UNITS m^3/s
       TIME_UNITS {{ value.injection_rate.time_unit }}
@@ -232,13 +223,12 @@ SUBSURFACE
   {%- endfor %}
 
 
-#=========================== output options ===================================
+#=== output options ===
 
   OUTPUT
     SNAPSHOT_FILE
-      #PERIODIC TIME 0.00001 y BETWEEN 0. y AND 0.00010 year
       TIMES year 0 0.1 1. 5.
-      FORMAT HDF5 #VTK
+      FORMAT HDF5
       PRINT_COLUMN_IDS
       VARIABLES
         LIQUID_PRESSURE
