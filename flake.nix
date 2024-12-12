@@ -107,6 +107,7 @@
             pkgs.poetry
             pkgs.ruff
             pkgs.pyright
+            pkgs.pylint
             pkgs.nixfmt-rfc-style
             pkgs.treefmt
             python3_env
