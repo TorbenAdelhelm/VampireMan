@@ -64,9 +64,9 @@ def test_prepare_heatpump_generation():
     state = preparation_stage(state)
     assert len(state.heatpump_parameters) == 10
     assert state.heatpump_parameters.get("hps_0").value.location == [102.5, 347.5, 2.5]
-    assert state.heatpump_parameters.get("hps_9").value.location == [52.5, 192.5, 2.5]
-    assert state.heatpump_parameters.get("hps_9").value.injection_temp.values[0] == 14.814702918850823
-    assert state.heatpump_parameters.get("hps_9").value.injection_rate.values[1] == 0
+    assert state.heatpump_parameters.get("hps_9").value.location == [157.5, 877.5, 2.5]
+    assert len(state.heatpump_parameters.get("hps_9").value.injection_temp.values) == 1
+    assert len(state.heatpump_parameters.get("hps_8").value.injection_rate.values) == 3
 
 
 def test_prepare_heatpump_name_clash():

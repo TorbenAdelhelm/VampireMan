@@ -115,11 +115,11 @@ class HeatPump(BaseModel):
     into coordinates matching the domain by multiplying it by the `GeneralConfig.cell_resolution`."""
 
     # TODO make this list[float]
-    injection_temp: TimeBasedValue | float
+    injection_temp: TimeBasedValue | ParameterValueMinMax | float
     """The injection temperature of the `HeatPump` in degree Celsius."""
 
     # TODO make this list[float]
-    injection_rate: TimeBasedValue | float
+    injection_rate: TimeBasedValue | ParameterValueMinMax | float
     """The injection rate of the `HeatPump` in m^3/s."""
 
     model_config = ConfigDict(extra="forbid")

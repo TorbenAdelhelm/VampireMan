@@ -72,6 +72,7 @@ def test_vary_space():
     param_scalar = state.hydrogeological_parameters.get("param_scalar")
 
     assert len(state.datapoints) == 0
+    state = preparation_stage(state)
     state = variation_stage(state)
     assert len(state.datapoints) == 2
 
@@ -139,6 +140,7 @@ def test_vary_const():
     param = state.hydrogeological_parameters.get("parameter")
 
     assert len(state.datapoints) == 0
+    state = preparation_stage(state)
     state = variation_stage(state)
     assert len(state.datapoints) == 3
 

@@ -19,20 +19,26 @@ from ..data_structures import (
 from .vary_perlin import create_perlin_field
 
 
-def copy_parameter(parameter: Parameter) -> Data:
+def copy_parameter(state: State, parameter: Parameter) -> Data:
     """This function simply copies all values from a `Parameter` to a `Data` object without any transformation"""
+    if isinstance(parameter.value, HeatPump):
+        return vary_heatpump(state, parameter, False)
     return Data(name=parameter.name, value=deepcopy(parameter.value))
 
 
-def vary_heatpump(state: State, parameter: Parameter) -> Data:
+def vary_heatpump(state: State, parameter: Parameter, vary_location: bool) -> Data:
     resolution = state.general.cell_resolution
     number_cells = np.array(state.general.number_cells)
 
     hp = deepcopy(parameter.value)
     assert isinstance(hp, HeatPump)
 
-    # This is needed as we need to calculate the heatpump coordinates for pflotran.in
-    result_location = (number_cells - 1) * state.get_rng().random(3) * resolution + (resolution * 0.5)
+    hp = handle_heatpump_values(state.get_rng(), hp)
+
+    result_location = np.array(hp.location)
+    if vary_location:
+        # This is needed as we need to calculate the heatpump coordinates for pflotran.in
+        result_location = (number_cells - 1) * state.get_rng().random(3) * resolution + (resolution * 0.5)
 
     return Data(
         name=parameter.name,
@@ -49,7 +55,7 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
     assert not isinstance(parameter.value, HeatPumps)
     match parameter.vary:
         case Vary.FIXED:
-            data = copy_parameter(parameter)
+            data = copy_parameter(state, parameter)
         case Vary.SPACE:
             if isinstance(parameter.value, ParameterValuePerlin):
                 data = Data(
@@ -63,7 +69,7 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
                 )
             # This should be inside the CONST block, yet it seems to make more sense to users to find it here
             elif isinstance(parameter.value, HeatPump):
-                data = vary_heatpump(state, parameter)
+                data = vary_heatpump(state, parameter, True)
             elif isinstance(parameter.value, ParameterValueMinMax):
                 raise ValueError(
                     f"Parameter {parameter.name} is vary.space and has min/max values, "
@@ -125,26 +131,32 @@ def calculate_hp_coordinates(state: State) -> State:
     return state
 
 
+def handle_heatpump_values(rand: np.random.Generator, hp_data: HeatPump) -> HeatPump:
+    """Normalize the given value to a `TimeBasedValue` with values that lay between the given min/max values."""
+
+    assert isinstance(hp_data.injection_temp, TimeBasedValue)
+    assert isinstance(hp_data.injection_rate, TimeBasedValue)
+
+    for timestep, value in hp_data.injection_temp.values.items():
+        # Iterate over each of the heat pumps time value
+        if isinstance(value, ParameterValueMinMax):
+            # Value is given as min/max
+            hp_data.injection_temp.values[timestep] = value.max - (rand.random() * (value.max - value.min))
+
+    for timestep, value in hp_data.injection_rate.values.items():
+        # Iterate over each of the heat pumps time value
+        if isinstance(value, ParameterValueMinMax):
+            # Value is given as min/max
+            hp_data.injection_rate.values[timestep] = value.max - (rand.random() * (value.max - value.min))
+
+    return hp_data
+
+
 def generate_heatpumps(state: State) -> State:
     """Generate `HeatPump`s from the given `HeatPumps` parameter. This function will remove all `HeatPumps` from
     `State.heatpump_parameters` and add `HeatPumps.number` `HeatPump`s to the dict. The `HeatPump.injection_temp` and
     `HeatPump.injection_rate` values are simply taken from a random number between the respective min and max values.
     """
-
-    def handle_heatpump_values(value: TimeBasedValue | ParameterValueMinMax):
-        """Normalize the given value to a `TimeBasedValue` with values that lay between the given min/max values."""
-        if isinstance(value, ParameterValueMinMax):
-            value = TimeBasedValue(values={0: ParameterValueMinMax(min=value.min, max=value.max)})
-
-        result = TimeBasedValue(time_unit=value.time_unit, values={})
-
-        for index, val in value.values.items():
-            if isinstance(val, ParameterValueMinMax):
-                result.values[index] = val.max - (rand.random() * (val.max - val.min))
-            else:
-                result.values[index] = val
-
-        return result
 
     rand = state.get_rng()
     new_heatpumps: dict[str, Parameter] = {}
@@ -166,8 +178,8 @@ def generate_heatpumps(state: State) -> State:
             # XXX: This is actually always random
             location = np.ceil(rand.random(3) * state.general.number_cells).tolist()
 
-            injection_temp = handle_heatpump_values(hps.value.injection_temp)
-            injection_rate = handle_heatpump_values(hps.value.injection_rate)
+            injection_temp = hps.value.injection_temp
+            injection_rate = hps.value.injection_rate
 
             logging.debug(
                 "Generating heatpump with location %s, injection_temp %s, injection_rate %s",
