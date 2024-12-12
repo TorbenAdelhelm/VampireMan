@@ -390,6 +390,10 @@ class State(BaseModel):
             )
         }
     )
+    """This defines the default `heatpump_parameters`. It creates a single heat pump. IMPORTANT: if given a user
+    settings file that specifies heat pump `hp2` and `hp3`, the `hp1` from the defaults will get discarded! If `hp1`
+    should be used when there are other heat pumps, it must be specified along the others in the settings file.
+    """
 
     # TODO split this in datapoints_fixed, datapoint_const_within_datapoint, ...
     datapoints: list[Datapoint] = Field(default_factory=lambda: [])
@@ -460,9 +464,12 @@ class State(BaseModel):
         return data
 
     def override_with(self, other_state: "State"):
+        """Override this `State` with another given `State` object. Will discard current `GeneralConfig`, current
+        `heatpump_parameters`, and `datapoints`, but will merge `hydrogeological_parameters`.
+        """
         self.general = other_state.general
         self.hydrogeological_parameters |= other_state.hydrogeological_parameters
-        self.heatpump_parameters |= other_state.heatpump_parameters
+        self.heatpump_parameters = other_state.heatpump_parameters
         self.datapoints = other_state.datapoints
 
     def get_rng(self) -> np.random.Generator:
