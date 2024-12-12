@@ -1,4 +1,14 @@
-# This setting has one heatpump and reads in files for the hydrogeological_parameters
+# This setting shows how to read data from files. The files for one heat pump and the hydrogeological_parameters are
+# being read in from the file system. It also shows, that json, h5 and ascii txt files are supported. When using this
+# feature, the vary field must be set to `fixed`.
+#
+# grid: 2D unstructured (converted to 3D with z = 1) -> (32, 256, 1)
+# datapoint(s): 1
+# heat pump(s): 1 fix
+# permeability: fix
+# hydraulic head: fix
+# temperature: fix
+
 general:
   output_directory: ./datasets_out/case7_read-from-files
   mpirun: false

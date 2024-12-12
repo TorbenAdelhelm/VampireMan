@@ -1,10 +1,12 @@
-# This setting has multiple hps and a varying permeability field.
+# This setting has two hps and a varying permeability field. It shows how to specify a perlin field using the
+# parameters `frequency`, `min` and `max`.
 #
-# Diff from case1:
+# grid: 2D unstructured (converted to 3D with z = 1) -> (32, 256, 1)
 # datapoint(s): 3
-# heat pump(s): 1 fix, 1 space
+# heat pump(s): 2 space
 # permeability: space
 # hydraulic head: fix
+# temperature: fix
 
 general:
   output_directory: ./datasets_out/case3_allin1
@@ -16,13 +18,13 @@ heatpump_parameters:
   hp1:
     vary: spatially_vary_within_datapoint
     value:
-      location: [32, 512, 1]
+      location: [1, 1, 1] # Gets overwritten
       injection_temp: 15.6
       injection_rate: 0.00024
   hp2:
     vary: spatially_vary_within_datapoint
     value:
-      location: [16, 64, 1]
+      location: [1, 1, 1] # Gets overwritten
       injection_temp: 15.6
       injection_rate: 0.00024
 hydrogeological_parameters:

@@ -1,9 +1,12 @@
-# In addition to case0, there are now two datapoints, the hydraulic_head and the permeability are varied using the CONST method.
+# This case will create two datapoints. The hydraulic_head and the permeability are varied using the CONST mode.
+# The case shall give insights in how the const mode works.
 #
-# Diff from case0:
+# grid: 2D unstructured (converted to 3D with z = 1) -> (32, 256, 1)
 # datapoint(s): 2
+# heat pump(s): 1 fix
 # permeability: const
 # hydraulic head: const
+# temperature: fix
 
 general:
   output_directory: ./datasets_out/case1_vary-hydraulic_head-const

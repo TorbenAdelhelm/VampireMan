@@ -1,4 +1,12 @@
 # This setting has one hp in a long domain using const hydraulic_head and perlin permeability field.
+#
+# grid: 2D unstructured (converted to 3D with z = 1) -> (32, 1280, 1)
+# datapoint(s): 3
+# heat pump(s): 1 fix
+# permeability: const
+# hydraulic head: const
+# temperature: fix
+
 general:
   number_datapoints: 3
   output_directory: ./datasets_out/case4_extend-plumes

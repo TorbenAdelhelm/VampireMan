@@ -1,9 +1,12 @@
-# This setting is larger than the default case and has several heat pumps.
+# This setting is larger than the default case and has three heat pumps. One of them is fix, the other two are
+# spatially varied, meaning the location that must be given by a user, gets randomized.
 #
-# Diff from case0:
-# grid: 2D larger -> (32, 512, 1)
+# grid: 2D unstructured (converted to 3D with z = 1) -> (32, 512, 1)
 # datapoint(s): 2
 # heat pump(s): 1 fix, 2 space
+# permeability: fix
+# hydraulic head: fix
+# temperature: fix
 
 general:
   number_datapoints: 1
@@ -14,7 +17,8 @@ general:
   mpirun: false
   mute_simulation_output: true
 heatpump_parameters:
-  # This overrides the default heatpump defined in the code
+  # As soon as any heatpumps are given, the default heatpump specified in the code will be discarded and replaced by
+  # these values here.
   hp1:
     value:
       location: [32, 64, 1]

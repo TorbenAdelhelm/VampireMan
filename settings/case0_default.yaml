@@ -1,6 +1,6 @@
-# This is the default use case. All the default values except the output_directory come from the defaults defined by the program.
-# It provides a small domain (32, 256, 1) with a resolution of (5, 5, 5) meters per cell.
-# There is a fixed temperature, hydraulic head and permeability and a single heat pump with a fix position.
+# This is the default use case. All the default values except the output_directory come from the defaults defined by the
+# program. It provides a small domain (32, 256, 1) with a resolution of (5, 5, 5) meters per cell. There is a fixed
+# temperature, hydraulic head and permeability and a single heat pump with a fix position.
 #
 # grid: 2D unstructured (converted to 3D with z = 1) -> (32, 256, 1)
 # datapoint(s): 1
@@ -13,4 +13,3 @@ general:
   output_directory: ./datasets_out/case0_default
   # TODO remove this
   mpirun: false
-  mute_simulation_output: true
