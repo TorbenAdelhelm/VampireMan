@@ -355,9 +355,6 @@ class State(BaseModel):
     general: GeneralConfig = Field(default_factory=lambda: GeneralConfig())
     """The `GeneralConfig`."""
 
-    pure: bool = Field(True, exclude=True)
-    """Internally used to detect if anything runs impure/non-deterministically."""
-
     hydrogeological_parameters: dict[str, Parameter] = Field(
         default_factory=lambda: {
             "permeability": Parameter(
@@ -460,13 +457,6 @@ class State(BaseModel):
             )
 
         return self
-
-    @model_validator(mode="before")
-    def prevent_pure_field_to_be_set(cls, data):
-        """This prevents setting the pure property."""
-        if data.get("pure") is not None:
-            raise ValueError("Not allowed to specify `pure` parameter.")
-        return data
 
     def override_with(self, other_state: "State"):
         """Override this `State` with another given `State` object. Will discard current `GeneralConfig`, current

@@ -115,7 +115,6 @@ def write_data_to_verified_json_file(state: "State", target_path: Path, data: Ba
         if hash_in_memory != hash_target_file:
             logging.warning("Target file '%s' has different contents than data structure!", target_path)
             if not get_answer(state, f"Different target file already in {target_path}, overwrite?"):
-                state.pure = False
                 return
         else:
             logging.debug("File '%s' doesn't need to be written", target_path)

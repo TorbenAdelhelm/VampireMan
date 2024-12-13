@@ -34,9 +34,6 @@ def test_state_dont_allow_extras():
 def test_state_catch_wrong_values():
     # Check if wrong values get caught
     with pytest.raises(ValidationError):
-        State(**{"pure": 5})
-
-    with pytest.raises(ValidationError):
         print(State(**{"general": {"number_cells": ["test", {}]}}))
 
 
