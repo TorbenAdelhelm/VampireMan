@@ -1,13 +1,20 @@
 # This setting has multiple hps and a varying permission field.
 general:
-  output_directory: ./datasets_out/test
-  number_datapoints: 3
-  time_to_simulate:
-    final_time: 27.5
-  profiling: true
-  mute_simulation_output: true
-  mpirun: false
+  number_cells: [32, 256] # third value will be automatically set to 1
+  cell_resolution: 5.0
   shuffle_datapoints: true
+  interactive: false
+  output_directory: ./datasets_out/case10_all-features
+  random_seed: 42
+  number_datapoints: 2
+  time_to_simulate:
+    final_time: 30.5
+    unit: year
+  workflow: pflotran
+  profiling: true
+  mpirun: true
+  mpirun_procs: 4
+  mute_simulation_output: true
 heatpump_parameters:
   hp1:
     vary: fixed
@@ -16,12 +23,22 @@ heatpump_parameters:
       injection_temp:
         time_unit: year
         values:
-          0: 15
-          3.5: 10
-          4: 15
-          4.5: 10
+          0:
+            min: 10
+            max: 15
+          3.5:
+            min: 10
+            max: 15
+          4:
+            min: 10
+            max: 15
+          4.5:
+            min: 10
+            max: 15
           5: 15
       injection_rate: 0.00024
+  hp2:
+    value: ./settings/case10_all-features/hp2.json
   hps:
     vary: spatially_vary_within_datapoint
     value:
@@ -55,3 +72,12 @@ hydrogeological_parameters:
       x: -0.0008
       y: -0.003
       z: 0
+  temperature:
+    vary: const_within_datapoint
+    value:
+      min: 8
+      max: 10
+  porosity:
+    value: 0.25
+  vertical_anisotropy_ratio:
+    value: 10
