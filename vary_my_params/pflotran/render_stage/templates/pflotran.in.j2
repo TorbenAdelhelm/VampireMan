@@ -60,7 +60,7 @@ SUBSURFACE
 
   MATERIAL_PROPERTY gravel
     ID 1
-    POROSITY 0.25d0                #[-]
+    POROSITY {{ porosity.value }}  #[-]
     ROCK_DENSITY 2.8d3             #[kg/m^3]
     SPECIFIC_HEAT 2.0d3            #[J/(kg*K)]
     THERMAL_CONDUCTIVITY_DRY 0.65  #[W/(K*m)]
@@ -166,7 +166,7 @@ SUBSURFACE
 
   MATERIAL_PROPERTY {{ key }}_material
     ID {{ outer_loop.index + 5 + 1 }} {#- visually separate from gravel #}
-    POROSITY 0.25d0                #[-]
+    POROSITY {{ porosity.value }}  #[-]
     ROCK_DENSITY 2.8d3             #[kg/m^3]
     SPECIFIC_HEAT 2.0d3            #[J/(kg*K)]
     THERMAL_CONDUCTIVITY_DRY 0.65  #[W/(K*m)]

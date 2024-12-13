@@ -375,6 +375,11 @@ class State(BaseModel):
                 vary=Vary.FIXED,
                 value=10.6,
             ),
+            "porosity": Parameter(
+                name="porosity",
+                vary=Vary.FIXED,
+                value=0.25,
+            ),
         }
     )
     heatpump_parameters: dict[str, Parameter] = Field(
