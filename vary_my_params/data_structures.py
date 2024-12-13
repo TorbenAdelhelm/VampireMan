@@ -458,6 +458,13 @@ class State(BaseModel):
 
         return self
 
+    @model_validator(mode="before")
+    def prevent_datapoints_to_be_set(cls, data):
+        """This prevents setting the pure property."""
+        if data.get("datapoints") is not None:
+            raise ValueError("Not allowed to specify `datapoints` parameter directly.")
+        return data
+
     def override_with(self, other_state: "State"):
         """Override this `State` with another given `State` object. Will discard current `GeneralConfig`, current
         `heatpump_parameters`, and `datapoints`, but will merge `hydrogeological_parameters`.
