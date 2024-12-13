@@ -15,15 +15,15 @@ from ruamel.yaml import YAML
 yaml = YAML(typ="safe")
 
 
-def value_is_3d(value: list[float]):
+def value_is_3d(value: list[float] | NDArray):
     """Ensure value is given in three dimensional space."""
-    if len(value) == 2:
-        if isinstance(value, NDArray):
-            value = np.append(value, 1)
+    if len(value) == 2:  # pyright: ignore
+        if isinstance(value, NDArray):  # pyright: ignore
+            value = np.append(value, 1)  # pyright: ignore
         else:
-            value.append(1)
+            value.append(1)  # pyright: ignore
 
-    if len(value) != 3:
+    if len(value) != 3:  # pyright: ignore
         raise ValueError("Value must be given in three dimensional space")
 
     return value
@@ -262,7 +262,7 @@ class Datapoint(BaseModel):
 class GeneralConfig(BaseModel):
     """The `GeneralConfig` doesn't change during execution of the program."""
 
-    number_cells: NDArray[Shape["3 number_cells"], int] | NDArray[Shape["2 number_cells"], int] = Field(
+    number_cells: NDArray[Shape["3 number_cells"], int] | NDArray[Shape["2 number_cells"], int] = Field(  # pyright: ignore[reportInvalidTypeArguments]
         default_factory=lambda: np.array([32, 256, 1])
     )
     """Specifies the number of cells for the simulation."""

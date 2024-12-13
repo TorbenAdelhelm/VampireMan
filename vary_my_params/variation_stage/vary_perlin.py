@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 import noise
 import numpy as np
@@ -14,7 +14,7 @@ def make_perlin_grid(
     offset: NDArray[np.float64],
     freq: list[float],
 ) -> NDArray[np.floating[Any]]:
-    grid_dimensions: list[int] = state.general.number_cells
+    grid_dimensions: list[int] = cast(np.ndarray, state.general.number_cells).tolist()
 
     # adapted by Manuel Hirche
 
@@ -91,7 +91,7 @@ def create_perlin_field(state: State, parameter: Parameter):
 
 def create_const_field(state: State, value: float | NDArray):
     # TODO think about pressure
-    return np.full(state.general.number_cells, value)
+    return np.full(cast(np.ndarray, state.general.number_cells), value)
 
 
 def calc_pressure_from_gradient_field(

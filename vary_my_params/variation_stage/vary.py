@@ -1,5 +1,6 @@
 import logging
 from copy import deepcopy
+from typing import cast
 
 import numpy as np
 
@@ -176,7 +177,7 @@ def generate_heatpumps(state: State) -> State:
                 raise ValueError(msg)
 
             # XXX: This is actually always random
-            location = np.ceil(rand.random(3) * state.general.number_cells).tolist()
+            location = np.ceil(rand.random(3) * cast(np.ndarray, state.general.number_cells)).tolist()
 
             injection_temp = hps.value.injection_temp
             injection_rate = hps.value.injection_rate

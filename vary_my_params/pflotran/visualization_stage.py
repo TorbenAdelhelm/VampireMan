@@ -1,7 +1,7 @@
 import logging
 from collections import OrderedDict
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import h5py
 import matplotlib.pyplot as plt
@@ -86,7 +86,7 @@ def print_heatpump_temp(state: State, data: TimeData):
 
 
 def make_plottable(state: State, hdf5_file: h5py.File) -> TimeData:
-    dimensions = state.general.number_cells
+    dimensions = cast(np.ndarray, state.general.number_cells)
 
     datapoints_to_plot: TimeData = OrderedDict()
 
@@ -193,7 +193,7 @@ def plot_vary_field(state: State, datapoint_dir: Path, parameter: Data):
 
     if parameter.value.ndim != 3:
         # Reshape the data to match the 3D space of the domain
-        parameter.value = parameter.value.reshape(state.general.number_cells, order="F")
+        parameter.value = parameter.value.reshape(cast(np.ndarray, state.general.number_cells), order="F")
 
     axes[0].imshow(parameter.value[:, :, 0])
     axes[2].imshow(parameter.value[:, 0, :])
