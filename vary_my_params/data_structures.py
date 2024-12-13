@@ -137,8 +137,8 @@ class HeatPumps(BaseModel):
     number: PositiveInt
     """How many `HeatPump`s to generate."""
 
-    injection_temp: TimeBasedValue | ParameterValueMinMax
-    injection_rate: TimeBasedValue | ParameterValueMinMax
+    injection_temp: TimeBasedValue | ParameterValueMinMax | float
+    injection_rate: TimeBasedValue | ParameterValueMinMax | float
 
     model_config = ConfigDict(extra="forbid")
 
