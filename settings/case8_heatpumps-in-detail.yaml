@@ -1,0 +1,87 @@
+# This setting has six hps which show the different possibilities to specify operational parameters.
+# - hp1: fixed values
+# - hp2: calculates different values for each of the datapoints
+# - hp3: time based values for the injection_temp
+# - hp4: time based values varying between min and max values
+# - hps: generates two heatpumps which also support the four modes from hp1-4
+#
+# grid: 2D unstructured (converted to 3D with z = 1) -> (32, 256, 1)
+# datapoint(s): 3
+# heat pump(s): 4 fix, 2 space
+# permeability: fix
+# hydraulic head: fix
+# temperature: fix
+
+general:
+  output_directory: ./datasets_out/case8_heatpumps-in-detail
+  number_datapoints: 3
+  mpirun: false
+  mute_simulation_output: true
+heatpump_parameters:
+  hp1:
+    # This heat pump has fixed values, nothing changes here.
+    vary: fixed
+    value:
+      location: [8, 32, 1]
+      injection_temp: 10.0
+      injection_rate: 0.0002
+  hp2:
+    # This heat pump has const values, varied between min and max
+    vary: fixed
+    value:
+      location: [20, 32, 1]
+      injection_temp:
+        min: 14.0
+        max: 18.0
+      injection_rate:
+        min: 0.0002
+        max: 0.0003
+  hp3:
+    vary: fixed
+    value:
+      location: [16, 32, 1]
+      injection_temp:
+        time_unit: year
+        values:
+          0: 15.6
+          1: 6.6
+          2: 15.6
+          3: 6.6
+          3.5: 15.6
+          4: 6.6
+          4.5: 15.6
+          5: 6.6
+          6: 15.6
+          7: 6.6
+      injection_rate: 0.00024
+  hp4:
+    vary: fixed
+    value:
+      location: [24, 32, 1]
+      injection_temp:
+        time_unit: year
+        values:
+          0: 6.6
+          1: 15.6
+          2: 6.6
+          3: 15.6
+          3.5: 6.6
+          4: 15.6
+          4.5: 6.6
+          5: 15.6
+          6: 6.6
+          7: 15.6
+      injection_rate:
+        time_unit: year
+        values:
+          0:
+            min: 0.0002
+            max: 0.0003
+          3.5:
+            min: 0.00008
+            max: 0.00018
+  hps:
+    value:
+      number: 2
+      injection_temp: 4
+      injection_rate: 0.0001
