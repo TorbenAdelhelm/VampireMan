@@ -91,6 +91,8 @@ def create_perlin_field(state: State, parameter: Parameter):
 
 def create_const_field(state: State, value: float | NDArray):
     # TODO think about pressure
+    if isinstance(value, np.ndarray):
+        value = value.reshape(state.general.number_cells) # pyright: ignore
     return np.full(cast(np.ndarray, state.general.number_cells), value)
 
 
