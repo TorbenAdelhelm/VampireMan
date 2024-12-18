@@ -93,6 +93,9 @@ class ParameterValueMinMax(BaseModel):
             raise ValueError("`max` value must be greater or equal to `min`")
         return self
 
+    def __str__(self) -> str:
+        return f"[{self.min} <= {self.max}]"
+
 
 class TimeBasedValue(BaseModel):
     """This represents a time based value. This could be anything that can be varied in the `Vary.TIME` mode."""
@@ -104,6 +107,12 @@ class TimeBasedValue(BaseModel):
     """Values that represent timesteps and their respective values. E.g., `{0: 10, 1: 15}` means, that at
     timestep `0`, the value is `10` and at timestep `1` the value is `15`.
         """
+
+    def __str__(self) -> str:
+        string = []
+        for key, value in self.values.items():
+            string.append(f"\n[{key} {self.time_unit}]: {value}")
+        return "".join(string)
 
 
 class HeatPump(BaseModel):
@@ -125,6 +134,13 @@ class HeatPump(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     _validated_3d = field_validator("location")(value_is_3d)
+
+    def __str__(self) -> str:
+        return (
+            f"X:{self.location[0]} Y:{self.location[1]} Z:{self.location[2]}\n"
+            f"Temp: {self.injection_temp}\n"
+            f"Rate: {self.injection_rate}"
+        )
 
 
 class HeatPumps(BaseModel):
@@ -173,6 +189,9 @@ class ParameterValuePerlin(BaseModel):
         if self.max < self.min:
             raise ValueError("`max` value must be greater or equal to `min`")
         return self
+
+    def __str__(self) -> str:
+        return f"Freq: {self.frequency}, [{self.min} <= {self.max}]"
 
 
 class ValueXYZ(BaseModel):
@@ -225,12 +244,13 @@ class Parameter(BaseModel):
         return value
 
     def __str__(self) -> str:
+        value_string = str(self.value)
+        value_string = value_string.split("\n")
+        value_string = "\n      ".join(value_string)
         return (
-            f"====== Parameter {self.name}\n"
-            f"       Distribution: {self.distribution}\n"
-            f"       Vary: {self.vary}\n"
-            f"       type(): {type(self.value)}\n"
-            f"       Value: {self.value}\n"
+            f"===== {self.name}: Distribution: {self.distribution}, "
+            f"Vary: {self.vary}, type(): {type(self.value)}\n"
+            f"      Value: {value_string}\n"
         )
 
 
@@ -242,7 +262,7 @@ class Data(BaseModel):
 
     def __str__(self) -> str:
         value = "ndarray" if isinstance(self.value, np.ndarray) else self.value
-        return f"====== {self.name} [{type(self.value)}]: {value}"
+        return f"===== {self.name} [{type(self.value)}]: {value}"
 
 
 class Datapoint(BaseModel):
@@ -253,11 +273,19 @@ class Datapoint(BaseModel):
 
     def __str__(self) -> str:
         data_strings = []
-        for _, item in self.data.items():
-            data_strings.append(str(item))
 
-        return f"=== Datapoint #{self.index}:\n" f"{"\n".join(data_strings)}"
+        for _, value in self.data.items():
 
+            value_string = str(value)
+            value_string = value_string.split("\n")
+            value_string = "\n      ".join(value_string)
+
+            data_strings.append(value_string)
+
+        return (
+            f"=== Datapoint #{self.index}\n"
+            f"{"\n".join(data_strings)}"
+        )
 
 class GeneralConfig(BaseModel):
     """The `GeneralConfig` doesn't change during execution of the program."""
