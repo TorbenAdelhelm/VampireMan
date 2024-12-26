@@ -275,17 +275,14 @@ class Datapoint(BaseModel):
         data_strings = []
 
         for _, value in self.data.items():
-
             value_string = str(value)
             value_string = value_string.split("\n")
             value_string = "\n      ".join(value_string)
 
             data_strings.append(value_string)
 
-        return (
-            f"=== Datapoint #{self.index}\n"
-            f"{"\n".join(data_strings)}"
-        )
+        return f"=== Datapoint #{self.index}\n" f"{"\n".join(data_strings)}"
+
 
 class GeneralConfig(BaseModel):
     """The `GeneralConfig` doesn't change during execution of the program."""
