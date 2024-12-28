@@ -177,3 +177,4 @@ pflotran.h5
 
 /html
 *.jsonschema
+/profiling
