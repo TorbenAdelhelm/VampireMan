@@ -111,6 +111,7 @@
             pkgs.nixfmt-rfc-style
             pkgs.treefmt
             python3_env
+            self.packages.x86_64-linux.hdf5
           ];
         };
       };
