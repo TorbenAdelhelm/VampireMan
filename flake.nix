@@ -2,7 +2,7 @@
   description = "Pflotran flake";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-  inputs.poetry2nix.url = "github:cheriimoya/poetry2nix";
+  inputs.poetry2nix.url = "github:nix-community/poetry2nix";
 
   outputs =
     {
