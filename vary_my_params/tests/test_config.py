@@ -42,7 +42,7 @@ def test_state_invalid_state():
         State(
             **{
                 "general": {
-                    "workflow": "new-thing",
+                    "numerical_solver": "new-thing",
                 }
             }
         )

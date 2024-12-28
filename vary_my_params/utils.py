@@ -42,16 +42,16 @@ def get_answer(state: "State", question: str, exit_if_no: bool = False) -> bool:
         sys.exit(0)
 
 
-def get_workflow_module(workflow: str) -> ModuleType:
-    # Get workflow specific defaults
-    match workflow:
+def get_numerical_solver_implementation(numerical_solver: str) -> ModuleType:
+    # Get solver specific defaults
+    match numerical_solver:
         case "pflotran":
             from . import pflotran
 
             return pflotran
         case _:
-            logging.error("%s workflow is not yet implemented", workflow)
-            raise NotImplementedError("Workflow not implemented")
+            logging.error("%s numerical solver is not yet implemented", numerical_solver)
+            raise NotImplementedError("Numerical solver not implemented")
 
 
 def profile_function(function):

@@ -4,7 +4,7 @@ This tool allows a user to describe how parameters for a data set should be vari
 After describing which parameters should be varied in which manner, i.e. permeability should be a constant field, with values varying between 1 and 10, the program proceeds actually varying these parameters and also renders all files necessary to run the simulations afterwards.
 Then, the tool starts a simulation based on the rendered input files and finally visualizes the results.
 
-Currently, only the preparation for the simulation software `pflotran` workflow is implemented.
+Currently, only the preparation for the simulation software `pflotran` is implemented.
 
 The minimum required Python version is 3.11.
 
@@ -69,7 +69,7 @@ Two dimensional grids are implicitly converted to three dimensions by adding a `
 Further, all cases have the similarities:
 - random seed is always set to `0`
 - output directory is set to `./datasets_out/<casename>`.
-- workflow is `pflotran`
+- numerical solver is `pflotran`
 - profiling is disabled
 - simulation time is 27.5 years
 - interactive is set to false

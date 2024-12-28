@@ -54,11 +54,11 @@ class Vary(enum.StrEnum):
     """
 
 
-class Workflow(enum.StrEnum):
-    """Enum behind `GeneralConfig.workflow`."""
+class NumericalSolver(enum.StrEnum):
+    """Enum behind `GeneralConfig.numerical_solver`."""
 
     PFLOTRAN = "pflotran"
-    """The reference implementation and therefore the default workflow."""
+    """The reference implementation and therefore the default value."""
 
 
 class TimeToSimulate(BaseModel):
@@ -333,7 +333,7 @@ class GeneralConfig(BaseModel):
     time_to_simulate: TimeToSimulate = Field(default_factory=lambda: TimeToSimulate())
     """Influences the timespan of the simulation."""
 
-    workflow: Workflow = Workflow.PFLOTRAN
+    numerical_solver: NumericalSolver = NumericalSolver.PFLOTRAN
     """In essence, this states which simulation tool specific functions should be called during later stages of the
     pipeline."""
 
@@ -367,7 +367,7 @@ class GeneralConfig(BaseModel):
             f"    Output directory: {self.output_directory}\n"
             f"    Random seed: {self.random_seed}\n"
             f"    Number of datapoints: {self.number_datapoints}\n"
-            f"    Using workflow: {self.workflow}\n"
+            f"    Using numerical solver: {self.numerical_solver}\n"
             f"    Number of cells: {self.number_cells}\n"
             f"    Cell resolution: {self.cell_resolution}\n"
             f"    Time to simulate: {str(self.time_to_simulate)}\n"

@@ -10,7 +10,7 @@ general:
   time_to_simulate:
     final_time: 30.5
     unit: year
-  workflow: pflotran
+  numerical_solver: pflotran
   profiling: true
   mpirun: true
   mpirun_procs: 4
