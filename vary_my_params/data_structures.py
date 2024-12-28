@@ -61,7 +61,7 @@ class NumericalSolver(enum.StrEnum):
     """The reference implementation and therefore the default value."""
 
 
-class TimeToSimulate(BaseModel):
+class ValueTimeSpan(BaseModel):
     """The timespan that the simulation tool should simulate. Value and unit are separated for more flexibility."""
 
     final_time: float = 27.5
@@ -330,7 +330,7 @@ class GeneralConfig(BaseModel):
     number_datapoints: PositiveInt = 1
     """The number of datapoints to be generated."""
 
-    time_to_simulate: TimeToSimulate = Field(default_factory=lambda: TimeToSimulate())
+    time_to_simulate: ValueTimeSpan = Field(default_factory=lambda: ValueTimeSpan())
     """Influences the timespan of the simulation."""
 
     numerical_solver: NumericalSolver = NumericalSolver.PFLOTRAN
