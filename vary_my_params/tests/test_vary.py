@@ -5,9 +5,9 @@ from vary_my_params.data_structures import (
     HeatPump,
     Parameter,
     State,
-    TimeBasedValue,
     ValueMinMax,
     ValuePerlin,
+    ValueTimeSeries,
     Vary,
 )
 from vary_my_params.pipeline import preparation_stage, variation_stage
@@ -184,7 +184,7 @@ def test_time_based_provided_values():
             name="hp1",
             value=HeatPump(
                 location=[1, 1, 1],
-                injection_temp=TimeBasedValue(
+                injection_temp=ValueTimeSeries(
                     values={
                         0: 0,
                         1: 1,

@@ -97,7 +97,7 @@ class ValueMinMax(BaseModel):
         return f"[{self.min} <= {self.max}]"
 
 
-class TimeBasedValue(BaseModel):
+class ValueTimeSeries(BaseModel):
     """This represents a time series value."""
 
     time_unit: str = "year"
@@ -175,11 +175,11 @@ class HeatPump(BaseModel):
     into coordinates matching the domain by multiplying it by the `GeneralConfig.cell_resolution`."""
 
     # TODO make this list[float]
-    injection_temp: TimeBasedValue | ValueMinMax | float
+    injection_temp: ValueTimeSeries | ValueMinMax | float
     """The injection temperature of the `HeatPump` in degree Celsius."""
 
     # TODO make this list[float]
-    injection_rate: TimeBasedValue | ValueMinMax | float
+    injection_rate: ValueTimeSeries | ValueMinMax | float
     """The injection rate of the `HeatPump` in m^3/s."""
 
     model_config = ConfigDict(extra="forbid")
@@ -204,8 +204,8 @@ class HeatPumps(BaseModel):
     number: PositiveInt
     """How many `HeatPump`s to generate."""
 
-    injection_temp: TimeBasedValue | ValueMinMax | float
-    injection_rate: TimeBasedValue | ValueMinMax | float
+    injection_temp: ValueTimeSeries | ValueMinMax | float
+    injection_rate: ValueTimeSeries | ValueMinMax | float
 
     model_config = ConfigDict(extra="forbid")
 

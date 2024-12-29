@@ -5,8 +5,8 @@ from vary_my_params.data_structures import (
     HeatPumps,
     Parameter,
     State,
-    TimeBasedValue,
     ValueMinMax,
+    ValueTimeSeries,
     Vary,
 )
 from vary_my_params.pipeline import preparation_stage
@@ -50,7 +50,7 @@ def test_prepare_heatpump_generation():
             value=HeatPumps(
                 number=10,
                 injection_temp=ValueMinMax(min=14, max=18),
-                injection_rate=TimeBasedValue(
+                injection_rate=ValueTimeSeries(
                     time_unit="year",
                     values={
                         0: ValueMinMax(min=0, max=0.002),

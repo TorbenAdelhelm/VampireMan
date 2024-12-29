@@ -12,9 +12,9 @@ from ..data_structures import (
     HeatPumps,
     Parameter,
     State,
-    TimeBasedValue,
     ValueMinMax,
     ValuePerlin,
+    ValueTimeSeries,
     Vary,
 )
 from .vary_perlin import create_perlin_field
@@ -133,10 +133,10 @@ def calculate_hp_coordinates(state: State) -> State:
 
 
 def handle_heatpump_values(rand: np.random.Generator, hp_data: HeatPump) -> HeatPump:
-    """Normalize the given value to a `TimeBasedValue` with values that lay between the given min/max values."""
+    """Normalize the given value to a `ValueTimeSeries` with values that lay between the given min/max values."""
 
-    assert isinstance(hp_data.injection_temp, TimeBasedValue)
-    assert isinstance(hp_data.injection_rate, TimeBasedValue)
+    assert isinstance(hp_data.injection_temp, ValueTimeSeries)
+    assert isinstance(hp_data.injection_rate, ValueTimeSeries)
 
     for timestep, value in hp_data.injection_temp.values.items():
         # Iterate over each of the heat pumps time value
@@ -264,10 +264,10 @@ def handle_time_based_params(state: State) -> State:
     # Convert heatpumps to time based values
     for _, heatpump in state.heatpump_parameters.items():
         assert isinstance(heatpump.value, HeatPump)
-        if not isinstance(heatpump.value.injection_temp, TimeBasedValue):
-            heatpump.value.injection_temp = TimeBasedValue(values={0: heatpump.value.injection_temp})
-        if not isinstance(heatpump.value.injection_rate, TimeBasedValue):
-            heatpump.value.injection_rate = TimeBasedValue(values={0: heatpump.value.injection_rate})
+        if not isinstance(heatpump.value.injection_temp, ValueTimeSeries):
+            heatpump.value.injection_temp = ValueTimeSeries(values={0: heatpump.value.injection_temp})
+        if not isinstance(heatpump.value.injection_rate, ValueTimeSeries):
+            heatpump.value.injection_rate = ValueTimeSeries(values={0: heatpump.value.injection_rate})
 
     return state
 
