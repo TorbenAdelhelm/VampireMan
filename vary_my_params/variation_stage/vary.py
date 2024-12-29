@@ -11,10 +11,10 @@ from ..data_structures import (
     HeatPump,
     HeatPumps,
     Parameter,
-    ParameterValuePerlin,
     State,
     TimeBasedValue,
     ValueMinMax,
+    ValuePerlin,
     Vary,
 )
 from .vary_perlin import create_perlin_field
@@ -58,7 +58,7 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
         case Vary.FIXED:
             data = copy_parameter(state, parameter)
         case Vary.SPACE:
-            if isinstance(parameter.value, ParameterValuePerlin):
+            if isinstance(parameter.value, ValuePerlin):
                 data = Data(
                     name=parameter.name,
                     value=create_perlin_field(state, parameter),
@@ -273,12 +273,12 @@ def handle_time_based_params(state: State) -> State:
 
 
 def calculate_frequencies(state: State) -> State:
-    """For every `Parameter` that has a value of `ParameterValuePerlin` type, calculate the frequency value if
+    """For every `Parameter` that has a value of `ValuePerlin` type, calculate the frequency value if
     `ValueMinMax` is given."""
 
     # Convert heatpumps to time based values
     for _, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
-        if not isinstance(parameter.value, ParameterValuePerlin):
+        if not isinstance(parameter.value, ValuePerlin):
             continue
 
         if not isinstance(parameter.value.frequency, ValueMinMax):

@@ -4,7 +4,7 @@ import noise
 import numpy as np
 from numpy.typing import NDArray
 
-from ..data_structures import Distribution, Parameter, ParameterValuePerlin, State, ValueMinMax
+from ..data_structures import Distribution, Parameter, State, ValueMinMax, ValuePerlin
 
 
 def make_perlin_grid(
@@ -58,7 +58,7 @@ def make_perlin_grid(
 def create_perlin_field(state: State, parameter: Parameter):
     base_offset = state.get_rng().random(3) * 4242
 
-    if not isinstance(parameter.value, ParameterValuePerlin):
+    if not isinstance(parameter.value, ValuePerlin):
         raise ValueError()
 
     freq_factor = parameter.value.frequency

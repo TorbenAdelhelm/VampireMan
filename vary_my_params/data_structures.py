@@ -159,7 +159,7 @@ class HeatPumps(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class ParameterValuePerlin(BaseModel):
+class ValuePerlin(BaseModel):
     """Datastructure to represent a perlin noise value for `Parameter.value`."""
 
     frequency: ValueMinMax | list[float]
@@ -217,7 +217,7 @@ class Parameter(BaseModel):
         | list[int]
         | HeatPumps
         | HeatPump
-        | ParameterValuePerlin
+        | ValuePerlin
         | ValueMinMax
         | Path  # Could use pydantic.FilePath here, but then tests fail as cwd does not match
         | ValueXYZ

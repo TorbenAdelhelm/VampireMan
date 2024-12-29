@@ -4,10 +4,10 @@ from vary_my_params.data_structures import (
     Distribution,
     HeatPump,
     Parameter,
-    ParameterValuePerlin,
     State,
     TimeBasedValue,
     ValueMinMax,
+    ValuePerlin,
     Vary,
 )
 from vary_my_params.pipeline import preparation_stage, variation_stage
@@ -66,7 +66,7 @@ def test_vary_space():
         name="param_perlin",
         vary=Vary.SPACE,
         distribution=Distribution.LOG,
-        value=ParameterValuePerlin(frequency=[18, 18, 18], max=2, min=1),
+        value=ValuePerlin(frequency=[18, 18, 18], max=2, min=1),
     )
 
     param_scalar = state.hydrogeological_parameters.get("param_scalar")
