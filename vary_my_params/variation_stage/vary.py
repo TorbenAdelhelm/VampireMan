@@ -11,10 +11,10 @@ from ..data_structures import (
     HeatPump,
     HeatPumps,
     Parameter,
-    ParameterValueMinMax,
     ParameterValuePerlin,
     State,
     TimeBasedValue,
+    ValueMinMax,
     Vary,
 )
 from .vary_perlin import create_perlin_field
@@ -71,7 +71,7 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
             # This should be inside the CONST block, yet it seems to make more sense to users to find it here
             elif isinstance(parameter.value, HeatPump):
                 data = vary_heatpump(state, parameter, True)
-            elif isinstance(parameter.value, ParameterValueMinMax):
+            elif isinstance(parameter.value, ValueMinMax):
                 raise ValueError(
                     f"Parameter {parameter.name} is vary.space and has min/max values, "
                     f"it should be set to vary.perlin instead; {parameter}"
@@ -80,7 +80,7 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
                 raise NotImplementedError(f"Dont know how to vary {parameter}")
 
         case Vary.CONST:
-            if isinstance(parameter.value, ParameterValueMinMax):
+            if isinstance(parameter.value, ValueMinMax):
                 # XXX: This will generate one float per datapoint, between min and max values
                 # Currently, there is no shuffling implemented
                 max = deepcopy(parameter.value.max)
@@ -140,13 +140,13 @@ def handle_heatpump_values(rand: np.random.Generator, hp_data: HeatPump) -> Heat
 
     for timestep, value in hp_data.injection_temp.values.items():
         # Iterate over each of the heat pumps time value
-        if isinstance(value, ParameterValueMinMax):
+        if isinstance(value, ValueMinMax):
             # Value is given as min/max
             hp_data.injection_temp.values[timestep] = value.max - (rand.random() * (value.max - value.min))
 
     for timestep, value in hp_data.injection_rate.values.items():
         # Iterate over each of the heat pumps time value
-        if isinstance(value, ParameterValueMinMax):
+        if isinstance(value, ValueMinMax):
             # Value is given as min/max
             hp_data.injection_rate.values[timestep] = value.max - (rand.random() * (value.max - value.min))
 
@@ -231,7 +231,7 @@ def vary_params(state: State) -> State:
 
 def shuffle_datapoints(state: State) -> State:
     """Shuffles all `Parameter`s randomly in between the different `Datapoint`s. This is needed when e.g. two
-    parameters are generated as `Vary.CONST` with `ParameterValueMinMax`, as otherwise they would both have min
+    parameters are generated as `Vary.CONST` with `ValueMinMax`, as otherwise they would both have min
     values in the first `Datapoint` and max values in the last one.
     """
 
@@ -274,14 +274,14 @@ def handle_time_based_params(state: State) -> State:
 
 def calculate_frequencies(state: State) -> State:
     """For every `Parameter` that has a value of `ParameterValuePerlin` type, calculate the frequency value if
-    `ParameterValueMinMax` is given."""
+    `ValueMinMax` is given."""
 
     # Convert heatpumps to time based values
     for _, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
         if not isinstance(parameter.value, ParameterValuePerlin):
             continue
 
-        if not isinstance(parameter.value.frequency, ParameterValueMinMax):
+        if not isinstance(parameter.value.frequency, ValueMinMax):
             continue
 
         rand = state.get_rng()

@@ -4,10 +4,10 @@ from vary_my_params.data_structures import (
     Distribution,
     HeatPump,
     Parameter,
-    ParameterValueMinMax,
     ParameterValuePerlin,
     State,
     TimeBasedValue,
+    ValueMinMax,
     Vary,
 )
 from vary_my_params.pipeline import preparation_stage, variation_stage
@@ -119,7 +119,7 @@ def test_vary_heatpump():
 
 
 def test_vary_const():
-    # TODO: Write CONST&&ParameterValueMinMaxArray test
+    # TODO: Write CONST&&ValueMinMaxArray test
     state = State()
     state.general.interactive = False
     state.general.number_datapoints = 3
@@ -129,12 +129,12 @@ def test_vary_const():
     state.hydrogeological_parameters["parameter"] = Parameter(
         name="parameter",
         vary=Vary.CONST,
-        value=ParameterValueMinMax(min=1, max=5),
+        value=ValueMinMax(min=1, max=5),
     )
     state.hydrogeological_parameters["parameter2"] = Parameter(
         name="parameter2",
         vary=Vary.CONST,
-        value=ParameterValueMinMax(min=-0.12, max=0.32),
+        value=ValueMinMax(min=-0.12, max=0.32),
     )
 
     param = state.hydrogeological_parameters.get("parameter")

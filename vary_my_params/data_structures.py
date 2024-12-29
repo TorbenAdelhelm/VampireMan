@@ -78,8 +78,8 @@ class ValueTimeSpan(BaseModel):
         return f"{self.final_time} {self.unit}"
 
 
-class ParameterValueMinMax(BaseModel):
-    """Datastructure to represent a `min` and a `max` value for `Parameter.value`."""
+class ValueMinMax(BaseModel):
+    """Datastructure to represent a `min` and a `max` value, e.g., for `Parameter.value`."""
 
     min: float
     max: float
@@ -98,12 +98,12 @@ class ParameterValueMinMax(BaseModel):
 
 
 class TimeBasedValue(BaseModel):
-    """This represents a time based value. This could be anything that can be varied in the `Vary.TIME` mode."""
+    """This represents a time series value."""
 
     time_unit: str = "year"
     """The unit of each of the float values in the `values` dict."""
 
-    values: dict[float, ParameterValueMinMax | float]
+    values: dict[float, ValueMinMax | float]
     """Values that represent timesteps and their respective values. E.g., `{0: 10, 1: 15}` means, that at
     timestep `0`, the value is `10` and at timestep `1` the value is `15`.
         """
@@ -124,11 +124,11 @@ class HeatPump(BaseModel):
     into coordinates matching the domain by multiplying it by the `GeneralConfig.cell_resolution`."""
 
     # TODO make this list[float]
-    injection_temp: TimeBasedValue | ParameterValueMinMax | float
+    injection_temp: TimeBasedValue | ValueMinMax | float
     """The injection temperature of the `HeatPump` in degree Celsius."""
 
     # TODO make this list[float]
-    injection_rate: TimeBasedValue | ParameterValueMinMax | float
+    injection_rate: TimeBasedValue | ValueMinMax | float
     """The injection rate of the `HeatPump` in m^3/s."""
 
     model_config = ConfigDict(extra="forbid")
@@ -153,8 +153,8 @@ class HeatPumps(BaseModel):
     number: PositiveInt
     """How many `HeatPump`s to generate."""
 
-    injection_temp: TimeBasedValue | ParameterValueMinMax | float
-    injection_rate: TimeBasedValue | ParameterValueMinMax | float
+    injection_temp: TimeBasedValue | ValueMinMax | float
+    injection_rate: TimeBasedValue | ValueMinMax | float
 
     model_config = ConfigDict(extra="forbid")
 
@@ -162,12 +162,12 @@ class HeatPumps(BaseModel):
 class ParameterValuePerlin(BaseModel):
     """Datastructure to represent a perlin noise value for `Parameter.value`."""
 
-    frequency: ParameterValueMinMax | list[float]
+    frequency: ValueMinMax | list[float]
     """The larger these values are, the more fine grained the perlin field will
     be (i.e., the smaller the "dots" are and how many of them).
 
     Can either be a fixed three dimensional list of floats, in which case the value will simply be taken as is,
-    or `ParameterValueMinMax`, in which case the min and max values describe a range in which three floats are
+    or `ValueMinMax`, in which case the min and max values describe a range in which three floats are
     being generated.
     """
 
@@ -218,7 +218,7 @@ class Parameter(BaseModel):
         | HeatPumps
         | HeatPump
         | ParameterValuePerlin
-        | ParameterValueMinMax
+        | ValueMinMax
         | Path  # Could use pydantic.FilePath here, but then tests fail as cwd does not match
         | ValueXYZ
         | NDArray[Shape["*, ..."], (np.float64,)]  # pyright: ignore

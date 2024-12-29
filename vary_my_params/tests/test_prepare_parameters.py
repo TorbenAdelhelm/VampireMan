@@ -4,9 +4,9 @@ from vary_my_params.data_structures import (
     HeatPump,
     HeatPumps,
     Parameter,
-    ParameterValueMinMax,
     State,
     TimeBasedValue,
+    ValueMinMax,
     Vary,
 )
 from vary_my_params.pipeline import preparation_stage
@@ -49,13 +49,13 @@ def test_prepare_heatpump_generation():
             vary=Vary.FIXED,
             value=HeatPumps(
                 number=10,
-                injection_temp=ParameterValueMinMax(min=14, max=18),
+                injection_temp=ValueMinMax(min=14, max=18),
                 injection_rate=TimeBasedValue(
                     time_unit="year",
                     values={
-                        0: ParameterValueMinMax(min=0, max=0.002),
+                        0: ValueMinMax(min=0, max=0.002),
                         1: 0,
-                        2: ParameterValueMinMax(min=0.00024, max=0.002),
+                        2: ValueMinMax(min=0.00024, max=0.002),
                     },
                 ),
             ),
@@ -82,8 +82,8 @@ def test_prepare_heatpump_name_clash():
             vary=Vary.FIXED,
             value=HeatPumps(
                 number=1,
-                injection_temp=ParameterValueMinMax(min=1, max=2),
-                injection_rate=ParameterValueMinMax(min=1, max=2),
+                injection_temp=ValueMinMax(min=1, max=2),
+                injection_rate=ValueMinMax(min=1, max=2),
             ),
         ),
     }
