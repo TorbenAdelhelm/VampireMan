@@ -1,4 +1,9 @@
 import logging
+import warnings
+
+# This supresses unwanted output as the library tries to write to its installation directory. Only required once.
+with warnings.catch_warnings(action="ignore"):
+    import numpydantic as numpydantic
 
 from . import cli
 
