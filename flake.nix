@@ -30,10 +30,17 @@
       packages.x86_64-linux = rec {
         default = pflotran;
 
+        mpi = pkgs.openmpi;
+
         hdf5 = pkgs.hdf5.override {
           cppSupport = false;
           fortranSupport = true;
           mpiSupport = true;
+          inherit mpi;
+        };
+
+        parmetis = pkgs.parmetis.override {
+          inherit mpi;
         };
 
         petsc =
@@ -41,7 +48,7 @@
             hdf5-support = true;
             petsc-optimized = true;
             withParmetis = true;
-            inherit hdf5;
+            inherit parmetis hdf5 mpi;
           }).overrideAttrs
             rec {
               version = "3.21.5";
@@ -64,13 +71,14 @@
           enableParallelBuilding = true;
           PETSC_DIR = petsc;
           nativeBuildInputs = [
-            pkgs.mpi
-            pkgs.pkg-config
+            mpi
           ];
           buildInputs = [
             hdf5
+            mpi
             pkgs.parmetis
           ];
+          strictDeps = true;
           patches = [ ./pflotran.patch ];
           doCheck = false;
         };
@@ -81,7 +89,7 @@
 
           nativeBuildInputs = [
             self.packages.x86_64-linux.default
-            pkgs.mpi
+            mpi
             python3_env
           ];
 
@@ -103,7 +111,7 @@
           PFLOTRAN_DIR = self.packages.x86_64-linux.default;
           buildInputs = [
             self.packages.x86_64-linux.default
-            pkgs.mpi
+            self.packages.x86_64-linux.mpi
             pkgs.poetry
             pkgs.ruff
             pkgs.pyright
@@ -178,7 +186,7 @@
 
           nativeBuildInputs = [
             self.packages.x86_64-linux.default
-            pkgs.mpi
+            self.packages.x86_64-linux.mpi
             self.packages.x86_64-linux.hdf5
             pkgs.openssh
             python3_env
