@@ -219,8 +219,8 @@ class Parameter(BaseModel):
         | HeatPump
         | ValuePerlin
         | ValueMinMax
-        | Path  # Could use pydantic.FilePath here, but then tests fail as cwd does not match
         | ValueXYZ
+        | Path  # Could use pydantic.FilePath here, but then tests fail as cwd does not match
         | NDArray[Shape["*, ..."], (np.float64,)]  # pyright: ignore
     )
     distribution: Distribution = Distribution.UNIFORM
