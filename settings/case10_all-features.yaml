@@ -1,4 +1,4 @@
-# This setting has multiple hps and a varying permission field.
+# This setting has multiple hps and a varying permeability field.
 general:
   number_cells: [32, 256] # third value will be automatically set to 1
   cell_resolution: 5.0
