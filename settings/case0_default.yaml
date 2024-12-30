@@ -11,5 +11,3 @@
 
 general:
   output_directory: ./datasets_out/case0_default
-  # TODO remove this
-  mpirun: false

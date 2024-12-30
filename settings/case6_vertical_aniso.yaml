@@ -12,8 +12,6 @@ general:
   output_directory: ./datasets_out/case6_vertical_aniso
   number_datapoints: 1
   number_cells: [32, 256, 16]
-  # TODO remove
-  mpirun: false
   mute_simulation_output: true
 heatpump_parameters:
   hp1:

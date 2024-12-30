@@ -13,8 +13,6 @@ general:
   output_directory: ./datasets_out/case2_vary-hp-positions
   # random_seed: null
   number_cells: [32, 512, 1]
-  # TODO remove
-  mpirun: false
   mute_simulation_output: true
 heatpump_parameters:
   # As soon as any heatpumps are given, the default heatpump specified in the code will be discarded and replaced by
