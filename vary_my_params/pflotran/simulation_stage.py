@@ -25,7 +25,9 @@ def simulation_stage(state: State):
 
         command: list[str] = []
         if state.general.mpirun:
-            command += ["mpirun", "-n", str(state.general.mpirun_procs)]
+            command += ["mpirun"]
+            if state.general.mpirun_procs:
+                command += ["-n", str(state.general.mpirun_procs)]
         command += ["pflotran"]
         if state.general.mute_simulation_output:
             command += ["-screen_output", "off"]

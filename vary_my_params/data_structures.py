@@ -346,9 +346,9 @@ class GeneralConfig(BaseModel):
     """If the simulation tool should be called by running `mpirun -n x <simulationtool>` or simply
     `<simulationtool>`."""
 
-    mpirun_procs: PositiveInt = 1
+    mpirun_procs: None | PositiveInt = 1
     """When `mpirun` is set to `True`, specifies the number of ranks being used, i.e. the `x` in `mpirun -n x
-    <simulationtool>`."""
+    <simulationtool>`. Setting this to `None` is equal to running `mpirun <simulationtool>` without the `-n`."""
 
     mute_simulation_output: bool = False
     """Some simulation tools produce output that can be muted. This option disables the output."""
@@ -361,9 +361,12 @@ class GeneralConfig(BaseModel):
     _validated_3d = field_validator("number_cells")(value_is_3d)
 
     def __str__(self) -> str:
+        mpi_string = "disabled" if not self.mpirun else "enabled"
+        if self.mpirun and self.mpirun_procs:
+            mpi_string += f", {self.mpirun_procs} procs"
         return (
             f"=== GeneralConfig\n"
-            f"    mpirun: {'disabled' if not self.mpirun else f'enabled, {self.mpirun_procs} procs'}\n"
+            f"    mpirun: {mpi_string}\n"
             f"    Interactive: {self.interactive}\n"
             f"    Output directory: {self.output_directory}\n"
             f"    Random seed: {self.random_seed}\n"
