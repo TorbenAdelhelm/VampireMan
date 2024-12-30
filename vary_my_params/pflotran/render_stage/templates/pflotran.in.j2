@@ -69,7 +69,7 @@ SUBSURFACE
     TRANSVERSE_DISPERSIVITY_H 0.1  #[m]
     PERMEABILITY                   #[m^2]
       DATASET perm
-      {%- if vertical_anisotropy_ratio %}
+      {%- if vertical_anisotropy_ratio is defined %}
       VERTICAL_ANISOTROPY_RATIO {{ vertical_anisotropy_ratio.value }}
       {%- endif %}
     /
@@ -175,7 +175,7 @@ SUBSURFACE
     TRANSVERSE_DISPERSIVITY_H 0.1  #[m]
     PERMEABILITY                   #[m^2]
       DATASET perm
-      {%- if vertical_anisotropy_ratio %}
+      {%- if vertical_anisotropy_ratio is defined %}
       VERTICAL_ANISOTROPY_RATIO {{ vertical_anisotropy_ratio.value }}
       {%- endif %}
     /
