@@ -9,14 +9,14 @@ def validation_stage(state: State) -> State:
     # TODO make this more extensive
     # XXX this could also be done by pydantic...
 
-    hydraulic_head = state.hydrogeological_parameters.get("hydraulic_head")
+    pressure_gradient = state.hydrogeological_parameters.get("pressure_gradient")
     permeability = state.hydrogeological_parameters.get("permeability")
     temperature = state.hydrogeological_parameters.get("temperature")
 
     if permeability is None:
         raise ValueError("`permeability` must not be None")
-    if hydraulic_head is None:
-        raise ValueError("`hydraulic_head` must not be None")
+    if pressure_gradient is None:
+        raise ValueError("`pressure_gradient` must not be None")
     if temperature is None:
         raise ValueError("`temperature` must not be None")
 

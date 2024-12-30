@@ -391,8 +391,8 @@ class State(BaseModel):
                 vary=Vary.FIXED,
                 value=1.2882090745857623e-10,
             ),
-            "hydraulic_head": Parameter(
-                name="hydraulic_head",
+            "pressure_gradient": Parameter(
+                name="pressure_gradient",
                 vary=Vary.FIXED,
                 value=-0.0024757478454929577,
             ),
@@ -456,7 +456,7 @@ class State(BaseModel):
 
         # Get all parameters
         permeability = self.hydrogeological_parameters.get("permeability")
-        hydraulic_head = self.hydrogeological_parameters.get("hydraulic_head")
+        pressure_gradient = self.hydrogeological_parameters.get("pressure_gradient")
         temperature = self.hydrogeological_parameters.get("temperature")
 
         # Override with True where value is a Path to a file
@@ -466,12 +466,12 @@ class State(BaseModel):
             permeability = True
         else:
             permeability = False
-        if hydraulic_head is not None and isinstance(hydraulic_head.value, Path):
-            if not hydraulic_head.vary == Vary.FIXED:
+        if pressure_gradient is not None and isinstance(pressure_gradient.value, Path):
+            if not pressure_gradient.vary == Vary.FIXED:
                 raise ValueError("When providing a Path, vary mode must be FIXED")
-            hydraulic_head = True
+            pressure_gradient = True
         else:
-            hydraulic_head = False
+            pressure_gradient = False
         if temperature is not None and isinstance(temperature.value, Path):
             if not temperature.vary == Vary.FIXED:
                 raise ValueError("When providing a Path, vary mode must be FIXED")
@@ -480,9 +480,9 @@ class State(BaseModel):
             temperature = False
 
         # If any of the parameters is True, all must be. Otherwise if none is True, its also fine
-        if not (permeability == hydraulic_head == temperature):
+        if not (permeability == pressure_gradient == temperature):
             raise ValueError(
-                "If any of the parameters `permeability`, `hydraulic_head` or `temperature` is a Path, all must be"
+                "If any of the parameters `permeability`, `pressure_gradient` or `temperature` is a Path, all must be"
             )
 
         return self

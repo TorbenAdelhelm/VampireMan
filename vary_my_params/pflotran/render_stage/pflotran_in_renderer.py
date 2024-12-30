@@ -27,10 +27,10 @@ def render_stage(state: State):
     for index, datapoint in enumerate(state.datapoints):
         datapoint_dir = state.general.output_directory / f"datapoint-{index}"
 
-        # Ensure hydraulic_head is x, y, z
-        hydraulic_head = datapoint.data["hydraulic_head"]
-        if isinstance(hydraulic_head.value, float):
-            hydraulic_head.value = ValueXYZ(x=0, y=hydraulic_head.value, z=0)
+        # Ensure pressure_gradient is x, y, z
+        pressure_gradient = datapoint.data["pressure_gradient"]
+        if isinstance(pressure_gradient.value, float):
+            pressure_gradient.value = ValueXYZ(x=0, y=pressure_gradient.value, z=0)
 
         # Handle permeability
         permeability = datapoint.data["permeability"]

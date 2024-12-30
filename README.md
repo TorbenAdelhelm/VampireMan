@@ -75,16 +75,16 @@ Further, all cases have the similarities:
 - interactive is set to false
 - groundwater temperature is always fix to 10.6 degrees Celsius, except case 10, there it is varying const
 
-| case                                           | grid        | datapoint(s) | heat pump(s)   | permeability | hydraulic head | additional specialties                                         |
-|------------------------------------------------|-------------|--------------|----------------|--------------|----------------|----------------------------------------------------------------|
-| [0](./settings/case0_default.yaml)             | (32,256,1)  | 1            | 1 fix          | fix          | fix            |                                                                |
-| [1](./settings/case1_vary-pressure-const.yaml) | (32,256,1)  | 2            | 1 fix          | const        | const          |                                                                |
-| [2](./settings/case2_vary-hp-positions.yaml)   | (32,512,1)  | 2            | 1 fix, 2 space | fix          | fix            |                                                                |
-| [3](./settings/case3_allin1.yaml)              | (32,512,1)  | 3            | 2 space        | space        | fix            |                                                                |
-| [4](./settings/case4_extend-plumes.yaml)       | (32,1280,1) | 3            | 1 fix          | space        | const          |                                                                |
-| [5](./settings/case5_3d.yaml)                  | (32,256,32) | 1            | 1 fix          | fix          | fix            |                                                                |
-| [6](./settings/case6_vertical_aniso.yaml)      | (32,256,32) | 1            | 1 fix          | space        | fix            | vertical anisotropy ratio of 10                                |
-| [7](./settings/case7_read-from-files.yaml)     | (32,256,1)  | 1            | 1 fix          | fix          | fix            | heat pump, permeability and hydraulic head are read from file  |
-| [8](./settings/case8_heatpumps-in-detail.yaml) | (32,256,1)  | 3            | 4 fix, 2 space | fix          | fix            | operational heatpump parameters specified in more detail       |
-| [9](./settings/case9_seasonal-changes.yaml)    | (32,512,1)  | 1            | 2 fix          | fix          | fix            | time based changes in heat pump injection temperature and rate |
-| [10](./settings/case10_all-features.yaml)      | (32,256,1)  | 3            | 2 fix, 5 space | space        | fix            | case shows all supported features of the software              |
+| case                                           | grid        | datapoint(s) | heat pump(s)   | permeability | pressure gradient | additional specialties                                           |
+|------------------------------------------------|-------------|--------------|----------------|--------------|-------------------|------------------------------------------------------------------|
+| [0](./settings/case0_default.yaml)             | (32,256,1)  | 1            | 1 fix          | fix          | fix               |                                                                  |
+| [1](./settings/case1_vary-pressure-const.yaml) | (32,256,1)  | 2            | 1 fix          | const        | const             |                                                                  |
+| [2](./settings/case2_vary-hp-positions.yaml)   | (32,512,1)  | 2            | 1 fix, 2 space | fix          | fix               |                                                                  |
+| [3](./settings/case3_allin1.yaml)              | (32,512,1)  | 3            | 2 space        | space        | fix               |                                                                  |
+| [4](./settings/case4_extend-plumes.yaml)       | (32,1280,1) | 3            | 1 fix          | space        | const             |                                                                  |
+| [5](./settings/case5_3d.yaml)                  | (32,256,32) | 1            | 1 fix          | fix          | fix               |                                                                  |
+| [6](./settings/case6_vertical_aniso.yaml)      | (32,256,32) | 1            | 1 fix          | space        | fix               | vertical anisotropy ratio of 10                                  |
+| [7](./settings/case7_read-from-files.yaml)     | (32,256,1)  | 1            | 1 fix          | fix          | fix               | heat pump, permeability and pressure gradient are read from file |
+| [8](./settings/case8_heatpumps-in-detail.yaml) | (32,256,1)  | 3            | 4 fix, 2 space | fix          | fix               | operational heatpump parameters specified in more detail         |
+| [9](./settings/case9_seasonal-changes.yaml)    | (32,512,1)  | 1            | 2 fix          | fix          | fix               | time based changes in heat pump injection temperature and rate   |
+| [10](./settings/case10_all-features.yaml)      | (32,256,1)  | 3            | 2 fix, 5 space | space        | fix               | case shows all supported features of the software                |

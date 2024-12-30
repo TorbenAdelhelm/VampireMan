@@ -1,21 +1,21 @@
-# This case will create two datapoints. The hydraulic_head and the permeability are varied using the CONST mode.
+# This case will create two datapoints. The pressure_gradient and the permeability are varied using the CONST mode.
 # The case shall give insights in how the const mode works.
 #
 # grid: 2D unstructured (converted to 3D with z = 1) -> (32, 256, 1)
 # datapoint(s): 2
 # heat pump(s): 1 fix
 # permeability: const
-# hydraulic head: const
+# pressure gradient: const
 # temperature: fix
 
 general:
-  output_directory: ./datasets_out/case1_vary-hydraulic_head-const
+  output_directory: ./datasets_out/case1_vary-pressure-const
   number_datapoints: 2
   # TODO remove
   mpirun: false
   mute_simulation_output: true
 hydrogeological_parameters:
-  hydraulic_head:
+  pressure_gradient:
     vary: const_within_datapoint
     value:
       max: -0.0015

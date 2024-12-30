@@ -6,7 +6,7 @@
 # datapoint(s): 1
 # heat pump(s): 1 fix
 # permeability: fix
-# hydraulic head: fix
+# pressure gradient: fix
 # temperature: fix
 
 general:
@@ -20,9 +20,9 @@ hydrogeological_parameters:
   permeability:
     vary: fixed
     value: ./settings/case7_inputs/permeability_field.h5
-  hydraulic_head:
+  pressure_gradient:
     vary: fixed
-    value: ./settings/case7_inputs/hydraulic_head.txt
+    value: ./settings/case7_inputs/pressure_gradient.txt
   temperature:
     vary: fixed
     value: ./settings/case7_inputs/temperature

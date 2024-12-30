@@ -5,7 +5,7 @@
 # datapoint(s): 2
 # heat pump(s): 1 fix, 2 space
 # permeability: fix
-# hydraulic head: fix
+# pressure gradient: fix
 # temperature: fix
 
 general:

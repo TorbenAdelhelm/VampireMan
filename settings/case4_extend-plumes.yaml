@@ -1,10 +1,10 @@
-# This setting has one hp in a long domain using const hydraulic_head and perlin permeability field.
+# This setting has one hp in a long domain using const pressure_gradient and perlin permeability field.
 #
 # grid: 2D unstructured (converted to 3D with z = 1) -> (32, 1280, 1)
 # datapoint(s): 3
 # heat pump(s): 1 fix
 # permeability: const
-# hydraulic head: const
+# pressure gradient: const
 # temperature: fix
 
 general:
@@ -28,7 +28,7 @@ hydrogeological_parameters:
       frequency: [18, 18, 18]
       max: 5.09683995922528e-09
       min: 1.0193679918450561e-11
-  hydraulic_head:
+  pressure_gradient:
     vary: const_within_datapoint
     value:
       max: -0.0015

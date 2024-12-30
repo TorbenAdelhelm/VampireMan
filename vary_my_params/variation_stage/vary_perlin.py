@@ -83,7 +83,7 @@ def create_perlin_field(state: State, parameter: Parameter):
     if parameter.distribution == Distribution.LOG:
         cells = 10**cells
 
-    if parameter.name == "hydraulic_head":
+    if parameter.name == "pressure_gradient":
         cells = calc_pressure_from_gradient_field(cells, state, parameter)
 
     return cells
