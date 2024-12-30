@@ -11,10 +11,10 @@ def make_perlin_grid(
     aimed_min: float,
     aimed_max: float,
     state: State,
-    offset: NDArray[np.float64],
+    offset: NDArray[np.floating[Any]],
     freq: list[float],
 ) -> NDArray[np.floating[Any]]:
-    grid_dimensions: list[int] = cast(np.ndarray, state.general.number_cells).tolist()
+    grid_dimensions: list[int] = state.general.number_cells.tolist()  # pyright: ignore
 
     # adapted by Manuel Hirche
 
@@ -97,8 +97,8 @@ def create_const_field(state: State, value: float | NDArray):
 
 
 def calc_pressure_from_gradient_field(
-    gradient_field: NDArray[np.float64], state: State, parameter: Parameter
-) -> NDArray[np.float64]:
+    gradient_field: NDArray[np.floating[Any]], state: State, parameter: Parameter
+) -> NDArray[np.floating[Any]]:
     # XXX: is this function correctly implemented?
 
     value = parameter.value
