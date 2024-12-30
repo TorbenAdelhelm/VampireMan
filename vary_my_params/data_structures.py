@@ -363,6 +363,7 @@ class GeneralConfig(BaseModel):
     def __str__(self) -> str:
         return (
             f"=== GeneralConfig\n"
+            f"    mpirun: {'disabled' if not self.mpirun else f'enabled, {self.mpirun_procs} procs'}\n"
             f"    Interactive: {self.interactive}\n"
             f"    Output directory: {self.output_directory}\n"
             f"    Random seed: {self.random_seed}\n"
