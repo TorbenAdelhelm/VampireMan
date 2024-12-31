@@ -295,7 +295,7 @@ class GeneralConfig(BaseModel):
     cell_resolution: float = 5.0
     """Resolution of each of the cells. Cells must be cubic currently."""
 
-    shuffle_datapoints: bool = False
+    shuffle_datapoints: bool = True
     """Whether or not to shuffle the order the calculated data from each parameter appears in the datapoints."""
 
     interactive: bool = True

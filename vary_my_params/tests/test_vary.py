@@ -122,6 +122,7 @@ def test_vary_const():
     # TODO: Write CONST&&ValueMinMaxArray test
     state = State()
     state.general.interactive = False
+    state.general.shuffle_datapoints = False
     state.general.number_datapoints = 3
 
     create_dataset_and_datapoint_dirs(state)
