@@ -30,6 +30,7 @@
       packages.x86_64-linux = rec {
         default = pflotran;
 
+        # The mpi implementation here could also be set to pkgs.mpich
         mpi = pkgs.openmpi;
 
         hdf5 = pkgs.hdf5.override {
