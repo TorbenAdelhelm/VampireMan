@@ -101,7 +101,8 @@ class ValueTimeSeries(BaseModel):
     """This represents a time series value."""
 
     time_unit: str = "year"
-    """The unit of each of the float values in the `values` dict."""
+    """The unit of each of the float values in the `values` dict. For valid options see
+    https://docs.opengosim.com/manual/input_deck/units_conventions/"""
 
     values: dict[float, ValueMinMax | float]
     """Values that represent timesteps and their respective values. E.g., `{0: 10, 1: 15}` means, that at
