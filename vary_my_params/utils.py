@@ -78,7 +78,9 @@ def profile_function(function):
             ps = pstats.Stats(profile, stream=s).sort_stats(SortKey.CUMULATIVE)
             ps.print_stats()
 
-            with open(f"profiling_{function.__module__}.{function.__name__}.txt", "w") as file:
+            with open(
+                f"profiling/{state.general.output_directory.name}_{function.__module__}.{function.__name__}.txt", "w"
+            ) as file:
                 file.write(s.getvalue())
         else:
             result = function(*args)
