@@ -162,6 +162,51 @@ def test_vary_const():
     assert data_2.value == 0.32
 
 
+def test_shuffle():
+    state = State()
+    state.general.interactive = False
+    state.general.shuffle_datapoints = False
+    state.general.number_datapoints = 30
+
+    create_dataset_and_datapoint_dirs(state)
+
+    state.hydrogeological_parameters["parameter"] = Parameter(
+        name="parameter",
+        vary=Vary.CONST,
+        value=ValueMinMax(min=1, max=30),
+    )
+
+    state = preparation_stage(state)
+    state = variation_stage(state)
+
+    for i in range(28):
+        this_value = state.datapoints[i].data.get("parameter").value
+        next_value = state.datapoints[i + 1].data.get("parameter").value
+        assert this_value < next_value
+        assert this_value == i + 1
+
+    state = State()
+    state.general.interactive = False
+    state.general.shuffle_datapoints = True
+    state.general.number_datapoints = 30
+
+    create_dataset_and_datapoint_dirs(state)
+
+    state.hydrogeological_parameters["parameter"] = Parameter(
+        name="parameter",
+        vary=Vary.CONST,
+        value=ValueMinMax(min=1, max=30),
+    )
+
+    state = preparation_stage(state)
+    state = variation_stage(state)
+
+    for i in range(28):
+        this_value = state.datapoints[i].data.get("parameter").value
+        # Actually this could be the case...
+        assert this_value != i + 1
+
+
 def test_time_based_conversion():
     state = State()
 
