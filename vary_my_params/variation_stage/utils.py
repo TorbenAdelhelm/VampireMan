@@ -1,4 +1,3 @@
-import hashlib
 from ..data_structures import State
 from ..utils import get_answer, profile_function, write_data_to_verified_json_file
 from .vary import vary_params
