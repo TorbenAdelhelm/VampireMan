@@ -1,6 +1,5 @@
 general:
-  output_directory: ./datasets_out/large
-  mpirun: false
+  output_directory: ./datasets_out/case11_large-domain
   profiling: true
   number_cells: [320,2560,32]
 heatpump_parameters:

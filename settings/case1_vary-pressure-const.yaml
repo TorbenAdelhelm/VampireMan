@@ -11,7 +11,6 @@
 general:
   output_directory: ./datasets_out/case1_vary-pressure-const
   number_datapoints: 2
-  mute_simulation_output: true
 hydrogeological_parameters:
   pressure_gradient:
     vary: const_within_datapoint

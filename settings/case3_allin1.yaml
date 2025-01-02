@@ -11,7 +11,6 @@
 general:
   output_directory: ./datasets_out/case3_allin1
   number_datapoints: 3
-  mute_simulation_output: true
 heatpump_parameters:
   hp1:
     vary: spatially_vary_within_datapoint

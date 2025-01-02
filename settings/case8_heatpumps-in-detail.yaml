@@ -15,8 +15,6 @@
 general:
   output_directory: ./datasets_out/case8_heatpumps-in-detail
   number_datapoints: 3
-  mpirun: false
-  mute_simulation_output: true
 heatpump_parameters:
   hp1:
     # This heat pump has fixed values, nothing changes here.

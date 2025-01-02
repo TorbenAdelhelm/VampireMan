@@ -13,7 +13,7 @@ general:
   numerical_solver: pflotran
   profiling: true
   mpirun: true
-  mpirun_procs: 4
+  mpirun_procs: null
   mute_simulation_output: true
 heatpump_parameters:
   hp1:
