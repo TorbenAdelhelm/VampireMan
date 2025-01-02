@@ -27,23 +27,19 @@ def make_perlin_grid(
 
     # Scale the simulation area down into a unit cube
     simulation_area_max = max(grid_dimensions)
-    scale_x = grid_dimensions[0] / simulation_area_max
-    scale_y = grid_dimensions[1] / simulation_area_max
-    scale_z = grid_dimensions[2] / simulation_area_max
+    scale = np.array(grid_dimensions) / simulation_area_max
 
-    values = np.zeros((grid_dimensions[0], grid_dimensions[1], grid_dimensions[2]))
-    for i in range(0, grid_dimensions[0]):
-        for j in range(0, grid_dimensions[1]):
-            for k in range(0, grid_dimensions[2]):
-                x = i / grid_dimensions[0] * scale_x + offset[0]
-                y = j / grid_dimensions[1] * scale_y + offset[1]
-                z = k / grid_dimensions[2] * scale_z + offset[2]
+    # Create the grid indices
+    i, j, k = np.meshgrid(
+        np.arange(grid_dimensions[0]), np.arange(grid_dimensions[1]), np.arange(grid_dimensions[2]), indexing="ij"
+    )
 
-                x = x * freq[0]
-                y = y * freq[1]
-                z = z * freq[2]
+    # Normalize
+    x = (i / grid_dimensions[0] * scale[0] + offset[0]) * freq[0]
+    y = (j / grid_dimensions[1] * scale[1] + offset[1]) * freq[1]
+    z = (k / grid_dimensions[2] * scale[2] + offset[2]) * freq[2]
 
-                values[i, j, k] = noise.pnoise3(x, y, z)
+    values = np.vectorize(noise.pnoise3)(x, y, z)
 
     # scale to intended range
     current_min = np.min(values)
