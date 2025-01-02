@@ -21,10 +21,20 @@ def validation_stage(state: State) -> State:
         raise ValueError("`temperature` must not be None")
 
     # Simulation without heatpumps doesn't make much sense
-    heatpumps = [{name: d.name} for name, d in state.heatpump_parameters.items() if isinstance(d.value, HeatPump)]
-    heatpumps_gen = [{name: d.name} for name, d in state.heatpump_parameters.items() if isinstance(d.value, HeatPumps)]
-    if len(heatpumps) + len(heatpumps_gen) < 1:
+    heatpumps = [
+        {name: d.name} for name, d in state.heatpump_parameters.items() if isinstance(d.value, HeatPump | HeatPumps)
+    ]
+    if len(heatpumps) < 1:
         logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
+        # TODO: Should we raise here?
+
+    heatpumps_in_hydrogeological_parameters = [
+        {name: d.name}
+        for name, d in state.hydrogeological_parameters.items()
+        if isinstance(d.value, HeatPump | HeatPumps)
+    ]
+    if len(heatpumps_in_hydrogeological_parameters) > 0:
+        raise ValueError("Heat pumps found in hydrogeological_parameters, this is not allowed")
 
     logging.info("State is valid")
     return state
