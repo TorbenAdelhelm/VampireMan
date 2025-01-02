@@ -3,6 +3,7 @@ from copy import deepcopy
 from typing import cast
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from ..data_structures import (
     Data,
@@ -44,7 +45,9 @@ def vary_heatpump(state: State, parameter: Parameter, vary_location: bool) -> Da
     return Data(
         name=parameter.name,
         value=HeatPump(
-            location=result_location.tolist(), injection_temp=hp.injection_temp, injection_rate=hp.injection_rate
+            location=cast(list[float], result_location.tolist()),
+            injection_temp=hp.injection_temp,
+            injection_rate=hp.injection_rate,
         ),
     )
 
@@ -127,7 +130,7 @@ def calculate_hp_coordinates(state: State) -> State:
         # This is needed as we need to calculate the heatpump coordinates for pflotran.in
         result_location = (np.array(hp.location) - 1) * resolution + (resolution * 0.5)
 
-        hp.location = result_location.tolist()
+        hp.location = cast(list[float], result_location.tolist())
 
     return state
 
@@ -191,7 +194,11 @@ def generate_heatpumps(state: State) -> State:
             new_heatpumps[name] = Parameter(
                 name=name,
                 vary=hps.vary,
-                value=HeatPump(location=location, injection_temp=injection_temp, injection_rate=injection_rate),
+                value=HeatPump(
+                    location=cast(list[float], location),
+                    injection_temp=injection_temp,
+                    injection_rate=injection_rate,
+                ),
             )
 
     for name, value in new_heatpumps.items():
@@ -244,12 +251,7 @@ def shuffle_datapoints(state: State) -> State:
             param_list.append(datapoint.data[parameter])
             parameters[parameter] = param_list
 
-        # This np.array -> shuffle -> array.tolist is necessary as, for some
-        # reason, pyright doesn't get that list[Data] is an ArrayLike...
-        array = parameters[parameter]
-        array = np.array(array)
-        state.get_rng().shuffle(array)
-        parameters[parameter] = array.tolist()
+        state.get_rng().shuffle(cast(ArrayLike, parameters[parameter]))
 
     for parameter in parameter_names:
         for index in range(state.general.number_datapoints):

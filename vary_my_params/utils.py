@@ -139,7 +139,7 @@ def write_data_to_verified_json_file(state: "State", target_path: Path, data: Ba
 
     if isinstance(data, Datapoint):
         # Restore the previous actual value
-        perm.value = perm_value
+        perm.value = perm_value  # pyright: ignore
 
 
 def read_in_files(state: "State"):
