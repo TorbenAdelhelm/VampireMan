@@ -17,6 +17,8 @@ import numpy as np
 from h5py import File
 from pydantic import BaseModel
 
+from .data_structures import Datapoint
+
 if TYPE_CHECKING:
     from .data_structures import State
 
@@ -104,9 +106,19 @@ def write_data_to_verified_json_file(state: "State", target_path: Path, data: Ba
     """Write a `pydantic.main.BaseModel` to a file and ask the user how to proceed, if there is already a file present
     with different contents than the data that is represented in `data`. The data will be written in json format."""
 
+    need_to_write_file = True
+
+    # Write hash of permeability content into permeability field
+    # This avoids putting hundreds of MB of numbers into the file when handling large perm fields
+    if isinstance(data, Datapoint):
+        perm = data.data.get("permeability")
+        assert perm is not None  # Should never happen, make the linter happy
+        perm_value = perm.value
+        data.data["permeability"].value = hashlib.sha256(perm.model_dump_json(indent=2).encode()).hexdigest()
+
     # Check if there already is a target file
     if os.path.isfile(target_path):
-        with open(target_path) as target_file:
+        with open(target_path, encoding="utf8") as target_file:
             target_file_content = target_file.read()
 
         # Calculate the hash from the data object and the existing target file
@@ -117,13 +129,17 @@ def write_data_to_verified_json_file(state: "State", target_path: Path, data: Ba
         if hash_in_memory != hash_target_file:
             logging.warning("Target file '%s' has different contents than data structure!", target_path)
             if not get_answer(state, f"Different target file already in {target_path}, overwrite?"):
-                return
+                need_to_write_file = False
         else:
             logging.debug("File '%s' doesn't need to be written", target_path)
-            return
 
-    with open(target_path, "w") as target_file:
-        target_file.write(data.model_dump_json(indent=2))
+    if need_to_write_file:
+        with open(target_path, "w", encoding="utf8") as target_file:
+            target_file.write(data.model_dump_json(indent=2))
+
+    if isinstance(data, Datapoint):
+        # Restore the previous actual value
+        perm.value = perm_value
 
 
 def read_in_files(state: "State"):

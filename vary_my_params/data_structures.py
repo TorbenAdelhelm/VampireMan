@@ -257,7 +257,7 @@ class Parameter(BaseModel):
 
 class Data(BaseModel):
     name: str
-    value: int | float | list[int] | list[float] | HeatPump | ValueXYZ | NDArray
+    value: int | float | list[int] | list[float] | HeatPump | ValueXYZ | NDArray | str
 
     model_config = ConfigDict(extra="forbid")
 
