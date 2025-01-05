@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+import sys
 
 from ..data_structures import State
 from ..utils import get_answer
@@ -32,7 +33,12 @@ def simulation_stage(state: State):
         command += ["pflotran"]
         if state.general.mute_simulation_output:
             command += ["-screen_output", "off"]
-        subprocess.run(command, check=True, close_fds=True)
+        try:
+            subprocess.run(command, check=True, close_fds=True)
+        except subprocess.CalledProcessError:
+            logging.critical(f"There was an error during executing the command `{" ".join(command)}`.")
+            logging.critical(f"Please check the logs at '{datapoint_path}/pflotran.out'")
+            sys.exit(1)
 
         # always go back to the original_dir as we use relative paths
         os.chdir(original_dir)
