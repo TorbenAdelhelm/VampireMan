@@ -84,8 +84,6 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
 
         case Vary.CONST:
             if isinstance(parameter.value, ValueMinMax):
-                # XXX: This will generate one float per datapoint, between min and max values
-                # Currently, there is no shuffling implemented
                 max = deepcopy(parameter.value.max)
                 min = deepcopy(parameter.value.min)
 
@@ -179,7 +177,6 @@ def generate_heatpumps(state: State) -> State:
                 logging.error(msg)
                 raise ValueError(msg)
 
-            # XXX: This is actually always random
             location = np.ceil(rand.random(3) * cast(np.ndarray, state.general.number_cells)).tolist()
 
             injection_temp = hps.value.injection_temp
@@ -221,12 +218,8 @@ def vary_params(state: State) -> State:
         # two separate for loops
         for _, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
             parameter_data = vary_parameter(state, parameter, datapoint_index)
-            # XXX: Store this in the parameter?
-            # parameter.set_datapoint(datapoint_index, parameter_data)
-
             data[parameter.name] = parameter_data
 
-        # TODO split into data_fixed etc
         state.datapoints.append(Datapoint(index=datapoint_index, data=data))
 
     if state.general.shuffle_datapoints:

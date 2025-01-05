@@ -67,7 +67,7 @@ def visualization_stage(state: State):
 
 
 def print_heatpump_temp(state: State, data: TimeData):
-    # XXX is this needed?
+    # XXX is this needed? Currently it's dead code
     key, value = data.popitem()
     data[key] = value
     temp_data = value["Temperature [C]"]
@@ -93,7 +93,6 @@ def make_plottable(state: State, hdf5_file: h5py.File) -> TimeData:
     for time_step, timegroup in hdf5_file.items():
         datapoints_to_plot[time_step] = OrderedDict()
 
-        # XXX: why not render the first timestep?
         for property, property_values in timegroup.items():
             # Read from the hdf5 file
             data = np.array(property_values)
@@ -135,7 +134,6 @@ def plot_isolines(state: State, data: TimeData, path: Path):
     rows = len(data)
     _, axes = plt.subplots(rows, 1, figsize=(20, 5 * rows))
 
-    # XXX: What should be the default values?
     level_min = float("inf")
     level_max = -float("inf")
     level_step = None

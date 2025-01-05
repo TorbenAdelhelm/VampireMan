@@ -6,9 +6,6 @@ from ..utils import profile_function
 
 @profile_function
 def validation_stage(state: State) -> State:
-    # TODO make this more extensive
-    # XXX this could also be done by pydantic...
-
     pressure_gradient = state.hydrogeological_parameters.get("pressure_gradient")
     permeability = state.hydrogeological_parameters.get("permeability")
     temperature = state.hydrogeological_parameters.get("temperature")

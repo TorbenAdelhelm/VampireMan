@@ -175,11 +175,9 @@ class HeatPump(BaseModel):
     """The location where the `HeatPump` should be. It is given in cells, the program translates the cell-based location
     into coordinates matching the domain by multiplying it by the `GeneralConfig.cell_resolution`."""
 
-    # TODO make this list[float]
     injection_temp: ValueTimeSeries | ValueMinMax | float
     """The injection temperature of the `HeatPump` in degree Celsius."""
 
-    # TODO make this list[float]
     injection_rate: ValueTimeSeries | ValueMinMax | float
     """The injection rate of the `HeatPump` in m^3/s."""
 
@@ -228,12 +226,6 @@ class Parameter(BaseModel):
     vary: Vary = Vary.FIXED
 
     model_config = ConfigDict(extra="forbid", validate_assignment=True)
-
-    # XXX: Store this in the parameter?
-    # _datapoints: dict[int, Data]
-    #
-    # def set_datapoint(self, index: int, data: Data):
-    #     self._datapoints[index] = data
 
     @field_validator("value")
     @classmethod
@@ -354,8 +346,6 @@ class GeneralConfig(BaseModel):
     mute_simulation_output: bool = False
     """Some simulation tools produce output that can be muted. This option disables the output."""
 
-    # XXX: distance to border in percent?
-
     # This makes pydantic fail if there is extra data in the yaml settings file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
 
@@ -427,7 +417,6 @@ class State(BaseModel):
     should be used when there are other heat pumps, it must be specified along the others in the settings file.
     """
 
-    # TODO split this in datapoints_fixed, datapoint_const_within_datapoint, ...
     datapoints: list[Datapoint] = Field(default_factory=lambda: [])
 
     _rng: np.random.Generator = np.random.default_rng(seed=0)
