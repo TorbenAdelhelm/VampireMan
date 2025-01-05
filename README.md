@@ -1,5 +1,4 @@
 # Vary My Params
-<!-- TODO add references to YAML, HDF5, JSON -->
 This tool allows a user to describe how parameters for a data set should be varied.
 After describing which parameters should be varied in which manner, i.e. permeability should be a constant field, with values varying between 1 and 10, the program proceeds actually varying these parameters and also renders all files necessary to run the simulations afterwards.
 Then, the tool starts a simulation based on the rendered input files and finally visualizes the results.
@@ -42,26 +41,22 @@ Depending on your environment, choose one of the following.
 
 ## Stages
 
-The program sequentially runs several stages passing the outputs of the previous stage onto the next one.
-
-<!-- TODO fix this -->
-
-Namely, the stages are (in this order):
-- load_config
-    load the user provided values and parameters etc
-- prepare_parameters
-    generate heatpumps from the heatpumps parameters
-- vary_parameters
-    varies the values loaded from the config step
-- prepare_simulation
-- simulation stage
-- collect_results
-- visualize_results
+The proposed software has seven stages that are run in sequence, each processing and enhancing the data of the previous stage.
+- Loading stage: The configuration file provided by the user is processed and interpreted in this stage.
+  Parameters relevant to the simulation are extracted from the loaded configuration.
+- Preparation stage: This stage preprocesses supplementary input files, such as permeability field definitions stored in [HDF5](https://www.hdfgroup.org/solutions/hdf5/) files or heat pump configurations in [JSON](https://www.json.org/json-en.html) format, and calculates or expands the required parameter values accordingly.
+- Validation stage: This stage ensures that the resulting configuration, after reading in any files and expanding parameters, is valid, i.e., at least the parameters `pressure_gradient`, `permeability`, and `temperature` are set and there is at least one heat pump in the domain.
+- Variation stage: The variation stage generates data points based on parameter values and associated metadata.
+- Render stage: This stage prepares the simulation environment by compiling and storing all necessary input files in their designated directories for the integration with the simulation program.
+- Simulation stage: In this stage, the simulation program is invoked, optionally with additional command line switches, depending on the user provided settings.
+- Visualization stage: After the simulation stage has completed, visualization stage renders the output of the simulations to facilitate understanding and analysis of the groundwater heat pump system's behavior.
 
 ## Settings
 
 There are several example settings in [the settings directory](./settings).
-Those settings represent test cases and are also semantically validated when running pytest.
+Those settings are written in [YAML](https://yaml.org/) represent test cases and are also semantically validated when running pytest.
+These files can also include other files by specifying a file path as a value.
+Supported file formats are ASCII, JSON and HDF5.
 
 In these examples, all grids are cartesian and have three dimensions with a cell resolution of 5 meters in each dimension.
 Two dimensional grids are implicitly converted to three dimensions by adding a `z` coordinate with the value of 1, meaning a height of 1 cell.
