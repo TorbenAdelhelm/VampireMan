@@ -339,9 +339,9 @@ class GeneralConfig(BaseModel):
     pipeline."""
 
     profiling: bool = False
-    """If set to `True`, the stages are being profiled and `profiling_<stagename>.txt` files are being written in the
-    root of the project. Also, the execution time of the stages are logged. This can help during development but is
-    probably not something a user of the program should use."""
+    """If set to `True`, the stages are being profiled and `<case-name>_<stage-name>.<function-name>.txt` files are
+    being written in the `./profiling` directory. Also, the execution time of the stages are logged. This can help
+    during development but is probably not something a user of the program should use."""
 
     mpirun: bool = True
     """If the simulation tool should be called by running `mpirun -n x <simulationtool>` or simply
