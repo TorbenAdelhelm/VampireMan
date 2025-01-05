@@ -115,7 +115,7 @@ SUBSURFACE
       LIQUID_PRESSURE HYDROSTATIC
       TEMPERATURE DIRICHLET
     /
-    DATUM 200 0 85 {#- TODO adjust? #}
+    DATUM 200 0 85 {#- XXX adjust? #}
     GRADIENT
       {%- set pg = pressure_gradient.value %}
       LIQUID_PRESSURE {{ pg.x }} {{  pg.y }} {{ pg.z }}

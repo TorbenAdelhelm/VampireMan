@@ -23,7 +23,7 @@ def validation_stage(state: State) -> State:
     ]
     if len(heatpumps) < 1:
         logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
-        # TODO: Should we raise here?
+        # XXX: Should we raise here?
 
     heatpumps_in_hydrogeological_parameters = [
         {name: d.name}
