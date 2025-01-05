@@ -196,7 +196,7 @@
           checkPhase = ''
             python -m vary_my_params --non-interactive
             # h5diff exits with code 0 if any objects are not comparable
-            h5diff -v1 datasets_out/*/datapoint-0/pflotran.h5 tests/reference_files/pflotran.h5 | tee diff.out
+            h5diff -v1 datasets_out/*/datapoint-0/pflotran.h5 reference_files/pflotran.h5 | tee diff.out
             if grep -q "Some objects are not comparable" diff.out; then
               exit 1
             fi
