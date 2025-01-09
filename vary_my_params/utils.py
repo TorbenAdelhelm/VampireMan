@@ -17,7 +17,7 @@ import numpy as np
 from h5py import File
 from pydantic import BaseModel
 
-from .data_structures import Datapoint
+from .data_structures import DataPoint
 
 if TYPE_CHECKING:
     from .data_structures import State
@@ -110,7 +110,7 @@ def write_data_to_verified_json_file(state: "State", target_path: Path, data: Ba
 
     # Write hash of permeability content into permeability field
     # This avoids putting hundreds of MB of numbers into the file when handling large perm fields
-    if isinstance(data, Datapoint):
+    if isinstance(data, DataPoint):
         perm = data.data.get("permeability")
         assert perm is not None  # Should never happen, make the linter happy
         perm_value = perm.value
@@ -137,7 +137,7 @@ def write_data_to_verified_json_file(state: "State", target_path: Path, data: Ba
         with open(target_path, "w", encoding="utf8") as target_file:
             target_file.write(data.model_dump_json(indent=2))
 
-    if isinstance(data, Datapoint):
+    if isinstance(data, DataPoint):
         # Restore the previous actual value
         perm.value = perm_value  # pyright: ignore
 

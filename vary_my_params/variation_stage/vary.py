@@ -7,7 +7,7 @@ from numpy.typing import ArrayLike
 
 from ..data_structures import (
     Data,
-    Datapoint,
+    DataPoint,
     Distribution,
     HeatPump,
     HeatPumps,
@@ -220,7 +220,7 @@ def vary_params(state: State) -> State:
             parameter_data = vary_parameter(state, parameter, datapoint_index)
             data[parameter.name] = parameter_data
 
-        state.datapoints.append(Datapoint(index=datapoint_index, data=data))
+        state.datapoints.append(DataPoint(index=datapoint_index, data=data))
 
     if state.general.shuffle_datapoints:
         state = shuffle_datapoints(state)
@@ -230,9 +230,9 @@ def vary_params(state: State) -> State:
 
 
 def shuffle_datapoints(state: State) -> State:
-    """Shuffles all `Parameter`s randomly in between the different `Datapoint`s. This is needed when e.g. two
+    """Shuffles all `Parameter`s randomly in between the different `DataPoint`s. This is needed when e.g. two
     parameters are generated as `Vary.CONST` with `ValueMinMax`, as otherwise they would both have min
-    values in the first `Datapoint` and max values in the last one.
+    values in the first `DataPoint` and max values in the last one.
     """
 
     parameters: dict[str, list[Data]] = {}

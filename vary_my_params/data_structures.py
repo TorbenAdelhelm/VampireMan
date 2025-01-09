@@ -39,18 +39,18 @@ class Vary(enum.StrEnum):
 
     FIXED = "fixed"
     """Don't vary the `Parameter` at all. Variation stage simply takes `Parameter.value` and copy it over to the
-    `Data` item in the `Datapoint`.
+    `Data` item in the `DataPoint`.
     """
 
     CONST = "const_within_datapoint"
-    """The `Parameter` will be varied constantly within the `Datapoint`, so the `Parameter.value` won't change
-    within this `Datapoint`. The value will, however, be varied across the whole datasets, i.e.,
+    """The `Parameter` will be varied constantly within the `DataPoint`, so the `Parameter.value` won't change
+    within this `DataPoint`. The value will, however, be varied across the whole datasets, i.e.,
     `State.datapoints`.
     """
 
     SPACE = "spatially_vary_within_datapoint"
-    """`Parameter.value` will be varied spatially within the `Datapoint` and also across the dataset. E.g., this
-    could be the permeability that varies within the `Datapoint` with a perlin noise function.
+    """`Parameter.value` will be varied spatially within the `DataPoint` and also across the dataset. E.g., this
+    could be the permeability that varies within the `DataPoint` with a perlin noise function.
     """
 
 
@@ -258,7 +258,7 @@ class Data(BaseModel):
         return f"===== {self.name} [{type(self.value)}]: {value}"
 
 
-class Datapoint(BaseModel):
+class DataPoint(BaseModel):
     index: int
     data: dict[str, Data]
 
@@ -274,7 +274,7 @@ class Datapoint(BaseModel):
 
             data_strings.append(value_string)
 
-        return f"=== Datapoint #{self.index}\n" f"{"\n".join(data_strings)}"
+        return f"=== DataPoint #{self.index}\n" f"{"\n".join(data_strings)}"
 
 
 class GeneralConfig(BaseModel):
@@ -417,7 +417,7 @@ class State(BaseModel):
     should be used when there are other heat pumps, it must be specified along the others in the settings file.
     """
 
-    datapoints: list[Datapoint] = Field(default_factory=lambda: [])
+    datapoints: list[DataPoint] = Field(default_factory=lambda: [])
 
     _rng: np.random.Generator = np.random.default_rng(seed=0)
     """The execution wide random number generator."""
