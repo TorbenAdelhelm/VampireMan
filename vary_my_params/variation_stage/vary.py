@@ -5,6 +5,8 @@ from typing import cast
 import numpy as np
 from numpy.typing import ArrayLike
 
+from vary_my_params.validation_stage.utils import are_duplicate_locations_in_heatpumps
+
 from ..data_structures import (
     Data,
     DataPoint,
@@ -169,9 +171,15 @@ def generate_heatpumps(state: State) -> State:
     """
 
     new_heatpumps: dict[str, Parameter] = {}
+
+    # Need to get the explicit heatpumps first, in case of location clashes we can simply draw another random number
     for _, hps in state.heatpump_parameters.items():
         if isinstance(hps.value, HeatPump):
             new_heatpumps[hps.name] = hps
+            continue
+
+    for _, hps in state.heatpump_parameters.items():
+        if isinstance(hps.value, HeatPump):
             continue
 
         if not isinstance(hps.value, HeatPumps):
@@ -195,6 +203,13 @@ def generate_heatpumps(state: State) -> State:
                 injection_rate=injection_rate,
             )
             logging.debug("Generated HeatPump %s", heatpump)
+
+            heatpumps = cast(list[HeatPump], [param.value for _, param in new_heatpumps.items()])
+            heatpumps.append(heatpump)
+            while are_duplicate_locations_in_heatpumps(heatpumps):
+                # Generate new heatpump location if the one we had is already taken
+                # TODO write test for this
+                heatpump.location = generate_heatpump_location(state)
 
             new_heatpumps[name] = Parameter(
                 name=name,
