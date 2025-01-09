@@ -60,27 +60,6 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
     match parameter.vary:
         case Vary.FIXED:
             data = copy_parameter(state, parameter)
-        case Vary.SPACE:
-            if isinstance(parameter.value, ValuePerlin):
-                data = Data(
-                    name=parameter.name,
-                    value=create_perlin_field(state, parameter),
-                )
-            elif isinstance(parameter.value, float):
-                raise ValueError(
-                    f"Parameter {parameter.name} is vary.space and has a float value, "
-                    f"it should be set to vary.fixed or vary.const with a min/max value instead; {parameter}"
-                )
-            # This should be inside the CONST block, yet it seems to make more sense to users to find it here
-            elif isinstance(parameter.value, HeatPump):
-                data = vary_heatpump(state, parameter, True)
-            elif isinstance(parameter.value, ValueMinMax):
-                raise ValueError(
-                    f"Parameter {parameter.name} is vary.space and has min/max values, "
-                    f"it should be set to vary.perlin instead; {parameter}"
-                )
-            else:
-                raise NotImplementedError(f"Dont know how to vary {parameter}")
 
         case Vary.CONST:
             if isinstance(parameter.value, ValueMinMax):
@@ -110,6 +89,29 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
                     parameter.name,
                 )
                 raise NotImplementedError()
+
+        case Vary.SPACE:
+            if isinstance(parameter.value, ValuePerlin):
+                data = Data(
+                    name=parameter.name,
+                    value=create_perlin_field(state, parameter),
+                )
+            elif isinstance(parameter.value, float):
+                raise ValueError(
+                    f"Parameter {parameter.name} is vary.space and has a float value, "
+                    f"it should be set to vary.fixed with a min/max value instead; {parameter}"
+                )
+            # This should be inside the CONST block, yet it seems to make more sense to users to find it here
+            elif isinstance(parameter.value, HeatPump):
+                data = vary_heatpump(state, parameter, True)
+            elif isinstance(parameter.value, ValueMinMax):
+                raise ValueError(
+                    f"Parameter {parameter.name} is vary.space and has min/max values, "
+                    f"it should be set to vary.perlin instead; {parameter}"
+                )
+            else:
+                raise NotImplementedError(f"Dont know how to vary {parameter}")
+
         case _:
             raise ValueError()
     return data
