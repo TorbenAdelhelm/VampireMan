@@ -45,7 +45,7 @@ def vary_heatpump(state: State, parameter: Parameter, vary_location: bool) -> Da
     return Data(
         name=parameter.name,
         value=HeatPump(
-            location=cast(list[float], result_location.tolist()),
+            location=cast(list[float], result_location),
             injection_temp=hp.injection_temp,
             injection_rate=hp.injection_rate,
         ),
@@ -156,13 +156,18 @@ def handle_heatpump_values(rand: np.random.Generator, hp_data: HeatPump) -> Heat
     return hp_data
 
 
+def generate_heatpump_location(state: State) -> list[float]:
+    random_vector = state.get_rng().random(3)
+    random_location = random_vector * cast(np.ndarray, state.general.number_cells)
+    return cast(list[float], np.ceil(random_location).tolist())
+
+
 def generate_heatpumps(state: State) -> State:
     """Generate `HeatPump`s from the given `HeatPumps` parameter. This function will remove all `HeatPumps` from
     `State.heatpump_parameters` and add `HeatPumps.number` `HeatPump`s to the dict. The `HeatPump.injection_temp` and
     `HeatPump.injection_rate` values are simply taken from a random number between the respective min and max values.
     """
 
-    rand = state.get_rng()
     new_heatpumps: dict[str, Parameter] = {}
     for _, hps in state.heatpump_parameters.items():
         if isinstance(hps.value, HeatPump):
@@ -179,25 +184,22 @@ def generate_heatpumps(state: State) -> State:
                 logging.error(msg)
                 raise ValueError(msg)
 
-            location = np.ceil(rand.random(3) * cast(np.ndarray, state.general.number_cells)).tolist()
-
             injection_temp = hps.value.injection_temp
             injection_rate = hps.value.injection_rate
 
-            logging.debug(
-                "Generating heatpump with location %s, injection_temp %s, injection_rate %s",
-                location,
-                injection_temp,
-                injection_rate,
+            location = generate_heatpump_location(state)
+
+            heatpump = HeatPump(
+                location=cast(list[float], location),
+                injection_temp=injection_temp,
+                injection_rate=injection_rate,
             )
+            logging.debug("Generated HeatPump %s", heatpump)
+
             new_heatpumps[name] = Parameter(
                 name=name,
                 vary=hps.vary,
-                value=HeatPump(
-                    location=cast(list[float], location),
-                    injection_temp=injection_temp,
-                    injection_rate=injection_rate,
-                ),
+                value=heatpump,
             )
 
     for name, value in new_heatpumps.items():
