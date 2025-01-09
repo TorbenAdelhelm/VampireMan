@@ -38,7 +38,6 @@ def run(args: Namespace):
     state = preparation_stage(state)
     state = validation_stage(state)
 
-    create_dataset_and_datapoint_dirs(state)
     write_data_to_verified_json_file(state, state.general.output_directory / "state.json", state)
 
     # Where do we check this?
