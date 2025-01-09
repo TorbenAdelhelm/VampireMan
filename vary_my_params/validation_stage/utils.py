@@ -18,20 +18,38 @@ def validation_stage(state: State) -> State:
         raise ValueError("`temperature` must not be None")
 
     # Simulation without heatpumps doesn't make much sense
-    heatpumps = [
-        {name: d.name} for name, d in state.heatpump_parameters.items() if isinstance(d.value, HeatPump | HeatPumps)
-    ]
+    heatpumps = [d.value for name, d in state.heatpump_parameters.items() if isinstance(d.value, HeatPump)]
     if len(heatpumps) < 1:
         logging.error("There are no heatpumps in this simulation. This usually doesn't make much sense.")
         # XXX: Should we raise here?
 
+    if are_duplicate_locations_in_heatpumps(heatpumps):
+        raise ValueError("Duplicate HeatPump location detected!")
+
     heatpumps_in_hydrogeological_parameters = [
-        {name: d.name}
-        for name, d in state.hydrogeological_parameters.items()
-        if isinstance(d.value, HeatPump | HeatPumps)
+        d.value for name, d in state.hydrogeological_parameters.items() if isinstance(d.value, HeatPump | HeatPumps)
     ]
     if len(heatpumps_in_hydrogeological_parameters) > 0:
         raise ValueError("Heat pumps found in hydrogeological_parameters, this is not allowed")
 
     logging.info("State is valid")
     return state
+
+
+def are_duplicate_locations_in_heatpumps(heatpumps: list[HeatPump]) -> bool:
+    """Check that no heatpumps have the same location."""
+    # TODO write test for this
+    heatpump_locations = set()
+    duplicates_detected = False
+
+    for heatpump in heatpumps:
+        # Needed as lists are not hashable
+        location = heatpump.location
+        location = (location[0], location[1], location[2])
+
+        if location in heatpump_locations:
+            duplicates_detected = True
+        else:
+            heatpump_locations.add(location)
+
+    return duplicates_detected

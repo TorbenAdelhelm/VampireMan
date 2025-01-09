@@ -1,5 +1,6 @@
 from ..data_structures import State
 from ..utils import create_dataset_and_datapoint_dirs, profile_function, read_in_files
+# TODO why from the variation_stage?
 from ..variation_stage.vary import (
     calculate_frequencies,
     calculate_hp_coordinates,
