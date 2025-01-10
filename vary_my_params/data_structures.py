@@ -492,6 +492,7 @@ class State(BaseModel):
         self.hydrogeological_parameters |= other_state.hydrogeological_parameters
         self.heatpump_parameters = other_state.heatpump_parameters
         self.datapoints = other_state.datapoints
+        self._rng = other_state._rng
 
     def get_rng(self) -> np.random.Generator:
         """Returns the execution-wide same instance of the random number generator instantiated with
