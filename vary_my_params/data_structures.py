@@ -6,6 +6,7 @@ import enum
 import inspect
 import logging
 from pathlib import Path
+from types import NoneType
 
 import numpy as np
 from numpydantic import NDArray, Shape
@@ -16,6 +17,7 @@ yaml = YAML(typ="safe")
 
 
 def value_is_3d(value: list[float] | NDArray):
+    # TODO this is a bad name as it modifies the value
     """Ensure value is given in three dimensional space."""
     if len(value) == 2:  # pyright: ignore
         if isinstance(value, NDArray):  # pyright: ignore
@@ -171,9 +173,11 @@ class HeatPump(BaseModel):
     """Datastructure representing a single heat pump. A heat pump has a location, an injection temperature and an
     injection rate."""
 
-    location: list[float]
+    location: list[float] | None
     """The location where the `HeatPump` should be. It is given in cells, the program translates the cell-based location
-    into coordinates matching the domain by multiplying it by the `GeneralConfig.cell_resolution`."""
+    into coordinates matching the domain by multiplying it by the `GeneralConfig.cell_resolution`. If the
+    `HeatPump` shall be varied spatially, set this to None as otherwise the user would have to provide unique
+    values for the locations to circumvent the duplicates check."""
 
     injection_temp: ValueTimeSeries | ValueMinMax | float
     """The injection temperature of the `HeatPump` in degree Celsius."""
@@ -183,14 +187,18 @@ class HeatPump(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    _validated_3d = field_validator("location")(value_is_3d)
+    @model_validator(mode="after")
+    def check_and_fix_location(self):
+        """If location is given, make it 3d"""
+        if isinstance(self.location, list):
+            value_is_3d(self.location)
+        return self
 
     def __str__(self) -> str:
-        return (
-            f"X:{self.location[0]} Y:{self.location[1]} Z:{self.location[2]}\n"
-            f"Temp: {self.injection_temp}\n"
-            f"Rate: {self.injection_rate}"
+        location_string = (
+            f"X:{self.location[0]} Y:{self.location[1]} Z:{self.location[2]}" if self.location is not None else "None"
         )
+        return f"{location_string}\nTemp: {self.injection_temp}\nRate: {self.injection_rate}"
 
 
 class HeatPumps(BaseModel):
@@ -235,6 +243,19 @@ class Parameter(BaseModel):
             return Path(str(value))
 
         return value
+
+    @model_validator(mode="after")
+    def check_heatpump_location(self):
+        # TODO write test
+        """If HeatPump location is None, the vary mode must be SPACE"""
+        if (
+            isinstance(self.value, HeatPump)
+            and isinstance(self.value.location, NoneType)
+            and self.vary is not Vary.SPACE
+        ):
+            raise ValueError("HeatPump location is only allowed to be null/None when vary mode is SPACE")
+
+        return self
 
     def __str__(self) -> str:
         value_string = str(self.value)

@@ -42,7 +42,7 @@ def vary_heatpump(state: State, parameter: Parameter) -> Data:
     result_location = np.array(hp.location)
     if parameter.vary == Vary.SPACE:
         # This is needed as we need to calculate the heatpump coordinates for pflotran.in
-        result_location = (number_cells - 1) * state.get_rng().random(3) * resolution + (resolution * 0.5)
+        result_location = generate_heatpump_location(state)
 
     return Data(
         name=parameter.name,
@@ -124,6 +124,10 @@ def calculate_hp_coordinates(state: State) -> State:
 
     for _, hp_data in state.heatpump_parameters.items():
         assert not isinstance(hp_data.value, HeatPumps)
+        if hp_data.value.location is None:
+            # This means the heatpump is assigned a random location during vary stage anyway
+            continue
+
         resolution = state.general.cell_resolution
 
         hp = hp_data.value

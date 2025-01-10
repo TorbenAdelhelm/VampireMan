@@ -45,6 +45,10 @@ def are_duplicate_locations_in_heatpumps(heatpumps: list[HeatPump]) -> bool:
     for heatpump in heatpumps:
         # Needed as lists are not hashable
         location = heatpump.location
+        if location is None:
+            # This means, the heatpump is varied spatially later on while ensuring the location is unique.
+            continue
+
         location = (location[0], location[1], location[2])
 
         if location in heatpump_locations:
