@@ -5,7 +5,6 @@ from .data_structures import State
 from .loading_stage import loading_stage
 from .preparation_stage import preparation_stage
 from .utils import (
-    create_dataset_and_datapoint_dirs,
     get_answer,
     get_sim_tool_implementation,
     profile_function,
