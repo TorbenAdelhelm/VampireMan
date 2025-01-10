@@ -63,27 +63,6 @@ def visualization_stage(state: State):
         # TODO: make this more general
         plot_vary_field(state, datapoint_path, datapoint.data["permeability"])
 
-        # print_heatpump_temp(state, list_to_plot)
-
-
-def print_heatpump_temp(state: State, data: TimeData):
-    # XXX is this needed? Currently it's dead code
-    key, value = data.popitem()
-    data[key] = value
-    temp_data = value["Temperature [C]"]
-    years = pflotran_time_to_year(key)
-
-    for index, datapoint in enumerate(state.datapoints):
-        heatpumps = [{name: d.value} for name, d in datapoint.data.items() if isinstance(d.value, HeatPump)]
-        for name, heatpump in heatpumps:
-            assert isinstance(heatpump, HeatPump)
-            location = heatpump.location
-            try:
-                temp = np.round(temp_data[location[0], location[1]], 4)
-                logging.info("datapoint %s: Temperature at HP at '%s' (%s years): %s C", index, name, years, temp)
-            except Exception as err:
-                logging.error("Could not get HP temp: %s", err)
-
 
 def make_plottable(state: State, hdf5_file: h5py.File) -> TimeData:
     dimensions = cast(np.ndarray, state.general.number_cells)
