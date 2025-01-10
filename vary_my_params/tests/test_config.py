@@ -42,7 +42,7 @@ def test_state_invalid_state():
         State(
             **{
                 "general": {
-                    "numerical_solver": "new-thing",
+                    "sim_tool": "new-thing",
                 }
             }
         )

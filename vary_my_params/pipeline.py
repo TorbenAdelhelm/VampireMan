@@ -7,7 +7,7 @@ from .preparation_stage import preparation_stage
 from .utils import (
     create_dataset_and_datapoint_dirs,
     get_answer,
-    get_numerical_solver_implementation,
+    get_sim_tool_implementation,
     profile_function,
     write_data_to_verified_json_file,
 )
@@ -18,19 +18,19 @@ from .variation_stage import variation_stage
 @profile_function
 def render_stage(state: State):
     get_answer(state, "Do you want to run the render stage?", True)
-    get_numerical_solver_implementation(state.general.numerical_solver).render_stage(state)
+    get_sim_tool_implementation(state.general.sim_tool).render_stage(state)
 
 
 @profile_function
 def simulation_stage(state: State):
     get_answer(state, "Do you want to run the simulation stage?", True)
-    get_numerical_solver_implementation(state.general.numerical_solver).simulation_stage(state)
+    get_sim_tool_implementation(state.general.sim_tool).simulation_stage(state)
 
 
 @profile_function
 def visualization_stage(state: State):
     get_answer(state, "Do you want to run the visualization stage?", True)
-    get_numerical_solver_implementation(state.general.numerical_solver).visualization_stage(state)
+    get_sim_tool_implementation(state.general.sim_tool).visualization_stage(state)
 
 
 def run(args: Namespace):

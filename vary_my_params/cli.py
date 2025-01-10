@@ -16,9 +16,7 @@ def main():
     )
 
     parser.add_argument("--settings-file", type=pathlib.Path, help="number of datapoints to generate")
-    parser.add_argument(
-        "--numerical-solver", type=str, default="pflotran", help="name of the numerical solver implementation"
-    )
+    parser.add_argument("--sim-tool", type=str, default="pflotran", help="name of the simulation tool implementation")
     parser.add_argument("--non-interactive", action="store_true", default=None, help="don't ask for user confirmation")
     parser.add_argument("--log-level", type=str, default="INFO", help="enable debug logging")
 

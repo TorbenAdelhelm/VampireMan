@@ -14,7 +14,7 @@ def test_all_settings():
         try:
             state = State.from_yaml(setting)
             state = loading_stage(
-                Namespace(settings_file=setting, numerical_solver="pflotran", non_interactive=True, log_level="INFO")
+                Namespace(settings_file=setting, sim_tool="pflotran", non_interactive=True, log_level="INFO")
             )
             if state.general.number_cells[1] > 1000:
                 # Skipping as large settings take ages

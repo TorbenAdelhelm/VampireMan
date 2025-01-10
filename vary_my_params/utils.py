@@ -44,16 +44,16 @@ def get_answer(state: "State", question: str, exit_if_no: bool = False) -> bool:
         sys.exit(0)
 
 
-def get_numerical_solver_implementation(numerical_solver: str) -> ModuleType:
-    # Get solver specific defaults
-    match numerical_solver:
+def get_sim_tool_implementation(sim_tool: str) -> ModuleType:
+    # Get simulation tool specific defaults
+    match sim_tool:
         case "pflotran":
             from . import pflotran
 
             return pflotran
         case _:
-            logging.error("%s numerical solver is not yet implemented", numerical_solver)
-            raise NotImplementedError("Numerical solver not implemented")
+            logging.error("%s simulation tool is not yet implemented", sim_tool)
+            raise NotImplementedError("Simulation tool not implemented")
 
 
 def profile_function(function):

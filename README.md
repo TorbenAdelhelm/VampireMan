@@ -64,7 +64,7 @@ Two dimensional grids are implicitly converted to three dimensions by adding a `
 Further, all cases have the similarities:
 - random seed is always set to `0`
 - output directory is set to `./datasets_out/<casename>`.
-- numerical solver is `pflotran`
+- simulation tool is `pflotran`
 - profiling is disabled
 - simulation time is 27.5 years
 - interactive is set to false
