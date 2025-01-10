@@ -26,11 +26,11 @@ from .vary_perlin import create_perlin_field
 def copy_parameter(state: State, parameter: Parameter) -> Data:
     """This function simply copies all values from a `Parameter` to a `Data` object without any transformation"""
     if isinstance(parameter.value, HeatPump):
-        return vary_heatpump(state, parameter, False)
+        return vary_heatpump(state, parameter)
     return Data(name=parameter.name, value=deepcopy(parameter.value))
 
 
-def vary_heatpump(state: State, parameter: Parameter, vary_location: bool) -> Data:
+def vary_heatpump(state: State, parameter: Parameter) -> Data:
     resolution = state.general.cell_resolution
     number_cells = np.array(state.general.number_cells)
 
@@ -40,7 +40,7 @@ def vary_heatpump(state: State, parameter: Parameter, vary_location: bool) -> Da
     hp = handle_heatpump_values(state.get_rng(), hp)
 
     result_location = np.array(hp.location)
-    if vary_location:
+    if parameter.vary == Vary.SPACE:
         # This is needed as we need to calculate the heatpump coordinates for pflotran.in
         result_location = (number_cells - 1) * state.get_rng().random(3) * resolution + (resolution * 0.5)
 
@@ -105,7 +105,7 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
                 )
             # This should be inside the CONST block, yet it seems to make more sense to users to find it here
             elif isinstance(parameter.value, HeatPump):
-                data = vary_heatpump(state, parameter, True)
+                data = vary_heatpump(state, parameter)
             elif isinstance(parameter.value, ValueMinMax):
                 raise ValueError(
                     f"Parameter {parameter.name} is vary.space and has min/max values, "
