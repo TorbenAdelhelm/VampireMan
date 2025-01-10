@@ -380,12 +380,12 @@ class State(BaseModel):
             "permeability": Parameter(
                 name="permeability",
                 vary=Vary.FIXED,
-                value=1.2882090745857623e-10,
+                value=1.29e-10,
             ),
             "pressure_gradient": Parameter(
                 name="pressure_gradient",
                 vary=Vary.FIXED,
-                value=-0.0024757478454929577,
+                value=-0.0025,
             ),
             "temperature": Parameter(
                 name="temperature",
