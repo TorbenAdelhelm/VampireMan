@@ -113,7 +113,6 @@ def plot_isolines(state: State, data: TimeData, path: Path):
         # Make the 3D data 2D so it can be plotted
         level = int((property_data.shape[2] - 1) / 2)
         plot_data = property_data[:, :, level]
-        plt.imshow(plot_data)
 
         plt.contourf(plot_data, levels=levels, cmap="RdBu_r")
 
