@@ -1,7 +1,7 @@
 import logging
 
 from ..data_structures import HeatPump, HeatPumps, State
-from ..utils import profile_function
+from ..utils import profile_function, write_data_to_verified_json_file
 
 
 @profile_function
@@ -33,6 +33,8 @@ def validation_stage(state: State) -> State:
         raise ValueError("Heat pumps found in hydrogeological_parameters, this is not allowed")
 
     logging.info("State is valid")
+    write_data_to_verified_json_file(state, state.general.output_directory / "state.json", state)
+
     return state
 
 

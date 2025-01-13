@@ -8,7 +8,6 @@ from .utils import (
     get_answer,
     get_sim_tool_implementation,
     profile_function,
-    write_data_to_verified_json_file,
 )
 from .validation_stage import validation_stage
 from .variation_stage import variation_stage
@@ -36,8 +35,6 @@ def run(args: Namespace):
     state = loading_stage(args)
     state = preparation_stage(state)
     state = validation_stage(state)
-
-    write_data_to_verified_json_file(state, state.general.output_directory / "state.json", state)
 
     # Where do we check this?
     logging.debug("Will run all stages")
