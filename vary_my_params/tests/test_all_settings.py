@@ -17,7 +17,7 @@ def test_all_settings(tmp_path):
                 Namespace(settings_file=setting, sim_tool="pflotran", non_interactive=True, log_level="INFO")
             )
             state.general.output_directory = tmp_path / f"render_test/{setting}"
-            if state.general.number_cells[1] > 1000:
+            if state.general.number_cells[0] * state.general.number_cells[1] * state.general.number_cells[2] > 50000:
                 # Skipping as large settings take ages
                 continue
             state = preparation_stage(state)
