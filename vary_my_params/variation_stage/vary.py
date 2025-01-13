@@ -40,6 +40,8 @@ def vary_heatpump(state: State, parameter: Parameter) -> Data:
     if parameter.vary == Vary.SPACE:
         # This is needed as we need to calculate the heatpump coordinates for pflotran.in
         result_location = generate_heatpump_location(state)
+        resolution = state.general.cell_resolution
+        result_location = (np.array(result_location) - 1) * resolution + (resolution * 0.5)
 
     return Data(
         name=parameter.name,
