@@ -8,7 +8,7 @@ from vary_my_params.utils import create_dataset_and_datapoint_dirs, write_data_t
 from vary_my_params.validation_stage.utils import validation_stage
 
 
-def test_all_settings():
+def test_all_settings(tmp_path):
     pathlist = Path("./settings/").glob("*.yaml")
     for setting in pathlist:
         try:
@@ -16,6 +16,7 @@ def test_all_settings():
             state = loading_stage(
                 Namespace(settings_file=setting, sim_tool="pflotran", non_interactive=True, log_level="INFO")
             )
+            state.general.output_directory = tmp_path / f"render_test/{setting}"
             if state.general.number_cells[1] > 1000:
                 # Skipping as large settings take ages
                 continue
