@@ -144,9 +144,9 @@ def plot_vary_field(state: State, datapoint_dir: Path, parameter: Data):
         # Reshape the data to match the 3D space of the domain
         parameter.value = parameter.value.reshape(cast(np.ndarray, state.general.number_cells), order="F")
 
-    axes[0].imshow(parameter.value[:, :, 0])
-    axes[2].imshow(parameter.value[:, 0, :])
-    axes[3].imshow(parameter.value[0, :, :])
+    axes[0].imshow(parameter.value[:, :, int((parameter.value.shape[2] - 1) / 2)])
+    axes[2].imshow(parameter.value[:, int((parameter.value.shape[1] - 1) / 2), :])
+    axes[3].imshow(parameter.value[int((parameter.value.shape[0] - 1) / 2), :, :])
     axes[0].set_title("yz")
     axes[2].set_title("xz")
     axes[3].set_title("xy")
