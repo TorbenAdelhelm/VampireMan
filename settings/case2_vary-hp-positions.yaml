@@ -9,7 +9,7 @@
 # temperature: fix
 
 general:
-  number_datapoints: 1
+  number_datapoints: 2
   output_directory: ./datasets_out/case2_vary-hp-positions
   # random_seed: null
   number_cells: [32, 512, 1]
@@ -24,12 +24,12 @@ heatpump_parameters:
   hp2:
     vary: spatially_vary_within_datapoint
     value:
-      location: [16, 64, 1] # Gets overwritten
+      location: null # Gets overwritten
       injection_temp: 15.6
       injection_rate: 0.00002
   hp3:
     vary: spatially_vary_within_datapoint
     value:
-      location: [16, 92, 1] # Gets overwritten
+      location: null # Gets overwritten
       injection_temp: 15.6
       injection_rate: 0.00005
