@@ -78,6 +78,7 @@ def plot_y(data: TimeData, path: Path):
 
     pic_file_name = path / "Pflotran_properties_2d.jpg"
     logging.info(f"Resulting picture is at {pic_file_name}")
+    plt.tight_layout()
     plt.savefig(pic_file_name)
 
 
