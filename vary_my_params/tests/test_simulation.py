@@ -2,7 +2,7 @@ import subprocess
 from unittest.mock import patch
 
 from vary_my_params.data_structures import State
-from vary_my_params.pipeline import preparation_stage, render_stage, simulation_stage, validation_stage, variation_stage
+from vary_my_params.pipeline import preparation_stage, simulation_stage
 
 
 def mock_pflotran_call(*args, **kwargs):

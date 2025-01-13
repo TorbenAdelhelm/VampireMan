@@ -31,9 +31,6 @@ def copy_parameter(state: State, parameter: Parameter) -> Data:
 
 
 def vary_heatpump(state: State, parameter: Parameter) -> Data:
-    resolution = state.general.cell_resolution
-    number_cells = np.array(state.general.number_cells)
-
     hp = deepcopy(parameter.value)
     assert isinstance(hp, HeatPump)
 
@@ -123,7 +120,7 @@ def calculate_hp_coordinates(state: State) -> State:
     """Calculate the coordinates of each heatpump by multiplying with the cell_resolution"""
 
     for _, hp_data in state.heatpump_parameters.items():
-        assert not isinstance(hp_data.value, HeatPumps)
+        assert isinstance(hp_data.value, HeatPump)
         if hp_data.value.location is None:
             # This means the heatpump is assigned a random location during vary stage anyway
             continue

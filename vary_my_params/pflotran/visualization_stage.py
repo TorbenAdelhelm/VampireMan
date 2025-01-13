@@ -9,7 +9,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from ..data_structures import Data, HeatPump, State
+from ..data_structures import Data, State
 
 TimeData = OrderedDict[str, dict[str, Any]]
 
@@ -17,34 +17,6 @@ TimeData = OrderedDict[str, dict[str, Any]]
 def pflotran_time_to_year(time_step: str) -> float:
     # Get year from '   3 Time  5.00000E+00 y'
     return float(time_step.split(" ")[-2])
-
-
-# This doesn't work
-# def asdf(data: TimeData, path: Path):
-#     time_steps = len(data)
-#     key, val = data.popitem()
-#     cols = len(val)
-#     data[key] = val
-#
-#     _, axes = plt.subplots(time_steps, cols, figsize=(20 * cols, 5 * time_steps))
-#
-#     for index, (time_step, time_data) in enumerate(data.items()):
-#         temp_data = time_data.get("Temperature [C]")
-#         for level in range(len(temp_data[2])):
-#             plt.subplot()
-#             set_trace()
-#
-#             # Make the 3D data 2D so it can be plotted
-#             plot_data = temp_data[:, :, level]
-#             plt.imshow(plot_data)
-#
-#             plt.xlabel("cells y")
-#             plt.ylabel("cells x or z")
-#             aligned_colorbar(label=f"Temp in C at z = {level}")
-#
-#         pic_file_name = path / "Pflotran_properties_2d-{row}.jpg"
-#         logging.info(f"Resulting picture is at {pic_file_name}")
-#         plt.savefig(pic_file_name)
 
 
 def visualization_stage(state: State):
