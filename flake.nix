@@ -84,11 +84,10 @@
             buildInputs = [
               hdf5
               mpi
-              pkgs.parmetis
+              parmetis
             ];
             strictDeps = true;
             patches = [ ./pflotran.patch ];
-            doCheck = false;
           };
 
           build_h5_file = pkgs.stdenvNoCC.mkDerivation {
