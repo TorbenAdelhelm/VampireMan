@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "vary-my-params"
+name = "vampireman"
 version = "0.1.0"
 description = ""
 authors = ["Max Hausch <github@hausch.xyz>"]
@@ -53,17 +53,17 @@ docstring-code-format = true
 docstring-code-line-length = 120
 
 [tool.pyright]
-include = [ "./vary_my_params" ]
-exclude = [ "./vary_my_params/tests" ]
+include = [ "./vampireman" ]
+exclude = [ "./vampireman/tests" ]
 
 [tool.pytest.ini_options]
-testpaths = "vary_my_params"
+testpaths = "vampireman"
 filterwarnings = [
     "ignore:ndarray.pyi stub file could not be generated",
 ]
 
 [tool.pylint]
-ignore = "vary_my_params/tests"
+ignore = "vampireman/tests"
 
 [tool.pylint.MAIN]
 max-line-length = 120

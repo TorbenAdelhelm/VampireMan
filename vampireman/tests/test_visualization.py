@@ -1,14 +1,14 @@
 import os
 
-from vary_my_params.data_structures import State
-from vary_my_params.pipeline import (
+from vampireman.data_structures import State
+from vampireman.pipeline import (
     preparation_stage,
     render_stage,
     simulation_stage,
     variation_stage,
     visualization_stage,
 )
-from vary_my_params.utils import create_dataset_and_datapoint_dirs
+from vampireman.utils import create_dataset_and_datapoint_dirs
 
 
 def test_vis_files_not_empty(tmp_path):

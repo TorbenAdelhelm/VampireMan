@@ -5,7 +5,7 @@ from typing import cast
 import numpy as np
 from numpy.typing import ArrayLike
 
-from vary_my_params.validation_stage.utils import are_duplicate_locations_in_heatpumps
+from vampireman.validation_stage.utils import are_duplicate_locations_in_heatpumps
 
 from ..data_structures import (
     Data,

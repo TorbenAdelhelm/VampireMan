@@ -1,8 +1,8 @@
 import os
 
-from vary_my_params.data_structures import State
-from vary_my_params.pipeline import preparation_stage, render_stage, variation_stage
-from vary_my_params.utils import create_dataset_and_datapoint_dirs
+from vampireman.data_structures import State
+from vampireman.pipeline import preparation_stage, render_stage, variation_stage
+from vampireman.utils import create_dataset_and_datapoint_dirs
 
 
 def test_render_borders_and_mesh(tmp_path):

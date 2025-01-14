@@ -1,6 +1,6 @@
 import numpy as np
 
-from vary_my_params.data_structures import (
+from vampireman.data_structures import (
     Distribution,
     HeatPump,
     Parameter,
@@ -10,8 +10,8 @@ from vary_my_params.data_structures import (
     ValueTimeSeries,
     Vary,
 )
-from vary_my_params.pipeline import preparation_stage, variation_stage
-from vary_my_params.utils import create_dataset_and_datapoint_dirs
+from vampireman.pipeline import preparation_stage, variation_stage
+from vampireman.utils import create_dataset_and_datapoint_dirs
 
 
 def test_vary_copy():

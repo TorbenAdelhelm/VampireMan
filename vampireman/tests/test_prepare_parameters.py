@@ -1,6 +1,6 @@
 import pytest
 
-from vary_my_params.data_structures import (
+from vampireman.data_structures import (
     HeatPump,
     HeatPumps,
     Parameter,
@@ -9,7 +9,7 @@ from vary_my_params.data_structures import (
     ValueTimeSeries,
     Vary,
 )
-from vary_my_params.pipeline import preparation_stage
+from vampireman.pipeline import preparation_stage
 
 
 def test_prepare_heatpump():

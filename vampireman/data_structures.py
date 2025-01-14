@@ -202,7 +202,7 @@ class HeatPump(BaseModel):
 
 
 class HeatPumps(BaseModel):
-    """Datastructure representing a set of heat pumps. During the `vary_my_params.pipeline.prepare_parameters` stage,
+    """Datastructure representing a set of heat pumps. During the `vampireman.pipeline.prepare_parameters` stage,
     the individual `HeatPump`s will be generated from this.
 
     Using `State.get_rng`, values between min and max are chosen for each of the generated `HeatPump`s.

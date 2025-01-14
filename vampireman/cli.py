@@ -11,7 +11,7 @@ from . import pipeline
 def main():
     logging.info("Staring up")
     parser = argparse.ArgumentParser(
-        prog="python3 -m vary_my_params",
+        prog="python3 -m vampireman",
         description="This program implements a pipeline that varies parameters for a simulation in a structured way",
     )
 

@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from vary_my_params.data_structures import State
+from vampireman.data_structures import State
 
 
 def test_state_override():
@@ -50,7 +50,7 @@ def test_state_invalid_state():
 
 def test_state_read_correct_yaml():
     # Check if reading yaml files works correctly
-    State.from_yaml("vary_my_params/tests/test_settings_valid.yaml")
+    State.from_yaml("vampireman/tests/test_settings_valid.yaml")
 
 
 def test_state_default_cases():
@@ -65,7 +65,7 @@ def test_state_default_cases():
 
 def test_state_read_incorrect_yaml():
     with pytest.raises(ValueError):
-        State.from_yaml("vary_my_params/tests/test_settings_invalid.yaml")
+        State.from_yaml("vampireman/tests/test_settings_invalid.yaml")
 
 
 def test_state_read_nonexistent_yaml():

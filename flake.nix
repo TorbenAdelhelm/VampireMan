@@ -101,7 +101,7 @@
             ];
 
             buildPhase = ''
-              python -m vary_my_params --non-interactive
+              python -m vampireman --non-interactive
             '';
 
             installPhase = ''
@@ -200,7 +200,7 @@
             ];
 
             checkPhase = ''
-              python -m vary_my_params --non-interactive
+              python -m vampireman --non-interactive
               # h5diff exits with code 0 if any objects are not comparable
               h5diff -v1 datasets_out/*/datapoint-0/pflotran.h5 reference_files/pflotran.h5 | tee diff.out
               if grep -q "Some objects are not comparable" diff.out; then
