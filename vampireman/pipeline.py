@@ -1,3 +1,20 @@
+"""
+This is the pipeline that executes the seven stages of vampireman in their order.
+The stages are:
+
+1. `vampireman.loading_stage.loading_stage.loading_stage`
+1. `vampireman.preparation_stage.preparation_stage.preparation_stage`
+1. `vampireman.validation_stage.validation_stage.validation_stage`
+1. `vampireman.variation_stage.variation_stage.variation_stage`
+1. `vampireman.render_stage.render_stage`
+1. `vampireman.simulation_stage.simulation_stage`
+1. `vampireman.visualization_stage.visualization_stage`
+
+When running interactively (depending on `vampireman.data_structures.GeneralConfig.interactive`), the execution flow
+will be interrupted after the `validation_stage` and after printing the resulting `State` object, asking the user if the
+pipeline should continue. If the user denies, vampireman will exit.
+"""
+
 import logging
 from argparse import Namespace
 
@@ -12,12 +29,11 @@ from .visualization_stage import visualization_stage
 
 
 def run(args: Namespace):
+    """Runs all pipeline stages."""
+    logging.debug("Running all stages now.")
     state = loading_stage(args)
     state = preparation_stage(state)
     state = validation_stage(state)
-
-    # Where do we check this?
-    logging.debug("Will run all stages")
 
     print("This is the state that is going to be used:")
     print(state)
