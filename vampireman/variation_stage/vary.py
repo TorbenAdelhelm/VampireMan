@@ -18,7 +18,6 @@ from ..data_structures import (
     ValueTimeSeries,
     Vary,
 )
-from ..validation_stage.validation_stage import are_duplicate_locations_in_heatpumps
 from .vary_perlin import create_perlin_field
 
 
@@ -112,31 +111,7 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
             else:
                 raise NotImplementedError(f"Dont know how to vary {parameter}")
 
-        case _:
-            raise ValueError()
     return data
-
-
-def calculate_hp_coordinates(state: State) -> State:
-    """Calculate the coordinates of each heatpump by multiplying with the cell_resolution"""
-
-    for _, hp_data in state.heatpump_parameters.items():
-        assert isinstance(hp_data.value, HeatPump)
-        if hp_data.value.location is None:
-            # This means the heatpump is assigned a random location during vary stage anyway
-            continue
-
-        resolution = state.general.cell_resolution
-
-        hp = hp_data.value
-        assert isinstance(hp, HeatPump)
-
-        # This is needed as we need to calculate the heatpump coordinates for pflotran.in
-        result_location = (np.array(hp.location) - 1) * resolution + (resolution * 0.5)
-
-        hp.location = cast(list[float], result_location.tolist())
-
-    return state
 
 
 def handle_heatpump_values(rand: np.random.Generator, hp_data: HeatPump) -> HeatPump:
@@ -164,69 +139,6 @@ def generate_heatpump_location(state: State) -> list[float]:
     random_vector = state.get_rng().random(3)
     random_location = random_vector * cast(np.ndarray, state.general.number_cells)
     return cast(list[float], np.ceil(random_location).tolist())
-
-
-def generate_heatpumps(state: State) -> State:
-    """Generate `HeatPump`s from the given `HeatPumps` parameter. This function will remove all `HeatPumps` from
-    `State.heatpump_parameters` and add `HeatPumps.number` `HeatPump`s to the dict. The `HeatPump.injection_temp` and
-    `HeatPump.injection_rate` values are simply taken from a random number between the respective min and max values.
-    """
-
-    new_heatpumps: dict[str, Parameter] = {}
-
-    # Need to get the explicit heatpumps first, in case of location clashes we can simply draw another random number
-    for _, hps in state.heatpump_parameters.items():
-        if isinstance(hps.value, HeatPump):
-            new_heatpumps[hps.name] = hps
-            continue
-
-    for _, hps in state.heatpump_parameters.items():
-        if isinstance(hps.value, HeatPump):
-            continue
-
-        if not isinstance(hps.value, HeatPumps):
-            raise ValueError("There was a non HeatPumps item in heatpump_parameters")
-
-        for index in range(hps.value.number):  # type:ignore
-            name = f"{hps.name}_{index}"
-            if (state.heatpump_parameters.get(name) is not None) and (new_heatpumps.get(name) is not None):
-                msg = f"There is a naming clash for generated heatpump {name}"
-                logging.error(msg)
-                raise ValueError(msg)
-
-            injection_temp = hps.value.injection_temp
-            injection_rate = hps.value.injection_rate
-
-            location = generate_heatpump_location(state)
-
-            heatpump = HeatPump(
-                location=cast(list[float], location),
-                injection_temp=injection_temp,
-                injection_rate=injection_rate,
-            )
-            logging.debug("Generated HeatPump %s", heatpump)
-
-            heatpumps = cast(list[HeatPump], [param.value for _, param in new_heatpumps.items()])
-            heatpumps.append(heatpump)
-            while are_duplicate_locations_in_heatpumps(heatpumps):
-                # Generate new heatpump location if the one we had is already taken
-                # TODO write test for this
-                heatpump.location = generate_heatpump_location(state)
-
-            new_heatpumps[name] = Parameter(
-                name=name,
-                vary=hps.vary,
-                value=heatpump,
-            )
-
-    for name, value in new_heatpumps.items():
-        if isinstance(value, HeatPumps):
-            raise ValueError(f"There should be no HeatPumps in the new_heatpumps dict, but {name} is.")
-
-    logging.debug("Old heatpump_parameters: %s", state.heatpump_parameters)
-    state.heatpump_parameters = new_heatpumps
-    logging.debug("New heatpump_parameters: %s", state.heatpump_parameters)
-    return state
 
 
 def vary_params(state: State) -> State:
@@ -270,45 +182,5 @@ def shuffle_datapoints(state: State) -> State:
     for parameter in parameter_names:
         for index in range(state.general.number_datapoints):
             state.datapoints[index].data[parameter] = parameters[parameter][index]
-
-    return state
-
-
-def handle_time_based_params(state: State) -> State:
-    """Convert specific parameters to time based entries."""
-
-    # Convert heatpumps to time based values
-    for _, heatpump in state.heatpump_parameters.items():
-        assert isinstance(heatpump.value, HeatPump)
-        if not isinstance(heatpump.value.injection_temp, ValueTimeSeries):
-            heatpump.value.injection_temp = ValueTimeSeries(values={0: heatpump.value.injection_temp})
-        if not isinstance(heatpump.value.injection_rate, ValueTimeSeries):
-            heatpump.value.injection_rate = ValueTimeSeries(values={0: heatpump.value.injection_rate})
-
-    return state
-
-
-def calculate_frequencies(state: State) -> State:
-    """For every `Parameter` that has a value of `ValuePerlin` type, calculate the frequency value if
-    `ValueMinMax` is given."""
-
-    # Convert heatpumps to time based values
-    for _, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
-        if not isinstance(parameter.value, ValuePerlin):
-            continue
-
-        if not isinstance(parameter.value.frequency, ValueMinMax):
-            continue
-
-        rand = state.get_rng()
-
-        min = parameter.value.frequency.min
-        max = parameter.value.frequency.max
-
-        val1 = max - (rand.random() * (max - min))
-        val2 = max - (rand.random() * (max - min))
-        val3 = max - (rand.random() * (max - min))
-
-        parameter.value.frequency = [val1, val2, val3]
 
     return state
