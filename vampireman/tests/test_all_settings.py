@@ -1,12 +1,9 @@
 from argparse import Namespace
 from pathlib import Path
 
+from vampireman import loading_stage, preparation_stage, render_stage, validation_stage, variation_stage
 from vampireman.data_structures import State
-from vampireman.loading_stage import loading_stage
-from vampireman.render_stage import render_stage
-from vampireman.pipeline import preparation_stage, variation_stage
 from vampireman.utils import create_dataset_and_datapoint_dirs, write_data_to_verified_json_file
-from vampireman.validation_stage.utils import validation_stage
 
 
 def test_all_settings(tmp_path):

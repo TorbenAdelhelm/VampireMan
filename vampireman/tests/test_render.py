@@ -1,7 +1,7 @@
 import os
 
+from vampireman import preparation_stage, render_stage, variation_stage
 from vampireman.data_structures import State
-from vampireman.pipeline import preparation_stage, render_stage, variation_stage
 from vampireman.utils import create_dataset_and_datapoint_dirs
 
 

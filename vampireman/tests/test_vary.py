@@ -1,5 +1,6 @@
 import numpy as np
 
+from vampireman import preparation_stage, variation_stage
 from vampireman.data_structures import (
     Distribution,
     HeatPump,
@@ -10,7 +11,6 @@ from vampireman.data_structures import (
     ValueTimeSeries,
     Vary,
 )
-from vampireman.pipeline import preparation_stage, variation_stage
 from vampireman.utils import create_dataset_and_datapoint_dirs
 
 

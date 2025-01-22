@@ -1,8 +1,7 @@
 import pytest
 
+from vampireman import preparation_stage, validation_stage
 from vampireman.data_structures import HeatPump, Parameter, State, Vary
-from vampireman.pipeline import preparation_stage
-from vampireman.validation_stage.utils import validation_stage
 
 
 def test_validation_stage_heatpump_in_hgp():

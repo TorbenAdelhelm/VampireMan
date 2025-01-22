@@ -1,8 +1,8 @@
 import subprocess
 from unittest.mock import patch
 
+from vampireman import preparation_stage, simulation_stage
 from vampireman.data_structures import State
-from vampireman.pipeline import preparation_stage, simulation_stage
 
 
 def mock_pflotran_call(*args, **kwargs):
