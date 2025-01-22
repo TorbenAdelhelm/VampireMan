@@ -1,34 +1,14 @@
 import logging
 from argparse import Namespace
 
-from .data_structures import State
 from .loading_stage import loading_stage
 from .preparation_stage import preparation_stage
-from .utils import (
-    get_answer,
-    get_sim_tool_implementation,
-    profile_function,
-)
+from .render_stage import render_stage
+from .simulation_stage import simulation_stage
+from .utils import get_answer
 from .validation_stage import validation_stage
 from .variation_stage import variation_stage
-
-
-@profile_function
-def render_stage(state: State):
-    get_answer(state, "Do you want to run the render stage?", True)
-    get_sim_tool_implementation(state.general.sim_tool).render_stage(state)
-
-
-@profile_function
-def simulation_stage(state: State):
-    get_answer(state, "Do you want to run the simulation stage?", True)
-    get_sim_tool_implementation(state.general.sim_tool).simulation_stage(state)
-
-
-@profile_function
-def visualization_stage(state: State):
-    get_answer(state, "Do you want to run the visualization stage?", True)
-    get_sim_tool_implementation(state.general.sim_tool).visualization_stage(state)
+from .visualization_stage import visualization_stage
 
 
 def run(args: Namespace):
@@ -42,8 +22,14 @@ def run(args: Namespace):
     print("This is the state that is going to be used:")
     print(state)
 
+    get_answer(state, "Do you want to run the variation stage?", True)
     state = variation_stage(state)
 
+    get_answer(state, "Do you want to run the render stage?", True)
     render_stage(state)
+
+    get_answer(state, "Do you want to run the simulation stage?", True)
     simulation_stage(state)
+
+    get_answer(state, "Do you want to run the visualization stage?", True)
     visualization_stage(state)

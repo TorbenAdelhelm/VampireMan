@@ -2,8 +2,9 @@ from argparse import Namespace
 from pathlib import Path
 
 from vampireman.data_structures import State
-from vampireman.loading_stage.utils import loading_stage
-from vampireman.pipeline import preparation_stage, render_stage, variation_stage
+from vampireman.loading_stage import loading_stage
+from vampireman.render_stage import render_stage
+from vampireman.pipeline import preparation_stage, variation_stage
 from vampireman.utils import create_dataset_and_datapoint_dirs, write_data_to_verified_json_file
 from vampireman.validation_stage.utils import validation_stage
 
