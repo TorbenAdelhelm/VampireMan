@@ -68,7 +68,7 @@
               };
 
           pflotran = pkgs.stdenv.mkDerivation rec {
-            name = "pflotran";
+            pname = "pflotran";
             version = "6.0.0";
             src = pkgs.fetchFromBitbucket {
               owner = "pflotran";
@@ -91,7 +91,7 @@
           };
 
           build_h5_file = pkgs.stdenvNoCC.mkDerivation {
-            name = "buildH5File";
+            pname = "buildH5File";
             src = ./.;
 
             nativeBuildInputs = [
@@ -133,7 +133,7 @@
 
         checks = {
           treefmt = pkgs.stdenvNoCC.mkDerivation {
-            name = "treefmtTest";
+            pname = "treefmtTest";
             src = ./.;
 
             doCheck = true;
@@ -153,7 +153,7 @@
           };
 
           ruff = pkgs.stdenvNoCC.mkDerivation {
-            name = "ruff";
+            pname = "ruff";
             src = ./.;
 
             doCheck = true;
@@ -168,7 +168,7 @@
           };
 
           pyright = pkgs.stdenvNoCC.mkDerivation {
-            name = "pyright";
+            pname = "pyright";
             src = ./.;
 
             doCheck = true;
@@ -186,7 +186,7 @@
           };
 
           check_h5_file = pkgs.stdenvNoCC.mkDerivation {
-            name = "checkH5File";
+            pname = "checkH5File";
             src = ./.;
 
             doCheck = true;
@@ -212,7 +212,7 @@
           };
 
           pytest = pkgs.stdenvNoCC.mkDerivation {
-            name = "pytest";
+            pname = "pytest";
             src = ./.;
 
             doCheck = true;
