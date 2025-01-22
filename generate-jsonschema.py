@@ -1,6 +1,6 @@
 from json import dumps, loads
 
-from vampireman.config import State
+from vampireman.data_structures import State
 
 # This is needed as pydantic outputs additionalProperties: false instead of an empty object
 json_string = dumps(State.model_json_schema())
