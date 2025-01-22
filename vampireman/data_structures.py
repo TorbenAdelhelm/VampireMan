@@ -523,6 +523,8 @@ class State(BaseModel):
 
     @staticmethod
     def from_yaml(settings_file_path: str) -> "State":
+        """Reads in a yaml file from `settings_file_path` and returns a `State` object with the provided
+            values."""
         logging.debug("Trying to load config from %s", settings_file_path)
         try:
             with open(settings_file_path, encoding="utf-8") as state_file:

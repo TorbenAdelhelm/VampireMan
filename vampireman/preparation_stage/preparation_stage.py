@@ -1,3 +1,7 @@
+"""The preparation stage is responsible for reading in any supplementary files specified in any of the
+`vampireman.data_structures.Parameter.value` fields. Afterwards, frequencies of the
+
+"""
 import logging
 from typing import cast
 
