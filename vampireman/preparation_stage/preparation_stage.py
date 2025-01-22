@@ -1,6 +1,18 @@
 """The preparation stage is responsible for reading in any supplementary files specified in any of the
-`vampireman.data_structures.Parameter.value` fields. Afterwards, frequencies of the
+`vampireman.data_structures.Parameter.value` fields.
 
+Afterwards, for each `vampireman.data_structures.HeatPumps` parameter, the corresponding
+`vampireman.data_structures.HeatPump`s are generated and added to the
+`vampireman.data_structures.State.heatpump_parameters` dict. The `vampireman.data_structures.HeatPumps` are then dropped
+from the state.
+
+`vampireman.data_structures.HeatPump.location` are multiplied with
+`vampireman.data_structures.GeneralConfig.cell_resolution` to change the cell based representation to a coordinate based
+representation.
+
+As a last step, the `vampireman.data_structures.HeatPump.injection_temp` and
+`vampireman.data_structures.HeatPump.injection_rate` values are converted to
+`vampireman.data_structures.ValueTimeSeries` values so they can be handled in a uniform way later.
 """
 import logging
 from typing import cast
