@@ -3,7 +3,7 @@ from typing import cast
 
 import numpy as np
 
-from ..data_structures import HeatPump, HeatPumps, Parameter, State, ValueMinMax, ValuePerlin, ValueTimeSeries
+from ..data_structures import HeatPump, HeatPumps, Parameter, State, ValueTimeSeries
 from ..utils import create_dataset_and_datapoint_dirs, profile_function, read_in_files
 from ..validation_stage.validation_stage import are_duplicate_locations_in_heatpumps
 from ..variation_stage.vary import generate_heatpump_location
@@ -13,36 +13,9 @@ from ..variation_stage.vary import generate_heatpump_location
 def preparation_stage(state: State) -> State:
     create_dataset_and_datapoint_dirs(state)
     state = read_in_files(state)
-    state = calculate_frequencies(state)
     state = generate_heatpumps(state)
     state = calculate_hp_coordinates(state)
     state = handle_time_based_params(state)
-    return state
-
-
-def calculate_frequencies(state: State) -> State:
-    """For every `Parameter` that has a value of `ValuePerlin` type, calculate the frequency value if
-    `ValueMinMax` is given."""
-
-    # Convert heatpumps to time based values
-    for _, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
-        if not isinstance(parameter.value, ValuePerlin):
-            continue
-
-        if not isinstance(parameter.value.frequency, ValueMinMax):
-            continue
-
-        rand = state.get_rng()
-
-        min = parameter.value.frequency.min
-        max = parameter.value.frequency.max
-
-        val1 = max - (rand.random() * (max - min))
-        val2 = max - (rand.random() * (max - min))
-        val3 = max - (rand.random() * (max - min))
-
-        parameter.value.frequency = [val1, val2, val3]
-
     return state
 
 

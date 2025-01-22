@@ -58,6 +58,20 @@ def create_perlin_field(state: State, parameter: Parameter):
         raise ValueError()
 
     freq_factor = parameter.value.frequency
+
+    if isinstance(freq_factor, ValueMinMax):
+        # If the frequency is `ValueMinMax`, get random values for x,y,z
+        rand = state.get_rng()
+
+        min = freq_factor.min
+        max = freq_factor.max
+
+        val1 = max - (rand.random() * (max - min))
+        val2 = max - (rand.random() * (max - min))
+        val3 = max - (rand.random() * (max - min))
+
+        freq_factor = [val1, val2, val3]
+
     if not isinstance(freq_factor, list):
         raise ValueError()
 
