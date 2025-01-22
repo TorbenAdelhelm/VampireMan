@@ -1,6 +1,3 @@
-"""This is the interface allowing a user to interact with the tool via a command line. It exposes common functions in a
-structured way."""
-
 import argparse
 import logging
 import pathlib
@@ -8,7 +5,9 @@ import pathlib
 from . import pipeline
 
 
-def main():
+def invoke_vampireman():
+    """This function takes care of parsing command line arguments and also adjusts the log level. Afterwards, it
+    calls `vampireman.pipeline.run()` to start the execution flow of the pipeline."""
     logging.info("Staring up")
     parser = argparse.ArgumentParser(
         prog="python3 -m vampireman",
