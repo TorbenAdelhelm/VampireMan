@@ -1,11 +1,6 @@
 # When running `python3 -m vampireman [...]` this file will be executed by python.
 # It then runs the `invoke_vampireman()` function in ./cli.py
 import logging
-import warnings
-
-# This supresses unwanted output as the library tries to write to its installation directory. Only required once.
-with warnings.catch_warnings(action="ignore"):
-    import numpydantic as numpydantic
 
 from . import cli
 

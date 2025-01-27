@@ -1,10 +1,14 @@
 import logging
 import pathlib
+import warnings
 
 import jinja2
 import numpy as np
 from h5py import File
-from numpydantic import NDArray
+
+# This supresses unwanted output as the library tries to write to its installation directory
+with warnings.catch_warnings(action="ignore"):
+    from numpydantic import NDArray
 
 from ...data_structures import HeatPump, State, ValueXYZ
 from ...variation_stage.vary_perlin import create_const_field

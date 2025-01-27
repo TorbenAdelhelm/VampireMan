@@ -5,11 +5,15 @@ import datetime
 import enum
 import inspect
 import logging
+import warnings
 from pathlib import Path
 from types import NoneType
 
 import numpy as np
-from numpydantic import NDArray, Shape
+
+# This supresses unwanted output as the library tries to write to its installation directory
+with warnings.catch_warnings(action="ignore"):
+    from numpydantic import NDArray, Shape
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator, model_validator
 from ruamel.yaml import YAML
 
@@ -524,7 +528,7 @@ class State(BaseModel):
     @staticmethod
     def from_yaml(settings_file_path: str) -> "State":
         """Reads in a yaml file from `settings_file_path` and returns a `State` object with the provided
-            values."""
+        values."""
         logging.debug("Trying to load config from %s", settings_file_path)
         try:
             with open(settings_file_path, encoding="utf-8") as state_file:
