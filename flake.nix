@@ -120,6 +120,7 @@
               self.packages.${system}.default
               self.packages.${system}.mpi
               pkgs.poetry
+              pkgs.tree
               pkgs.ruff
               pkgs.pyright
               pkgs.pylint

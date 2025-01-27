@@ -1,0 +1,38 @@
+# Case has multiple hps and
+# a varying permeability field
+general:
+  number_datapoints: 2
+  time_to_simulate:
+    final_time: 27.5
+  output_directory: ./datasets_out/demo
+heatpump_parameters:
+  hp1:
+    vary: fixed
+    value:
+      location: [16, 32, 1]
+      injection_temp: 15.6
+      injection_rate: 0.00024
+  hps:
+    vary: spatially_vary_within_datapoint
+    value:
+      number: 5
+      injection_temp:
+        min: 13.6
+        max: 15.6
+      injection_rate:
+        min: 0.00002
+        max: 0.0001
+hydrogeological_parameters:
+  permeability:
+    vary: spatially_vary_within_datapoint
+    distribution: logarithmic
+    value:
+      frequency: [18, 18, 18]
+      max: 5.1e-09
+      min: 1.02e-11
+  pressure gradient:
+    vary: fixed
+    value:
+      x: -0.0008
+      y: -0.003
+      z: 0
