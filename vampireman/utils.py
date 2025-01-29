@@ -2,7 +2,6 @@ import cProfile
 import functools
 import hashlib
 import io
-import json
 import logging
 import os
 import pstats
@@ -13,8 +12,6 @@ from pstats import SortKey
 from types import ModuleType
 from typing import TYPE_CHECKING
 
-import numpy as np
-from h5py import File
 from pydantic import BaseModel
 
 from .data_structures import DataPoint
@@ -140,34 +137,3 @@ def write_data_to_verified_json_file(state: "State", target_path: Path, data: Ba
     if isinstance(data, DataPoint):
         # Restore the previous actual value
         perm.value = perm_value  # pyright: ignore
-
-
-def read_in_files(state: "State"):
-    for parameter_name, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
-        if not isinstance(parameter.value, Path):
-            continue
-
-        try:
-            if parameter.value.suffix in [".H5", ".h5"]:
-                with File(parameter.value) as h5file:
-                    if parameter_name.title() not in h5file:
-                        raise KeyError("Could not find '%s' in the h5 file", parameter_name.title())
-                    parameter.value = np.array(h5file[parameter_name.title()])
-
-            elif parameter.value.suffix in [".json"]:
-                with open(parameter.value) as value_file:
-                    parameter.value = json.load(value_file)
-
-            elif parameter.value.suffix in [".txt", ""]:
-                with open(parameter.value) as value_file:
-                    parameter.value = value_file.read()
-
-            else:
-                msg = f"Don't know what to do with the extension '{parameter.value.suffix}'"
-                logging.error(msg)
-                raise ValueError(msg)
-
-        except (FileNotFoundError, PermissionError) as error:
-            raise OSError(f"Could not open value file '{parameter_name}' for parameter '{parameter.value}'") from error
-
-    return state

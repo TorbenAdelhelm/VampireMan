@@ -15,13 +15,16 @@ As a last step, the `vampireman.data_structures.HeatPump.injection_temp` and
 `vampireman.data_structures.ValueTimeSeries` values so they can be handled in a uniform way later.
 """
 
+import json
 import logging
+from pathlib import Path
 from typing import cast
 
 import numpy as np
+from h5py import File
 
 from ..data_structures import HeatPump, HeatPumps, Parameter, State, ValueTimeSeries
-from ..utils import create_dataset_and_datapoint_dirs, profile_function, read_in_files
+from ..utils import create_dataset_and_datapoint_dirs, profile_function
 from ..validation_stage.validation_stage import are_duplicate_locations_in_heatpumps
 from ..variation_stage.vary import generate_heatpump_location
 
@@ -132,4 +135,39 @@ def generate_heatpumps(state: State) -> State:
     logging.debug("Old heatpump_parameters: %s", state.heatpump_parameters)
     state.heatpump_parameters = new_heatpumps
     logging.debug("New heatpump_parameters: %s", state.heatpump_parameters)
+    return state
+
+
+def read_in_files(state: "State"):
+    """
+    This function iterates over all parameters
+    """
+
+    for parameter_name, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
+        if not isinstance(parameter.value, Path):
+            continue
+
+        try:
+            if parameter.value.suffix in [".H5", ".h5"]:
+                with File(parameter.value) as h5file:
+                    if parameter_name.title() not in h5file:
+                        raise KeyError("Could not find '%s' in the h5 file", parameter_name.title())
+                    parameter.value = np.array(h5file[parameter_name.title()])
+
+            elif parameter.value.suffix in [".json"]:
+                with open(parameter.value) as value_file:
+                    parameter.value = json.load(value_file)
+
+            elif parameter.value.suffix in [".txt", ""]:
+                with open(parameter.value) as value_file:
+                    parameter.value = value_file.read()
+
+            else:
+                msg = f"Don't know what to do with the extension '{parameter.value.suffix}'"
+                logging.error(msg)
+                raise ValueError(msg)
+
+        except (FileNotFoundError, PermissionError) as error:
+            raise OSError(f"Could not open value file '{parameter_name}' for parameter '{parameter.value}'") from error
+
     return state
