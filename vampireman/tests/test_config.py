@@ -91,3 +91,35 @@ def test_3d_param():
         state = State(**{"general": {"number_cells": [3]}})
     with pytest.raises(ValidationError):
         state = State(**{"general": {"number_cells": [1, 2, 3, 4]}})
+
+
+def test_heatpump_location():
+    with pytest.raises(ValidationError):
+        State(
+            **{
+                "heatpump_parameters": {
+                    "hp1": {
+                        "value": {
+                            "location": None,
+                            "injection_temp": 1,
+                            "injection_rate": 1,
+                        }
+                    },
+                },
+            },
+        )
+
+    State(
+        **{
+            "heatpump_parameters": {
+                "hp1": {
+                    "vary": "spatially_vary_within_datapoint",
+                    "value": {
+                        "location": None,
+                        "injection_temp": 1,
+                        "injection_rate": 1,
+                    },
+                },
+            },
+        },
+    )

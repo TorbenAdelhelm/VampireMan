@@ -250,7 +250,6 @@ class Parameter(BaseModel):
 
     @model_validator(mode="after")
     def check_heatpump_location(self):
-        # TODO write test
         """If HeatPump location is None, the vary mode must be SPACE"""
         if (
             isinstance(self.value, HeatPump)
