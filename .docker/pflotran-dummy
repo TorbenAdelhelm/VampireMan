@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+echo "This is a dummy PFLOTRAN"
+echo "Was called with arguments \"$@\""
+sleep 1
+cp /app/reference_files/pflotran.h5 .
