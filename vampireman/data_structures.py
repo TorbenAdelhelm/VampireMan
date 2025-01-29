@@ -371,6 +371,9 @@ class GeneralConfig(BaseModel):
     mute_simulation_output: bool = False
     """Some simulation tools produce output that can be muted. This option disables the output."""
 
+    skip_visualization: bool = False
+    """Whether to skip the visualization stage or not."""
+
     # This makes pydantic fail if there is extra data in the yaml settings file that cannot be parsed
     model_config = ConfigDict(extra="forbid")
 

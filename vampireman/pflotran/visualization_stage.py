@@ -20,6 +20,10 @@ def pflotran_time_to_year(time_step: str) -> float:
 
 
 def visualization_stage(state: State):
+    if state.general.skip_visualization:
+        logging.info("Skipping visualization stage as skip_visualization == True")
+        return
+
     if len(state.datapoints) == 0:
         logging.error("There are no datapoints that could be plotted. Did you skip the previous stages?")
 
