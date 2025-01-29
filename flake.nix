@@ -91,7 +91,7 @@
           };
 
           build_h5_file = pkgs.stdenvNoCC.mkDerivation {
-            pname = "buildH5File";
+            name = "buildH5File";
             src = ./.;
 
             nativeBuildInputs = [
@@ -134,7 +134,7 @@
 
         checks = {
           treefmt = pkgs.stdenvNoCC.mkDerivation {
-            pname = "treefmtTest";
+            name = "treefmtTest";
             src = ./.;
 
             doCheck = true;
@@ -154,7 +154,7 @@
           };
 
           ruff = pkgs.stdenvNoCC.mkDerivation {
-            pname = "ruff";
+            name = "ruff";
             src = ./.;
 
             doCheck = true;
@@ -169,7 +169,7 @@
           };
 
           pyright = pkgs.stdenvNoCC.mkDerivation {
-            pname = "pyright";
+            name = "pyright";
             src = ./.;
 
             doCheck = true;
@@ -187,7 +187,7 @@
           };
 
           check_h5_file = pkgs.stdenvNoCC.mkDerivation {
-            pname = "checkH5File";
+            name = "checkH5File";
             src = ./.;
 
             doCheck = true;
@@ -213,7 +213,7 @@
           };
 
           pytest = pkgs.stdenvNoCC.mkDerivation {
-            pname = "pytest";
+            name = "pytest";
             src = ./.;
 
             doCheck = true;
