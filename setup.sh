@@ -26,10 +26,17 @@ if [ ! -f "$NIX_BINARY_LOC" ]; then
 fi
 chmod 755 "$NIX_BINARY_LOC"
 
+echo "-- Where should the nix store be placed?"
+STORE_LOC_DEFAULT="/data/scratch/$(whoami)"
+read -p "(default is $STORE_LOC_DEFAULT) " STORE_LOC
+if [ -z "$STORE_LOC" ]; then
+    STORE_LOC="$STORE_LOC_DEFAULT"
+fi
+
 echo "-- Write the nix.conf file if it doesn't exist"
 if [ ! -f "$XDG_CONFIG_HOME/nix/nix.conf" ]; then
   cat <<EOF > "$XDG_CONFIG_HOME/nix/nix.conf"
-store = /data/scratch/$(whoami)
+store = $STORE_LOC
 experimental-features = nix-command flakes
 warn-dirty = false
 EOF
