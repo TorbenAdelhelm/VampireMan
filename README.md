@@ -4,10 +4,13 @@ This tool generates data sets based on user input.
 It allows a user to declaratively describe how parameters for a data set should be varied.
 
 The software is built in modular stages, forming a pipeline that passes and modifies data.
-When given a settings file, the program does the parameter variation for all data points and runs simulations (see #stages for more information).
+When given a settings file, the program does the parameter variation for all data points and runs simulations (see [stages](#stages) for more information).
 
 Currently, only the reference implementation of the simulation software `pflotran` is realized.
 The minimum required Python version is 3.11.
+
+After installing the dependencies, run `pdoc3 --http localhost:8080 vampireman` and open <http://localhost:8080> in your web browser to enter an interactive code documentation.
+For a developer documentation read the [DEV_README.md](./DEV_README.md) file.
 
 ## Quickstart
 
@@ -26,15 +29,21 @@ Depending on your environment, choose one of the following.
 ### Ubuntu
 
 1. Install at least Python 3.11 (e.g., `apt install python3`)
-1. Install poetry (e.g., `pip install poetry`)
+1. Install poetry (e.g., `apt install python3-poetry`)
+1. [Install PFLOTRAN 6.0.0](https://www.pflotran.org/documentation/user_guide/how_to/installation/installation.html)
 1. Clone this repository and `cd` into it
 1. Install the dependencies from the project root (i.e., `poetry install`)
 1. Enter a poetry shell (e.g., `poetry shell`)
-1. [Install pflotan 5.0.0](https://www.pflotran.org/documentation/user_guide/how_to/installation/installation.html)
 
-### Installing Nix on Uni Stuttgart IPVS Servers
+You can also have a look at the example [Dockerfile](./Dockerfile) to see how to get VampireMan running.
+
+### Installing Nix on a non-NixOS system
+
+This is primarily intended for installing Nix on Uni Stuttgart IPVS Servers.
 
 1. Clone the repository
+1. Make sure you have `wget` installed
+1. Read ./setup.sh and make sure you understand what it does
 1. Run `bash setup.sh` in the project root
 1. Log out and in again to apply the changes to the `PATH` environment variable
 1. Enter `nix develop` to load the Nix environment
@@ -42,6 +51,8 @@ Depending on your environment, choose one of the following.
 ### Nix
 
 1. If you have [Nix](https://nixos.org) and [direnv](https://direnv.net/) installed, simply enter the project root and type in `direnv allow`. Wait for a shell and you are done!
+
+If you don't have direnv, run `nix --experimental-features 'nix-command flakes' develop`.
 
 ## Stages
 
@@ -55,10 +66,10 @@ The proposed software has seven stages that are run in sequence, each processing
 - Simulation stage: In this stage, the simulation program is invoked, optionally with additional command line switches, depending on the user provided settings.
 - Visualization stage: After the simulation stage has completed, visualization stage renders the output of the simulations to facilitate understanding and analysis of the groundwater heat pump system's behavior.
 
-## Settings
+## Settings / Example Cases
 
 There are several example settings in [the settings directory](./settings).
-Those settings are written in [YAML](https://yaml.org/) represent test cases and are also semantically validated when running pytest.
+Those settings are written in [YAML](https://yaml.org/) represent test cases and are also semantically validated when running Pytest.
 These files can also include other files by specifying a file path as a value.
 Supported file formats are ASCII, JSON and HDF5.
 
