@@ -1,18 +1,22 @@
 # VampireMan
-This tool allows a user to describe how parameters for a data set should be varied.
-After describing which parameters should be varied in which manner, i.e. permeability should be a constant field, with values varying between 1 and 10, the program proceeds actually varying these parameters and also renders all files necessary to run the simulations afterwards.
-Then, the tool starts a simulation based on the rendered input files and finally visualizes the results.
 
-Currently, only the preparation for the simulation software `pflotran` is implemented.
+This tool generates data sets based on user input.
+It allows a user to declaratively describe how parameters for a data set should be varied.
 
+The software is built in modular stages, forming a pipeline that passes and modifies data.
+When given a settings file, the program does the parameter variation for all data points and runs simulations (see #stages for more information).
+
+Currently, only the reference implementation of the simulation software `pflotran` is realized.
 The minimum required Python version is 3.11.
 
 ## Quickstart
 
-After installing the dependencies, you can run the most basic default case by executing `python -m vampireman`.
-This command interactively guides you through the preparation stages of the pipeline and renders all files needed to execute a pflotran simulation to the directory specified by `output_directory` in the states `general` section (which is by default the date in UTC ISO 8601 format `./datasets_out/2024-08-17T10:06:15+00:00`).
+After installing the dependencies (#installation-of-the-software), you can run the default case ([settings](#settings)) by executing `python -m vampireman`.
+This command interactively guides you through the stages of the pipeline.
+It also renders all files needed to execute a PFLOTRAN simulation to the `output_directory`, which is by default the date in UTC ISO 8601 format `./datasets_out/2024-08-17T10:06:15+00:00`.
+Afterwards, the simulations are run and the simulation results are visualized.
 
-When the program has exited successfully, `cd datasets_out/<name of the output directory>` into the directory and look at the results.
+When the program has exited successfully, `cd <name of the output directory>` into the directory and look at the results.
 
 ## Installation of the Software
 
