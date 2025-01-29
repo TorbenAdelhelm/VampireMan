@@ -14,6 +14,7 @@ As a last step, the `vampireman.data_structures.HeatPump.injection_temp` and
 `vampireman.data_structures.HeatPump.injection_rate` values are converted to
 `vampireman.data_structures.ValueTimeSeries` values so they can be handled in a uniform way later.
 """
+
 import logging
 from typing import cast
 
