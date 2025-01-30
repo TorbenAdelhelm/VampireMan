@@ -14,6 +14,11 @@ def make_perlin_grid(
     offset: NDArray[np.floating[Any]],
     freq: list[float],
 ) -> NDArray[np.floating[Any]]:
+    """
+    Generate a perlin grid in the size of the domain as a numpy array.
+    Values are calculated between the `aimed_min` and `aimed_max`.
+    """
+
     grid_dimensions: list[int] = state.general.number_cells.tolist()  # pyright: ignore
 
     # adapted by Manuel Hirche
@@ -52,6 +57,12 @@ def make_perlin_grid(
 
 
 def create_perlin_field(state: State, parameter: Parameter):
+    """
+    Creates a perlin field for a data point from a `vampireman.data_structures.Parameter`.
+    If the `vampireman.data_structures.ValuePerlin.frequency` is a `vampireman.data_structures.ValueMinMax`, random
+    values will be calculated.
+    """
+
     base_offset = state.get_rng().random(3) * 4242
 
     if not isinstance(parameter.value, ValuePerlin):
@@ -100,6 +111,10 @@ def create_perlin_field(state: State, parameter: Parameter):
 
 
 def create_const_field(state: State, value: float | NDArray):
+    """
+    Create a constant field, as large as the domain, with the same `value` for each cell.
+    """
+
     if np.size(value) > 1:
         value = value.reshape(state.general.number_cells)  # pyright: ignore
     return np.full(cast(np.ndarray, state.general.number_cells), value)
@@ -108,10 +123,14 @@ def create_const_field(state: State, value: float | NDArray):
 def calc_pressure_from_gradient_field(
     gradient_field: NDArray[np.floating[Any]], state: State, parameter: Parameter
 ) -> NDArray[np.floating[Any]]:
-    # XXX: is this function correctly implemented?
+    """
+    This function calculates a pressure field from a gradient field.
+
+    WARNING: It is unclear if this function is implemented correctly.
+    """
 
     value = parameter.value
-    assert isinstance(value, ValueMinMax)
+    assert isinstance(value, ValueMinMax | ValuePerlin)
 
     # scale pressure field to min and max values from state
     current_min = np.min(gradient_field)

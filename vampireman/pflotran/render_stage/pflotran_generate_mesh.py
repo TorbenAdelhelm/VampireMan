@@ -8,6 +8,11 @@ from ...data_structures import State
 
 
 def write_mesh_and_border_files(state: State, output_dir: Path) -> None:
+    """
+    Generate and write ASCII mesh and boundary files for PFLOTRAN to the `output_dir`.
+    Called once per data set as the files don't change across data points.
+    """
+
     write_lines_to_file("mesh.uge", render_mesh(state), output_dir)
 
     north, east, south, west = render_borders(state)
@@ -20,22 +25,33 @@ def write_mesh_and_border_files(state: State, output_dir: Path) -> None:
 
 
 def write_lines_to_file(file_name: str, output_strings: list[str], output_dir: Path):
+    """
+    Writes the given lines of `str` to a file.
+    """
     with open(f"{output_dir}/{file_name}", "w", encoding="utf8") as file:
         file.writelines(output_strings)
 
 
 def render_mesh(state: State) -> list[str]:
+    """
+    Generates the contents of a PFLOTRAN mesh.uge file.
+
+    The specific file format is:
+
+    ```
+    CELLS <number of cells>
+    <cell id> <x> <y> <z> <volume>
+    ...
+    CONNECTIONS <number of connections>
+    <cell id a> <cell id b> <face center coordinate x> <face y> <face z> <area of the face>
+    ```
+    """
+
     xGrid, yGrid, zGrid = cast(np.ndarray, state.general.number_cells)
     resolution = state.general.cell_resolution
 
     volume = resolution**3
     face_area = resolution**2
-
-    # CELLS <number of cells>
-    # <cell id> <x> <y> <z> <volume>
-    # ...
-    # CONNECTIONS <number of connections>
-    # <cell id a> <cell id b> <face center coordinate x> <face y> <face z> <area of the face>
 
     output_string_cells = ["CELLS " + str(xGrid * yGrid * zGrid)]
     output_string_connections = [
@@ -80,6 +96,21 @@ def render_mesh(state: State) -> list[str]:
 
 
 def render_borders(state: State):
+    """
+    Render the PFLOTRAN boundary files
+
+    - east.ex
+    - west.ex
+    - north.ex
+    - south.ex
+
+    The file format is
+
+    ```
+    CONNECTIONS <number of connections>
+    <cell id> <face center coordinate x> <face y> <face z> <area of the face>
+    ```
+    """
     x_grid, y_grid, z_grid = cast(np.ndarray, state.general.number_cells)
     resolution = state.general.cell_resolution
 

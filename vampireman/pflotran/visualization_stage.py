@@ -1,3 +1,12 @@
+"""
+PFLOTRAN implementation of the visualization stage.
+It reads in pflotran.h5 files and generates three images:
+
+- the permeability field from three angles in three dimensions
+- temperature fields as isolines for each of the output time steps
+- all the properties that PFLOTRAN stores into the pflotran.h5 file
+"""
+
 import logging
 from collections import OrderedDict
 from pathlib import Path
@@ -12,14 +21,22 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from ..data_structures import Data, State
 
 TimeData = OrderedDict[str, dict[str, Any]]
+"""
+This data structure is used to store plottable data in a typed manner.
+"""
 
 
 def pflotran_time_to_year(time_step: str) -> float:
-    # Get year from '   3 Time  5.00000E+00 y'
+    """
+    Get year from PFLOTRAN hdf5 files such as '   3 Time  5.00000E+00 y' -> 5.0
+    """
     return float(time_step.split(" ")[-2])
 
 
 def visualization_stage(state: State):
+    """
+    Runs the stage.
+    """
     if state.general.skip_visualization:
         logging.info("Skipping visualization stage as skip_visualization == True")
         return
@@ -41,6 +58,11 @@ def visualization_stage(state: State):
 
 
 def make_plottable(state: State, hdf5_file: h5py.File) -> TimeData:
+    """
+    This function can be called to read a PFLOTRAN hdf5 file and store the data in an organized manner into a `TimeData`
+    data structure.
+    """
+
     dimensions = cast(np.ndarray, state.general.number_cells)
 
     datapoints_to_plot: TimeData = OrderedDict()
@@ -60,6 +82,12 @@ def make_plottable(state: State, hdf5_file: h5py.File) -> TimeData:
 
 
 def plot_y(data: TimeData, path: Path):
+    """
+    Iterates over all PFLOTRAN properties and plots them into a large image.
+    Each line is the output of a certain PFLOTRAN output time step, whereas each column represents a different PFLOTRAN
+    property.
+    """
+
     rows = len(data)
     key, val = data.popitem()
     cols = len(val)
@@ -87,6 +115,10 @@ def plot_y(data: TimeData, path: Path):
 
 
 def plot_isolines(state: State, data: TimeData, path: Path):
+    """
+    Plots the temperature fields as isolines.
+    """
+
     rows = len(data)
     _, axes = plt.subplots(rows, 1, figsize=(20, 5 * rows))
 
@@ -133,11 +165,19 @@ def plot_isolines(state: State, data: TimeData, path: Path):
 
 
 def aligned_colorbar(*args, **kwargs):
+    """
+    Adds a colorbar to the right of a figure.
+    """
+
     cax = make_axes_locatable(plt.gca()).append_axes("right", size=0.3, pad=0.05)
     plt.colorbar(*args, cax=cax, **kwargs)
 
 
 def plot_vary_field(state: State, datapoint_dir: Path, parameter: Data):
+    """
+    Plots the perlin field from three view angles.
+    """
+
     fig, axes = plt.subplots(2, 2, figsize=(10, 6))
     fig.suptitle(f"{parameter.name.title()} perlin field")
     axes = axes.ravel()

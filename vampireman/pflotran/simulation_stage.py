@@ -8,8 +8,10 @@ from ..utils import get_answer
 
 
 def simulation_stage(state: State):
-    """Runs the pflotran simulation. The function changes the cwd into each of the datapoints directories. Then,
-    in the respective datapoint dir, it runs the pflotran simulation either with mpirun or directly depending on
+    """
+    Runs the pflotran simulation.
+    The function changes the cwd into each of the datapoints directories.
+    Then, in the respective datapoint dir, it runs the pflotran simulation either with mpirun or directly depending on
     `vampireman.data_structures.GeneralConfig.mpirun`.
     """
 

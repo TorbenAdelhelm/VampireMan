@@ -22,13 +22,21 @@ from .vary_perlin import create_perlin_field
 
 
 def copy_parameter(state: State, parameter: Parameter) -> Data:
-    """This function simply copies all values from a `Parameter` to a `Data` object without any transformation"""
+    """
+    This function simply copies all values from a `Parameter` to a `Data` object without any transformation.
+    """
+
     if isinstance(parameter.value, HeatPump):
         return vary_heatpump(state, parameter)
     return Data(name=parameter.name, value=deepcopy(parameter.value))
 
 
 def vary_heatpump(state: State, parameter: Parameter) -> Data:
+    """
+    This function calculates operational parameters for `vampireman.data_structures.HeatPump`s.
+    If the `vampireman.data_structures.Vary` mode is SPACE, the location will be drawn randomly.
+    """
+
     hp = deepcopy(parameter.value)
     assert isinstance(hp, HeatPump)
 
@@ -36,9 +44,9 @@ def vary_heatpump(state: State, parameter: Parameter) -> Data:
 
     result_location = np.array(hp.location)
     if parameter.vary == Vary.SPACE:
-        # This is needed as we need to calculate the heatpump coordinates for pflotran.in
-        result_location = generate_heatpump_location(state)
+        result_location = generate_heatpump_location(state)  # XXX: Is this handling location clashes correctly?
         resolution = state.general.cell_resolution
+        # This is needed as we need to calculate the heatpump coordinates for pflotran.in
         result_location = (np.array(result_location) - 1) * resolution + (resolution * 0.5)
 
     return Data(
@@ -52,9 +60,12 @@ def vary_heatpump(state: State, parameter: Parameter) -> Data:
 
 
 def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
-    """This function does the variation of `Parameter`s. It does so by implementing a large match-case that in turn
-    invokes other functions that then work on the `Parameter.value` based on the `Parameter.vary` type.
     """
+    This function does the variation of `vampireman.data_structures.Parameter`s.
+    It does so by implementing a large match-case that in turn invokes other functions that then work on the
+    `vampireman.data_structures.Parameter.value` based on the `vampireman.data_structures.Parameter.vary` type.
+    """
+
     assert not isinstance(parameter.value, HeatPumps)
     match parameter.vary:
         case Vary.FIXED:
@@ -115,7 +126,12 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
 
 
 def handle_heatpump_values(rand: np.random.Generator, hp_data: HeatPump) -> HeatPump:
-    """Normalize the given value to a `ValueTimeSeries` with values that lay between the given min/max values."""
+    """
+    Processes each entry of the `vampireman.data_structures.ValueTimeSeries` in the operational heat pump parameters in
+    sequence.
+    If the value is a scalar, it is left as-is, if it is a `vampireman.data_structures.ValueMinMax`, a random value is
+    calculated.
+    """
 
     assert isinstance(hp_data.injection_temp, ValueTimeSeries)
     assert isinstance(hp_data.injection_rate, ValueTimeSeries)
@@ -136,13 +152,20 @@ def handle_heatpump_values(rand: np.random.Generator, hp_data: HeatPump) -> Heat
 
 
 def generate_heatpump_location(state: State) -> list[float]:
+    """
+    Return a list of three random float values, cell based.
+    """
+
     random_vector = state.get_rng().random(3)
     random_location = random_vector * cast(np.ndarray, state.general.number_cells)
     return cast(list[float], np.ceil(random_location).tolist())
 
 
 def vary_params(state: State) -> State:
-    """Calls the `vary_parameter` function for each datapoint sequentially."""
+    """
+    Calls the `vary_parameter()` function for each `vampireman.data_structures.Parameter` in each
+    `vampireman.data_structures.Datapoint` sequentially.
+    """
 
     for datapoint_index in range(state.general.number_datapoints):
         data = {}
@@ -163,9 +186,12 @@ def vary_params(state: State) -> State:
 
 
 def shuffle_datapoints(state: State) -> State:
-    """Shuffles all `Parameter`s randomly in between the different `DataPoint`s. This is needed when e.g. two
-    parameters are generated as `Vary.CONST` with `ValueMinMax`, as otherwise they would both have min
-    values in the first `DataPoint` and max values in the last one.
+    """
+    Shuffles all `vampireman.data_structures.Parameter`s randomly in between the different
+    `vampireman.data_structures.DataPoint`s.
+    This is needed when e.g. two parameters are generated as `vampireman.data_structures.Vary.CONST` with
+    `vampireman.data_structures.ValueMinMax`, as otherwise they would both have min values in the first
+    `vampireman.data_structures.DataPoint` and max values in the last one.
     """
 
     parameters: dict[str, list[Data]] = {}

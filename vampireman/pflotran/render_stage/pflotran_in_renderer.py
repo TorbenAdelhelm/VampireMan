@@ -1,3 +1,9 @@
+"""
+PFLOTRAN implementation of the render stage.
+This stage generates all necessary input files to run PFLOTRAN simulations, i.e., the `mesh.uge` file, boundary `.ex`
+files, the `pflotran.in` file and also any `.h5` files.
+"""
+
 import logging
 import pathlib
 import warnings
@@ -16,8 +22,10 @@ from .pflotran_generate_mesh import write_mesh_and_border_files
 
 
 def render_stage(state: State):
-    """Render all files needed for pflotran to run. This means, `write_mesh_and_border_files`, rendering the
-    pflotran.in file and rendering the permeability field with `save_vary_field`.
+    """
+    Render all files needed for pflotran to run.
+    This means, `write_mesh_and_border_files`, rendering the pflotran.in file and rendering the permeability field with
+    `save_vary_field`.
     """
 
     write_mesh_and_border_files(state, state.general.output_directory)
@@ -62,6 +70,11 @@ def render_stage(state: State):
 
 
 def save_vary_field(filename, number_cells, cells, parameter_name: str = "permeability"):
+    """
+    Writes the `.h5` field file for the given `parameter_name`.
+    The values for the file were calculated during the variation stage.
+    """
+
     n = number_cells[0] * number_cells[1] * number_cells[2]
     # create integer array for cell ids
     iarray = np.arange(n, dtype="i4")
