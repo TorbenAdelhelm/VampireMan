@@ -10,6 +10,7 @@ from vampireman.data_structures import (
     ValueTimeSeries,
     Vary,
 )
+from vampireman.validation_stage.validation_stage import are_duplicate_locations_in_heatpumps
 
 
 def test_prepare_heatpump():
@@ -90,3 +91,21 @@ def test_prepare_heatpump_name_clash():
 
     with pytest.raises(ValueError):
         preparation_stage(state)
+
+
+def test_duplicate_hp_locs():
+    # heat pumps have same location
+    assert are_duplicate_locations_in_heatpumps(
+        [
+            HeatPump(location=[16, 32, 1], injection_temp=10.5, injection_rate=0.002),
+            HeatPump(location=[16, 32, 1], injection_temp=10.5, injection_rate=0.002),
+        ]
+    )
+
+    # heat pumps have different location
+    assert not are_duplicate_locations_in_heatpumps(
+        [
+            HeatPump(location=[32, 16, 1], injection_temp=10.5, injection_rate=0.002),
+            HeatPump(location=[16, 32, 1], injection_temp=10.5, injection_rate=0.002),
+        ]
+    )

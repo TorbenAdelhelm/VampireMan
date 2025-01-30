@@ -40,7 +40,6 @@ def validation_stage(state: State) -> State:
 
 def are_duplicate_locations_in_heatpumps(heatpumps: list[HeatPump]) -> bool:
     """Check that no heatpumps have the same location."""
-    # TODO write test for this
     heatpump_locations = set()
     duplicates_detected = False
 
