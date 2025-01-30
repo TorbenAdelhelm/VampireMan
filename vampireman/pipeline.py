@@ -1,5 +1,5 @@
 """
-This is the pipeline that executes the seven stages of vampireman in their order.
+This is the pipeline that executes the seven stages of VampireMan in their order.
 The stages are:
 
 1. `vampireman.loading_stage.loading_stage.loading_stage`
@@ -12,7 +12,8 @@ The stages are:
 
 When running interactively (depending on `vampireman.data_structures.GeneralConfig.interactive`), the execution flow
 will be interrupted after the `validation_stage` and after printing the resulting `State` object, asking the user if the
-pipeline should continue. If the user denies, vampireman will exit.
+pipeline should continue.
+If the user denies, VampireMan will exit.
 """
 
 import logging
@@ -30,6 +31,7 @@ from .visualization_stage import visualization_stage
 
 def run(args: Namespace):
     """Runs all pipeline stages."""
+
     logging.debug("Running all stages now.")
     state = loading_stage(args)
     state = preparation_stage(state)

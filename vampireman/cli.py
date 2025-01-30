@@ -6,8 +6,10 @@ from . import pipeline
 
 
 def invoke_vampireman():
-    """This function takes care of parsing command line arguments and also adjusts the log level. Afterwards, it
-    calls `vampireman.pipeline.run()` to start the execution flow of the pipeline."""
+    """
+    This function takes care of parsing command line arguments and also adjusts the log level.
+    Afterwards, it calls `vampireman.pipeline.run()` to start the execution flow of the pipeline.
+    """
     parser = argparse.ArgumentParser(
         prog="python3 -m vampireman",
         description="This program implements a pipeline that varies parameters for a simulation in a structured way",

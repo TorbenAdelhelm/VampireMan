@@ -1,3 +1,7 @@
+"""
+This submodule encompasses utility functions that can be used throughout the code base.
+"""
+
 import cProfile
 import functools
 import hashlib
@@ -21,8 +25,9 @@ if TYPE_CHECKING:
 
 
 def get_answer(state: "State", question: str, exit_if_no: bool = False) -> bool:
-    """Ask a yes/no question on the command line and return True if the answer is yes and False if the answer is
-    no. When CTRL+C is detected, the function will terminate the whole program returning an exit code of 0.
+    """
+    Ask a yes/no question on the command line and return True if the answer is yes and False if the answer is no.
+    When CTRL+C is detected, the function will terminate the whole program returning an exit code of 0.
     """
 
     if not state.general.interactive:
@@ -42,7 +47,11 @@ def get_answer(state: "State", question: str, exit_if_no: bool = False) -> bool:
 
 
 def get_sim_tool_implementation(sim_tool: str) -> ModuleType:
-    # Get simulation tool specific defaults
+    """
+    Returns a submodule, based on the switch-case value.
+    Raises a `NotImplementedError` when the implementation could not be found.
+    """
+
     match sim_tool:
         case "pflotran":
             from . import pflotran
@@ -54,6 +63,18 @@ def get_sim_tool_implementation(sim_tool: str) -> ModuleType:
 
 
 def profile_function(function):
+    """
+    This function wrapper can be used to profile other functions.
+    To use, simply write
+
+    @profile_function
+    def my_function():
+        pass
+
+    This will write profiling information to the ./profiling directory and also print timings for the wrapped function.
+    Profiling does not work when profiling is already enabled, so make sure not to nest profiled functions.
+    """
+
     @functools.wraps(function)
     def wrapper(*args):
         state: State = args[0]
@@ -90,6 +111,10 @@ def profile_function(function):
 
 
 def create_dataset_and_datapoint_dirs(state: "State"):
+    """
+    For each of the `DataPoint`s create a directory.
+    """
+
     for index in range(state.general.number_datapoints):
         datapoint_dir = state.general.output_directory / f"datapoint-{index}"
         try:
@@ -100,8 +125,11 @@ def create_dataset_and_datapoint_dirs(state: "State"):
 
 
 def write_data_to_verified_json_file(state: "State", target_path: Path, data: BaseModel):
-    """Write a `pydantic.main.BaseModel` to a file and ask the user how to proceed, if there is already a file present
-    with different contents than the data that is represented in `data`. The data will be written in json format."""
+    """
+    Write a `pydantic.main.BaseModel` to a file and ask the user how to proceed, if there is already a file present
+    with different contents than the data that is represented in `data`.
+    The data will be written in JSON format.
+    """
 
     need_to_write_file = True
 
