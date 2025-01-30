@@ -34,6 +34,8 @@ def loading_stage(arguments: argparse.Namespace) -> State:
         run_state.general.interactive = False
 
     if run_state.general.interactive:
+        logging.info("Running interactively")
+    else:
         logging.info("Running non-interactively")
 
     logging.debug("Resulting state of load_state: %s", run_state)
