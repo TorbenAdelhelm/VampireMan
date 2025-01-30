@@ -10,7 +10,7 @@ Currently, only the reference implementation of the simulation software `pflotra
 The minimum required Python version is 3.11.
 
 After installing the dependencies, run `pdoc3 --http localhost:8080 vampireman` and open <http://localhost:8080> in your web browser to enter an interactive code documentation.
-For a developer documentation read the [DEV_README.md](./DEV_README.md) file.
+For a developer documentation read the [DEV_README.md](./docs/DEV_README.md) file.
 
 ## Quickstart
 
@@ -20,6 +20,8 @@ It also renders all files needed to execute a PFLOTRAN simulation to the `output
 Afterwards, the simulations are run and the simulation results are visualized.
 
 When the program has exited successfully, `cd <name of the output directory>` into the directory and look at the results.
+
+Also, have a look at the [tutorial](./docs/TUTORIAL.md).
 
 ## Installation of the Software
 

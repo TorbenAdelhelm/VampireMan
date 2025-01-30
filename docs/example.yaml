@@ -1,0 +1,46 @@
+# Basic setting with
+# - one fix heat pump
+# - two generated heat pumps,
+# - two data points
+# - interactive mode
+# - mpirun with as many processors as the system has
+# - spatially varying permeability field
+# - constant temperature, in one dp its 8 and in the other 10 degrees celsius
+
+general:
+  number_cells: [32, 256, 1]
+  cell_resolution: 5.0 # this is the default, so it could be left out
+  interactive: true # this is the default, so it could be left out
+  output_directory: ./datasets_out/example
+  number_datapoints: 2
+  mpirun_procs: null # default would be 1
+heatpump_parameters:
+  hp1:
+    vary: fixed
+    value:
+      location: [16, 32, 1]
+      injection_temp: 15
+      injection_rate: 0.00024
+  hps:
+    vary: spatially_vary_within_datapoint
+    value:
+      number: 2
+      injection_temp:
+        min: 12
+        max: 14
+      injection_rate:
+        min: 0.00002
+        max: 0.0002
+hydrogeological_parameters:
+  permeability:
+    vary: spatially_vary_within_datapoint
+    distribution: logarithmic
+    value:
+      frequency: [18, 18, 18]
+      max: 5.1e-09
+      min: 1.02e-11
+  temperature:
+    vary: const_within_datapoint
+    value:
+      min: 8
+      max: 10
