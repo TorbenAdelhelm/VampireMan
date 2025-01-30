@@ -31,6 +31,8 @@ from ..variation_stage.vary import generate_heatpump_location
 
 @profile_function
 def preparation_stage(state: State) -> State:
+    """Run the stage."""
+
     create_dataset_and_datapoint_dirs(state)
     state = read_in_files(state)
     state = generate_heatpumps(state)
@@ -40,9 +42,8 @@ def preparation_stage(state: State) -> State:
 
 
 def handle_time_based_params(state: State) -> State:
-    """Convert specific parameters to time based entries."""
+    """Convert operational `vampireman.data_structures.HeatPump` parameter values to time based entries."""
 
-    # Convert heatpumps to time based values
     for _, heatpump in state.heatpump_parameters.items():
         assert isinstance(heatpump.value, HeatPump)
         if not isinstance(heatpump.value.injection_temp, ValueTimeSeries):
@@ -54,7 +55,8 @@ def handle_time_based_params(state: State) -> State:
 
 
 def calculate_hp_coordinates(state: State) -> State:
-    """Calculate the coordinates of each heatpump by multiplying with the cell_resolution"""
+    """Calculate the coordinates of each `vampireman.data_structures.HeatPump` by multiplying with the
+    cell_resolution"""
 
     for _, hp_data in state.heatpump_parameters.items():
         assert isinstance(hp_data.value, HeatPump)
@@ -76,10 +78,12 @@ def calculate_hp_coordinates(state: State) -> State:
 
 
 def generate_heatpumps(state: State) -> State:
-    """Generate `HeatPump`s from the given `HeatPumps` parameter. This function will remove all `HeatPumps` from
-    `State.heatpump_parameters` and add `HeatPumps.number` `HeatPump`s to the dict. The `HeatPump.injection_temp` and
-    `HeatPump.injection_rate` values are simply taken from a random number between the respective min and max values.
-    """
+    """Generate `vampireman.data_structures.HeatPump`s from the given `vampireman.data_structures.HeatPumps` parameter.
+    This function will remove all `vampireman.data_structures.HeatPumps` from
+    `vampireman.data_structures.State.heatpump_parameters` and add `HeatPumps.number`
+    `vampireman.data_structures.HeatPump`s to the dict. The `vampireman.data_structures.HeatPump.injection_temp` and
+    `vampireman.data_structures.HeatPump.injection_rate` values are simply taken from a random number between the
+    respective min and max values."""
 
     new_heatpumps: dict[str, Parameter] = {}
 
@@ -140,7 +144,14 @@ def generate_heatpumps(state: State) -> State:
 
 def read_in_files(state: "State"):
     """
-    This function iterates over all parameters
+    This function iterates over all parameters and reads in all values that are file paths.
+    Supported file extensions are H5, h5, json, txt and "".
+
+    HDF5 files are expected to have one HDF5 data set by the name of the `Parameter.name` in title case.
+
+    JSON files are parsed into a `Parameter.
+
+    Text files (also files without an extension == "") are also parsed.
     """
 
     for parameter_name, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
