@@ -1,3 +1,10 @@
+"""
+This stage ensures the `vampireman.data_structures.State` object is correct.
+More specifically, it checks that `pressure_gradient`, `permeability` and `temperature` are set.
+Also, this stage checks for duplicate `vampireman.data_structures.HeatPump` locations and if there are any heat pumps in
+the data set at all.
+"""
+
 import logging
 
 from ..data_structures import HeatPump, HeatPumps, State
@@ -6,6 +13,10 @@ from ..utils import profile_function, write_data_to_verified_json_file
 
 @profile_function
 def validation_stage(state: State) -> State:
+    """
+    Runs the stage.
+    """
+
     pressure_gradient = state.hydrogeological_parameters.get("pressure_gradient")
     permeability = state.hydrogeological_parameters.get("permeability")
     temperature = state.hydrogeological_parameters.get("temperature")
@@ -39,7 +50,11 @@ def validation_stage(state: State) -> State:
 
 
 def are_duplicate_locations_in_heatpumps(heatpumps: list[HeatPump]) -> bool:
-    """Check that no heatpumps have the same location."""
+    """
+    Check that no heatpumps have the same location.
+    Returns False if there are no duplicates, True if there are.
+    """
+
     heatpump_locations = set()
     duplicates_detected = False
 
