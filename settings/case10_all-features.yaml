@@ -15,6 +15,7 @@ general:
   mpirun: true
   mpirun_procs: null
   mute_simulation_output: true
+  skip_visualization: false
 heatpump_parameters:
   hp1:
     vary: fixed
