@@ -35,7 +35,7 @@ Depending on your environment, choose one of the following.
 1. [Install PFLOTRAN 6.0.0](https://www.pflotran.org/documentation/user_guide/how_to/installation/installation.html)
 1. Clone this repository and `cd` into it
 1. Install the dependencies from the project root (i.e., `poetry install`)
-1. Enter a poetry shell (e.g., `poetry shell`)
+1. Enter a poetry shell (e.g., `poetry shell`, in newer versions: `eval $(poetry env activate)`)
 
 You can also have a look at the example [Dockerfile](./Dockerfile) to see how to get VampireMan running.
 
