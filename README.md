@@ -32,7 +32,7 @@ Depending on your environment, choose one of the following.
 
 1. Install at least Python 3.11 (e.g., `apt install python3`)
 1. Install poetry (e.g., `apt install python3-poetry` or `pip install poetry` if no root rights)
-1. [Install PFLOTRAN 6.0.0](https://www.pflotran.org/documentation/user_guide/how_to/installation/installation.html)
+1. [Install PFLOTRAN 6.0.0](https://www.pflotran.org/documentation/user_guide/how_to/installation/installation.html) and remember to include the PFLOTRAN executable in your `PATH` (e.g. by `export PATH="$PFLOTRAN_DIR/bin:$PATH"`)
 1. Clone this repository and `cd` into it
 1. Install the dependencies from the project root (i.e., `poetry install`)
 1. Enter a poetry shell (e.g., `poetry shell`, in newer versions: `eval $(poetry env activate)`)
