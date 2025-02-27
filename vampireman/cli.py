@@ -28,5 +28,5 @@ def invoke_vampireman():
 
     logging.debug("Arguments are: %s", args)
 
-    logging.info("Staring up")
+    logging.info("Starting up")
     pipeline.run(args)
