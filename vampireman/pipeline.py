@@ -23,7 +23,7 @@ from .loading_stage import loading_stage
 from .preparation_stage import preparation_stage
 from .render_stage import render_stage
 from .simulation_stage import simulation_stage
-from .utils import get_answer
+from .utils import get_answer, copy_settings_to_yaml
 from .validation_stage import validation_stage
 from .variation_stage import variation_stage
 from .visualization_stage import visualization_stage
@@ -35,6 +35,7 @@ def run(args: Namespace):
     logging.debug("Running all stages now.")
     state = loading_stage(args)
     state = preparation_stage(state)
+    copy_settings_to_yaml(args, state)
     state = validation_stage(state)
 
     print("This is the state that is going to be used:")
