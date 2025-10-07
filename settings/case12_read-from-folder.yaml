@@ -24,17 +24,8 @@ heatpump_parameters:
       injection_rate: 0.00024
 hydrogeological_parameters:
   permeability:
-      vary: spatially_vary_within_datapoint
-      distribution: logarithmic
-      value:
-        frequency:
-          min: 18
-          max: 19
-        max: 5.09683995922528e-09
-        min: 1.0193679918450561e-11
-  # permeability:
-  #   vary: list
-  #   value: ./settings/case12_inputs/permeability_fields #./settings/case7_inputs/permeability_field.h5
+    vary: list
+    value: ./settings/case12_inputs/permeability_fields #./settings/case7_inputs/permeability_field.h5
   pressure_gradient:
     vary: fixed
     value: ./settings/case7_inputs/pressure_gradient.txt
