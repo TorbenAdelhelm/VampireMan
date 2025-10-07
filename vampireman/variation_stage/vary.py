@@ -121,6 +121,12 @@ def vary_parameter(state: State, parameter: Parameter, index: int) -> Data:
                 )
             else:
                 raise NotImplementedError(f"Dont know how to vary {parameter}")
+                
+        case Vary.LIST:
+            data = data = Data(
+                    name=parameter.name,
+                    value=deepcopy(parameter.value[index]),
+                )
 
     return data
 

@@ -15,6 +15,7 @@ As a last step, the `vampireman.data_structures.HeatPump.injection_temp` and
 `vampireman.data_structures.ValueTimeSeries` values so they can be handled in a uniform way later.
 """
 
+import os
 import json
 import logging
 from pathlib import Path
@@ -157,7 +158,7 @@ def read_in_files(state: "State"):
     for parameter_name, parameter in (state.hydrogeological_parameters | state.heatpump_parameters).items():
         if not isinstance(parameter.value, Path):
             continue
-
+            
         try:
             if parameter.value.suffix in [".H5", ".h5"]:
                 with File(parameter.value) as h5file:
@@ -169,9 +170,22 @@ def read_in_files(state: "State"):
                 with open(parameter.value) as value_file:
                     parameter.value = json.load(value_file)
 
-            elif parameter.value.suffix in [".txt", ""]:
+            elif parameter.value.suffix in [".txt"]:
                 with open(parameter.value) as value_file:
                     parameter.value = value_file.read()
+            
+            elif parameter.value.suffix == "":
+                if os.path.isdir(parameter.value):
+                    value_list = []
+                    for file_path in parameter.value.iterdir():
+                        if file_path.is_file():
+                            with File(file_path) as value_file:
+                                data = np.array(value_file[parameter_name.title()])
+                            value_list.append(data)
+                    parameter.value = value_list
+                else:
+                    with open(parameter.value) as value_file:
+                        parameter.value = value_file.read()
 
             else:
                 msg = f"Don't know what to do with the extension '{parameter.value.suffix}'"

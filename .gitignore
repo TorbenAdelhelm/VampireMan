@@ -178,3 +178,6 @@ pflotran.h5
 /html
 *.jsonschema
 /profiling
+
+#bash
+bashrc.my

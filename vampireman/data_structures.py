@@ -73,6 +73,8 @@ class Vary(enum.StrEnum):
     E.g., this could be the permeability that varies within the `DataPoint` with a perlin noise function.
     """
 
+    LIST = "list"
+
 
 class SimTool(enum.StrEnum):
     """
@@ -660,8 +662,8 @@ class State(BaseModel):
 
         # Override with True where value is a Path to a file
         if permeability is not None and isinstance(permeability.value, Path):
-            if not permeability.vary == Vary.FIXED:
-                raise ValueError("When providing a Path, vary mode must be FIXED")
+            if not (permeability.vary == Vary.FIXED or permeability.vary == Vary.LIST):
+                raise ValueError("When providing a Path, vary mode must be FIXED or LIST")
             permeability = True
         else:
             permeability = False
@@ -679,10 +681,10 @@ class State(BaseModel):
             temperature = False
 
         # If any of the parameters is True, all must be. Otherwise if none is True, its also fine
-        if not (permeability == pressure_gradient == temperature):
-            raise ValueError(
-                "If any of the parameters `permeability`, `pressure_gradient` or `temperature` is a Path, all must be"
-            )
+        # if not (permeability == pressure_gradient == temperature):
+        #     raise ValueError(
+        #         "If any of the parameters `permeability`, `pressure_gradient` or `temperature` is a Path, all must be"
+        #     )
 
         return self
 
